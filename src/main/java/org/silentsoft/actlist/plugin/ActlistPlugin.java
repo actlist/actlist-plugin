@@ -1,5 +1,6 @@
 package org.silentsoft.actlist.plugin;
 
+import java.net.URL;
 import java.util.HashMap;
 
 import javafx.fxml.FXMLLoader;
@@ -73,10 +74,24 @@ public abstract class ActlistPlugin {
 		return pluginDescription;
 	}
 	
+	private URL getFXML() {
+		return getClass().getResource(getClass().getSimpleName().concat(".fxml"));
+	}
+	
+	public boolean existsGraphic() {
+		boolean result = true;
+		try {
+			getFXML().openStream().close();
+		} catch (Exception e) {
+			result = false;
+		}
+		return result;
+	}
+	
 	private Node graphic;
 	public Node getGraphic() throws Exception {
 		if (graphic == null) {
-			FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(getClass().getSimpleName().concat(".fxml")));
+			FXMLLoader fxmlLoader = new FXMLLoader(getFXML());
 			fxmlLoader.setController(this);
 			graphic = fxmlLoader.load();
 		}
@@ -107,19 +122,19 @@ public abstract class ActlistPlugin {
 		getFunctionMap().replace(functionName, function);
 	}
 	
-	public void applicationActivated() {
+	public void applicationActivated() throws Exception {
 		
 	}
 	
-	public void applicationDeactivated() {
+	public void applicationDeactivated() throws Exception {
 		
 	}
 	
-	public void pluginActivated() {
+	public void pluginActivated() throws Exception {
 		
 	}
 	
-	public void pluginDeactivated() {
+	public void pluginDeactivated() throws Exception {
 		
 	}
 	

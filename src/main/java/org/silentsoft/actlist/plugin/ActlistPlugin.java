@@ -3,8 +3,6 @@ package org.silentsoft.actlist.plugin;
 import java.net.URL;
 import java.util.HashMap;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableMap;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
@@ -52,10 +50,10 @@ public abstract class ActlistPlugin {
 	
 	private String pluginDescription;
 	
+	private PluginConfig pluginConfig;
+	
 	private HashMap<String, Function> functionMap;
 	
-	private ObservableMap<String, String> configMap;
-
 	public ActlistPlugin(String pluginName) {
 		this(pluginName, null);
 	}
@@ -68,7 +66,6 @@ public abstract class ActlistPlugin {
 		this.pluginName = pluginName;
 		this.pluginDescription = pluginDescription;
 		this.functionMap = new HashMap<>();
-		this.configMap = FXCollections.observableHashMap();
 	}
 	
 	/**
@@ -94,6 +91,14 @@ public abstract class ActlistPlugin {
 		return getClass().getResource(getClass().getSimpleName().concat(".fxml"));
 	}
 	
+	PluginConfig getPluginConfig() {
+		return pluginConfig;
+	}
+	
+	void setPluginConfig(PluginConfig pluginConfig) {
+		this.pluginConfig = pluginConfig;
+	}
+	
 	public boolean existsGraphic() {
 		boolean result = true;
 		try {
@@ -116,14 +121,6 @@ public abstract class ActlistPlugin {
 	
 	HashMap<String, Function> getFunctionMap() {
 		return functionMap;
-	}
-	
-	ObservableMap<String, String> getConfigMap() {
-		return configMap;
-	}
-	
-	void setConfigMap(ObservableMap<String, String> configMap) {
-		this.configMap = configMap;
 	}
 	
 	/**
@@ -162,11 +159,15 @@ public abstract class ActlistPlugin {
 		
 	}
 	
-	public void putConfig(String key, String value) {
-		getConfigMap().put(key, value);
+	public <T> T getConfig(String key) throws Exception {
+		return getPluginConfig().get(key);
 	}
 	
-	public String getConfig(String key) {
-		return getConfigMap().get(key);
+	public void putConfig(String key, Object value) throws Exception {
+		getPluginConfig().put(key, value);
+	}
+	
+	public void removeConfig(String key) throws Exception {
+		getPluginConfig().remove(key);
 	}
 }

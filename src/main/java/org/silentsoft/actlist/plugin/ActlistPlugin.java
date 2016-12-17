@@ -3,6 +3,8 @@ package org.silentsoft.actlist.plugin;
 import java.net.URL;
 import java.util.HashMap;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableMap;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
@@ -51,6 +53,8 @@ public abstract class ActlistPlugin {
 	private String pluginDescription;
 	
 	private HashMap<String, Function> functionMap;
+	
+	private ObservableMap<String, String> configMap;
 
 	public ActlistPlugin(String pluginName) {
 		this(pluginName, null);
@@ -64,7 +68,19 @@ public abstract class ActlistPlugin {
 		this.pluginName = pluginName;
 		this.pluginDescription = pluginDescription;
 		this.functionMap = new HashMap<>();
+		this.configMap = FXCollections.observableHashMap();
 	}
+	
+	/**
+	 * Please write code inside of this method to initialize the plugin when first time.</p>
+	 * <em>
+	 * CRITICAL : </br>
+	 * Please do not change this method's access modifier to public.</br>
+	 * b/c name that '<tt>initialize</tt>' is method that called by FXMLLoader automatically.</br>
+	 * so you should know that may occur change plugin's life cycle what if you change this method's access modifier to public from protected.
+	 * </em>
+	 */
+	protected abstract void initialize() throws Exception;
 	
 	public String getPluginName() {
 		return pluginName;
@@ -100,6 +116,14 @@ public abstract class ActlistPlugin {
 	
 	HashMap<String, Function> getFunctionMap() {
 		return functionMap;
+	}
+	
+	ObservableMap<String, String> getConfigMap() {
+		return configMap;
+	}
+	
+	void setConfigMap(ObservableMap<String, String> configMap) {
+		this.configMap = configMap;
 	}
 	
 	/**
@@ -138,4 +162,11 @@ public abstract class ActlistPlugin {
 		
 	}
 	
+	public void putConfig(String key, String value) {
+		getConfigMap().put(key, value);
+	}
+	
+	public String getConfig(String key) {
+		return getConfigMap().get(key);
+	}
 }

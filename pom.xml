@@ -18,6 +18,9 @@
 
 		<!-- Logging -->
 		<slf4j.version>1.7.5</slf4j.version>
+		
+		<!-- Silentsoft -->
+		<silentsoft.core.version>1.0.2</silentsoft.core.version>
 
 		<!-- 3rd party -->
 		<jfoenix.version>1.0.0</jfoenix.version>
@@ -55,6 +58,11 @@
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
 			<version>${slf4j.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.silentsoft</groupId>
+			<artifactId>silentsoft-core</artifactId>
+			<version>${silentsoft.core.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.jfoenix</groupId>

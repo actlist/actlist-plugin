@@ -2,7 +2,10 @@ package org.silentsoft.actlist.plugin.messagebox;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
@@ -10,11 +13,26 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
+import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
+import javafx.stage.Stage;
 import javafx.stage.Window;
 
 public final class MessageBox {
+	
+	private static List<Image> getActlistIcons() {
+		return new Function<int[], List<Image>>() {
+			@Override
+			public List<Image> apply(int[] values) {
+				ArrayList<Image> images = new ArrayList<Image>();
+				for (int size : values) {
+					images.add(new Image(String.join("", "/images/icon/actlist_", String.valueOf(size), ".png")));
+				}
+				return images;
+			}
+		}.apply(new int[]{24, 32, 48, 64, 128, 256});
+	}
 	
 	public static void showAbout(String message) {
 		showAbout(null, null, message);
@@ -32,6 +50,7 @@ public final class MessageBox {
 		String title = "About";
 		
 		Alert alert = new Alert(AlertType.INFORMATION);
+		((Stage) alert.getDialogPane().getScene().getWindow()).getIcons().addAll(getActlistIcons());
 		alert.setTitle(title);
 		alert.setHeaderText(masthead);
 		alert.setContentText(message);
@@ -47,6 +66,7 @@ public final class MessageBox {
 		String title = "Information";
 		
 		Alert alert = new Alert(AlertType.INFORMATION);
+		((Stage) alert.getDialogPane().getScene().getWindow()).getIcons().addAll(getActlistIcons());
 		alert.setTitle(title);
 		alert.setHeaderText(masthead);
 		alert.setContentText(message);
@@ -74,6 +94,7 @@ public final class MessageBox {
 		String title = "Confirm";
 		
 		Alert alert = new Alert(AlertType.CONFIRMATION);
+		((Stage) alert.getDialogPane().getScene().getWindow()).getIcons().addAll(getActlistIcons());
 		alert.setTitle(title);
 		alert.setHeaderText(masthead);
 		alert.setContentText(message);
@@ -101,6 +122,7 @@ public final class MessageBox {
 		String title = "Error";
 		
 		Alert alert = new Alert(AlertType.ERROR);
+		((Stage) alert.getDialogPane().getScene().getWindow()).getIcons().addAll(getActlistIcons());
 		alert.setTitle(title);
 		alert.setHeaderText(masthead);
 		alert.setContentText(message);
@@ -137,6 +159,7 @@ public final class MessageBox {
 			String title = "Exception";
 			
 			Alert alert = new Alert(AlertType.ERROR);
+			((Stage) alert.getDialogPane().getScene().getWindow()).getIcons().addAll(getActlistIcons());
 			alert.setTitle(title);
 			alert.setHeaderText(masthead);
 			alert.setContentText(message);

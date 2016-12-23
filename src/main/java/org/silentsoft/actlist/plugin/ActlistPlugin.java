@@ -50,6 +50,8 @@ public abstract class ActlistPlugin {
 	
 	private String pluginDescription;
 	
+	private String pluginAuthor;
+	
 	private PluginConfig pluginConfig;
 	
 	private HashMap<String, Function> functionMap;
@@ -63,8 +65,13 @@ public abstract class ActlistPlugin {
 	 * @param pluginDescription for install tooltip.
 	 */
 	public ActlistPlugin(String pluginName, String pluginDescription) {
+		this(pluginName, pluginDescription, null);
+	}
+	
+	public ActlistPlugin(String pluginName, String pluginDescription, String pluginAuthor) {
 		this.pluginName = pluginName;
 		this.pluginDescription = pluginDescription;
+		this.pluginAuthor = pluginAuthor;
 		this.functionMap = new HashMap<>();
 	}
 	
@@ -83,8 +90,12 @@ public abstract class ActlistPlugin {
 		return pluginName;
 	}
 	
-	public String getPlguinDescription() {
+	public String getPluginDescription() {
 		return pluginDescription;
+	}
+	
+	public String getPluginAuthor() {
+		return pluginAuthor;
 	}
 	
 	private URL getFXML() {

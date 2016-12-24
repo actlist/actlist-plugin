@@ -3,6 +3,8 @@ package org.silentsoft.actlist.plugin;
 import java.net.URL;
 import java.util.HashMap;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
@@ -56,6 +58,8 @@ public abstract class ActlistPlugin {
 	
 	private HashMap<String, Function> functionMap;
 	
+	private BooleanProperty shouldShowLoadingBar;
+	
 	public ActlistPlugin(String pluginName) {
 		this(pluginName, null);
 	}
@@ -73,6 +77,8 @@ public abstract class ActlistPlugin {
 		this.pluginDescription = pluginDescription;
 		this.pluginAuthor = pluginAuthor;
 		this.functionMap = new HashMap<>();
+		
+		shouldShowLoadingBar = new SimpleBooleanProperty(false);
 	}
 	
 	/**
@@ -110,14 +116,18 @@ public abstract class ActlistPlugin {
 		this.pluginConfig = pluginConfig;
 	}
 	
+	private Boolean existsGraphic;
 	public boolean existsGraphic() {
-		boolean result = true;
-		try {
-			getFXML().openStream().close();
-		} catch (Exception e) {
-			result = false;
+		if (existsGraphic == null) {
+			existsGraphic = true;
+			try {
+				getFXML().openStream().close();
+			} catch (Exception e) {
+				existsGraphic = false;
+			}
 		}
-		return result;
+		
+		return existsGraphic;
 	}
 	
 	private Node graphic;
@@ -132,6 +142,10 @@ public abstract class ActlistPlugin {
 	
 	HashMap<String, Function> getFunctionMap() {
 		return functionMap;
+	}
+	
+	BooleanProperty shouldShowLoadingBar() {
+		return shouldShowLoadingBar;
 	}
 	
 	/**
@@ -180,5 +194,13 @@ public abstract class ActlistPlugin {
 	
 	public void removeConfig(String key) throws Exception {
 		getPluginConfig().remove(key);
+	}
+	
+	public void showLoadingBar() {
+		shouldShowLoadingBar().set(true);
+	}
+	
+	public void hideLoadingBar() {
+		shouldShowLoadingBar().set(false);
 	}
 }

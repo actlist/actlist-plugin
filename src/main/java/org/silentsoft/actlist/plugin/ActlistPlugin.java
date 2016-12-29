@@ -8,6 +8,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
+import javafx.scene.image.ImageView;
 
 /**
  * Please generate executable main class called '<tt>Plugin</tt>' where in default package(please do not assign package).</br>
@@ -16,7 +17,9 @@ import javafx.scene.control.Label;
  * The Actlist core find the '<tt>Plugin</tt>' class in your jar that not defined any package.</br>
  * then export your project to runnable jar file(option : *'Extract required libraries into generated JAR') and put into <tt>/plugins</tt> directory that under the Actlist installed path.</p>
  * 
- * To make a plugin that contains graphic things, you can write the fxml file with your <tt>Plguin</tt> name.</p>
+ * To make a plugin that contains graphic things, you can write the 'Plugin.fxml' file where in the same location of your <tt>Plguin</tt> class.
+ * Also you can set the plugin's icon image that display where in about section (Right click -> About) through 'Plugin.png'</br>
+ * <em><tt>NOTE : the recommanded size of image is 48x48.</tt></em></p>
  * 
  * If you wanna make it jar as compact and light version, you should remove unused classes from exported jar file.</br>
  * this is very important because the *Extract option is contains all dependent libraries (even unused).</p>
@@ -52,6 +55,8 @@ public abstract class ActlistPlugin {
 	
 	private String pluginDescription;
 	
+	private String pluginVersion;
+	
 	private String pluginAuthor;
 	
 	private PluginConfig pluginConfig;
@@ -61,21 +66,7 @@ public abstract class ActlistPlugin {
 	private BooleanProperty shouldShowLoadingBar;
 	
 	public ActlistPlugin(String pluginName) {
-		this(pluginName, null);
-	}
-	
-	/**
-	 * @param pluginName for display to user.
-	 * @param pluginDescription for install tooltip.
-	 */
-	public ActlistPlugin(String pluginName, String pluginDescription) {
-		this(pluginName, pluginDescription, null);
-	}
-	
-	public ActlistPlugin(String pluginName, String pluginDescription, String pluginAuthor) {
 		this.pluginName = pluginName;
-		this.pluginDescription = pluginDescription;
-		this.pluginAuthor = pluginAuthor;
 		this.functionMap = new HashMap<>();
 		
 		shouldShowLoadingBar = new SimpleBooleanProperty(false);
@@ -92,6 +83,42 @@ public abstract class ActlistPlugin {
 	 */
 	protected abstract void initialize() throws Exception;
 	
+	/**
+	 * This method is called when plugin is activated.</p>
+	 * Plugin is activated when user clicks to toggle-button, or called if this plugin was activate when Actlist is started up.
+	 * 
+	 * @throws Exception
+	 */
+	public abstract void pluginActivated() throws Exception;
+	
+	/**
+	 * This method is called when plugin is deactivated.</p>
+	 * Plugin is deactivated when the user clicks the toggle button again after plugin is activated.
+	 * 
+	 * @throws Exception
+	 */
+	public abstract void pluginDeactivated() throws Exception;
+	
+	/**
+	 * This method is called when Actlist application is activated.</p>
+	 * It could be time that user clicks system tray icon, or press the global short cut to showing up.
+	 * 
+	 * @throws Exception
+	 */
+	public void applicationActivated() throws Exception {
+		
+	}
+	
+	/**
+	 * This method is called when Actlist application is deactivated.</p>
+	 * It could be time that user clicks minimize button or system tray icon again, or press the global short cut again when after shown.
+	 *  
+	 * @throws Exception
+	 */
+	public void applicationDeactivated() throws Exception {
+		
+	}
+	
 	public String getPluginName() {
 		return pluginName;
 	}
@@ -99,13 +126,25 @@ public abstract class ActlistPlugin {
 	public String getPluginDescription() {
 		return pluginDescription;
 	}
-	
+
+	protected void setPluginDescription(String pluginDescription) {
+		this.pluginDescription = pluginDescription;
+	}
+
+	public String getPluginVersion() {
+		return pluginVersion;
+	}
+
+	protected void setPluginVersion(String pluginVersion) {
+		this.pluginVersion = pluginVersion;
+	}
+
 	public String getPluginAuthor() {
 		return pluginAuthor;
 	}
-	
-	private URL getFXML() {
-		return getClass().getResource(getClass().getSimpleName().concat(".fxml"));
+
+	protected void setPluginAuthor(String pluginAuthor) {
+		this.pluginAuthor = pluginAuthor;
 	}
 	
 	PluginConfig getPluginConfig() {
@@ -114,6 +153,36 @@ public abstract class ActlistPlugin {
 	
 	void setPluginConfig(PluginConfig pluginConfig) {
 		this.pluginConfig = pluginConfig;
+	}
+	
+	private URL getPNG() {
+		return getClass().getResource(getClass().getSimpleName().concat(".png"));
+	}
+	
+	private URL getFXML() {
+		return getClass().getResource(getClass().getSimpleName().concat(".fxml"));
+	}
+	
+	private Boolean existsIcon;
+	public boolean existsIcon() {
+		if (existsIcon == null) {
+			existsIcon = true;
+			try {
+				getPNG().openStream().close();
+			} catch (Exception e) {
+				existsIcon = false;
+			}
+		}
+		
+		return existsIcon;
+	}
+	
+	private ImageView icon;
+	public ImageView getIcon() throws Exception {
+		if (icon == null) {
+			icon = new ImageView(getPNG().toExternalForm());
+		}
+		return icon;
 	}
 	
 	private Boolean existsGraphic;
@@ -166,22 +235,6 @@ public abstract class ActlistPlugin {
 	
 	protected void replaceFunction(String functionName, Function function) {
 		getFunctionMap().replace(functionName, function);
-	}
-	
-	public void applicationActivated() throws Exception {
-		
-	}
-	
-	public void applicationDeactivated() throws Exception {
-		
-	}
-	
-	public void pluginActivated() throws Exception {
-		
-	}
-	
-	public void pluginDeactivated() throws Exception {
-		
 	}
 	
 	public <T> T getConfig(String key) throws Exception {

@@ -4,7 +4,9 @@ import java.net.URL;
 import java.util.HashMap;
 
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
@@ -19,7 +21,7 @@ import javafx.scene.image.ImageView;
  * 
  * To make a plugin that contains graphic things, you can write the 'Plugin.fxml' file where in the same location of your <tt>Plguin</tt> class.
  * Also you can set the plugin's icon image that display where in about section (Right click -> About) through 'Plugin.png'</br>
- * <em><tt>NOTE : the recommanded size of image is 48x48.</tt></em></p>
+ * <em><tt>NOTE : the recommended size of image is 48x48.</tt></em></p>
  * 
  * If you wanna make it jar as compact and light version, you should remove unused classes from exported jar file.</br>
  * this is very important because the *Extract option is contains all dependent libraries (even unused).</p>
@@ -65,17 +67,21 @@ public abstract class ActlistPlugin {
 	
 	private BooleanProperty shouldShowLoadingBar;
 	
+	private ObjectProperty<Throwable> exceptionObject;
+	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public ActlistPlugin(String pluginName) {
 		this.pluginName = pluginName;
 		this.functionMap = new HashMap<>();
 		
 		shouldShowLoadingBar = new SimpleBooleanProperty(false);
+		exceptionObject = new SimpleObjectProperty(null);
 	}
 	
 	/**
 	 * Please write code inside of this method to initialize the plugin when first time.</p>
 	 * <em>
-	 * CRITICAL : </br>
+	 * CRITICAL :</br>
 	 * Please do not change this method's access modifier to public.</br>
 	 * b/c name that '<tt>initialize</tt>' is method that called by FXMLLoader automatically.</br>
 	 * so you should know that may occur change plugin's life cycle what if you change this method's access modifier to public from protected.
@@ -85,7 +91,9 @@ public abstract class ActlistPlugin {
 	
 	/**
 	 * This method is called when plugin is activated.</p>
-	 * Plugin is activated when user clicks to toggle-button, or called if this plugin was activate when Actlist is started up.
+	 * 
+	 * Plugin will be activated when the user clicks to toggle button.</br>
+	 * also this method will be called if this plugin was activate when Actlist is started up.
 	 * 
 	 * @throws Exception
 	 */
@@ -93,7 +101,8 @@ public abstract class ActlistPlugin {
 	
 	/**
 	 * This method is called when plugin is deactivated.</p>
-	 * Plugin is deactivated when the user clicks the toggle button again after plugin is activated.
+	 * 
+	 * Plugin will be deactivated when the user clicks the toggle button again after plugin is activated.
 	 * 
 	 * @throws Exception
 	 */
@@ -101,6 +110,7 @@ public abstract class ActlistPlugin {
 	
 	/**
 	 * This method is called when Actlist application is activated.</p>
+	 * 
 	 * It could be time that user clicks system tray icon, or press the global short cut to showing up.
 	 * 
 	 * @throws Exception
@@ -111,6 +121,7 @@ public abstract class ActlistPlugin {
 	
 	/**
 	 * This method is called when Actlist application is deactivated.</p>
+	 * 
 	 * It could be time that user clicks minimize button or system tray icon again, or press the global short cut again when after shown.
 	 *  
 	 * @throws Exception
@@ -217,6 +228,10 @@ public abstract class ActlistPlugin {
 		return shouldShowLoadingBar;
 	}
 	
+	ObjectProperty<Throwable> exceptionObject() {
+		return exceptionObject;
+	}
+	
 	/**
 	 * @param functionName for display to user.
 	 * @param function executes when user choosed.
@@ -255,5 +270,48 @@ public abstract class ActlistPlugin {
 	
 	public void hideLoadingBar() {
 		shouldShowLoadingBar().set(false);
+	}
+	
+	/**
+	 * The plugin's toggle button will be toggle-off and displayed as RED color when you call to this method.</p>
+	 * <em>
+	 * CRITICAL :</br>
+	 * if you created thread and the thread is do something within infinite-while-loop,</br>
+	 * you must to do that finalize all kind of thread that you are created.</p>
+	 * 
+	 * the recommended infinite-while-loop code of thread is below.
+	 * <code><pre>
+	 * private Thread thread;
+	 * 
+	 * <code>@Override</code>
+	 * public void pluginActivated() throws Exception {
+	 *     thread = null;
+	 *     thread = new Thread(() -> {
+	 *         try {
+	 *             while (true) {
+	 *                 // do something here.
+	 * 
+	 *                 Thread.sleep(WHATEVER_YOU_WANT);
+	 *             }
+	 *         } catch (InterruptedException e) {
+	 *             // expected exception.
+	 *         } catch (Exception e) {
+	 *             raiseException(e);
+	 *         }
+	 *     });
+	 *     thread.start();
+	 * }
+	 * 
+	 * <code>@Override</code>
+	 * public void pluginDeactivated() throws Exception {
+	 *     thread.interrupt();
+	 * }
+	 * </pre></code>
+	 * </em>
+	 * 
+	 * @param exception that you can't handle
+	 */
+	public void raiseException(Throwable exception) {
+		exceptionObject().set(exception);
 	}
 }

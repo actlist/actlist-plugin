@@ -276,7 +276,7 @@ public abstract class ActlistPlugin {
 	 * The plugin's toggle button will be toggle-off and displayed as RED color when you call to this method.</p>
 	 * <em>
 	 * CRITICAL :</br>
-	 * if you created thread and the thread is do something within infinite-while-loop,</br>
+	 * if you created a thread and the thread is do something within infinite-while-loop,</br>
 	 * you must to do that finalize all kind of thread that you are created.</p>
 	 * 
 	 * the recommended infinite-while-loop code of thread is below.
@@ -296,7 +296,7 @@ public abstract class ActlistPlugin {
 	 *         } catch (InterruptedException e) {
 	 *             // expected exception.
 	 *         } catch (Exception e) {
-	 *             raiseException(e);
+	 *             throwException(e);
 	 *         }
 	 *     });
 	 *     thread.start();
@@ -311,7 +311,7 @@ public abstract class ActlistPlugin {
 	 * 
 	 * @param exception that you can't handle
 	 */
-	public void raiseException(Throwable exception) {
+	public void throwException(Throwable exception) {
 		exceptionObject().set(exception);
 	}
 }

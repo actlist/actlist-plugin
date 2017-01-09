@@ -160,14 +160,17 @@ public class Plugin extends ActlistPlugin {
 
 ## How to show message box
 
-* The Actlist has built in `MessageBox`. See the sample source code below:
+* The Actlist has built in `MessageBox`.
+  See the sample source code below:
   ```
-  Optional<ButtonType> result = MessageBox.showConfirm("Are you human?");
-  result.ifPresent((buttonType) -> {
-      if (buttonType == ButtonType.OK) {
-          System.out.println("OK. You are human");
-	  }
-  });
+  public void confirmHuman() {
+      Optional<ButtonType> result = MessageBox.showConfirm("Are you human?");
+      result.ifPresent((buttonType) -> {
+          if (buttonType == ButtonType.OK) {
+              System.out.println("OK. You are human");
+          }
+      });
+  }
   ```
 
 ## How to save and load the config information

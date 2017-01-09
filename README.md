@@ -3,6 +3,8 @@
 
 With Actlist plugin, You can create anything.
 
+![](http://silentsoft.org/actlist/images/preview.png)
+
 ## Development setup
 
 To create an Actlist plugin, you need to do some of the following:

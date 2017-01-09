@@ -84,9 +84,9 @@ public class Plugin extends ActlistPlugin {
 * Basically, the Actlist application contains all the libraries that required plugin things. So, you must to delete libraries within your jar file for reduce size of file. (This action will save about 7.2 MB and the jar file will be about 45 KB from 7.24 MB)
 * If you are not added any 3rd party libraries, then the inside of the jar file is like as below.
   ```
-  /META-INF
-  Plugin.class
-  (option) Plugin.fxml
+  /META-INF  
+  Plugin.class  
+  (option) Plugin.fxml  
   (option) Plugin.png
   ```
 * Finally, put the jar file into `/plugins/` directory that under the Actlist installed path and (re)start to Actlist.

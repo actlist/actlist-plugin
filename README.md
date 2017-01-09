@@ -64,15 +64,19 @@ public class Plugin extends ActlistPlugin {
 ## How to export as jar file
 
 * (Only the first time) Plugin.java > Right click > `Run as Java Application`
+  
   ![](http://silentsoft.org/actlist/images/export-1.png)
 
 * Project > Right click > `Export`
+  
   ![](http://silentsoft.org/actlist/images/export-2.png)
 
 * Select `Runnable JAR file`
+  
   ![](http://silentsoft.org/actlist/images/export-3.png)
 
 * Select your project in `Launch configuration` combo box and define export destination via `Browse...` button then choose `Extract required libraries into generated JAR` option
+  
   ![](http://silentsoft.org/actlist/images/export-4.png)
 
 * Basically, the Actlist application contains all the libraries that required plugin things. So, you must to delete libraries within your jar file for reduce size of file. (This action will save about 7.2 MB and the jar file will be about 45 KB from 7.24 MB)
@@ -93,6 +97,7 @@ public class Plugin extends ActlistPlugin {
       super("whatever you want");
   }
   ```
+  
   ![](http://silentsoft.org/actlist/images/how-to-define-plugin-name.png)
 
 ## How to define `about` menu
@@ -107,6 +112,7 @@ public class Plugin extends ActlistPlugin {
       setPluginAuthor("Silentsoft (http://silentsoft.org)");
   }
   ```
+  
   ![](http://silentsoft.org/actlist/images/how-to-define-about-menu.png)
 
 ## How to add an image icon on `about` menu
@@ -130,6 +136,7 @@ public class Plugin extends ActlistPlugin {
 	  }));
   }
   ```
+  
   ![](http://silentsoft.org/actlist/images/how-to-add-function-context-menu.png)
 
 ## How to generate graphic things
@@ -167,4 +174,5 @@ public class Plugin extends ActlistPlugin {
 ## How to throw exception
 
 * You can tell to the Actlist through the `throwException(e)` method when you can not control the exception. (This action will cause to plugin to disable with red color and possible to  check the exception message via double click)
+  
   ![](http://silentsoft.org/actlist/images/how-to-throw-exception.png)

@@ -149,10 +149,12 @@ public class Plugin extends ActlistPlugin {
 ## How to show or hide the loading bar
 
 * You can show or hide the loading bar when you create a graphic plugin.
+
   Way to show the loading bar:
   ```
   showLoadingBar();
   ```
+  
   Way to hide the loading bar:
   ```
   hideLoadingBar();
@@ -161,6 +163,7 @@ public class Plugin extends ActlistPlugin {
 ## How to show message box
 
 * The Actlist has built in `MessageBox`.
+
   See the sample source code below:
   ```
   public void confirmHuman() {

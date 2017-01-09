@@ -166,14 +166,12 @@ public class Plugin extends ActlistPlugin {
 
   See the sample source code below:
   ```
-  public void confirmHuman() {
-      Optional<ButtonType> result = MessageBox.showConfirm("Are you human?");
-      result.ifPresent((buttonType) -> {
-          if (buttonType == ButtonType.OK) {
-              System.out.println("OK. You are human");
-          }
-      });
-  }
+  Optional<ButtonType> result = MessageBox.showConfirm("Are you human?");
+  result.ifPresent((buttonType) -> {
+      if (buttonType == ButtonType.OK) {
+          System.out.println("OK. You are human");
+      }
+  });
   ```
 
 ## How to save and load the config information

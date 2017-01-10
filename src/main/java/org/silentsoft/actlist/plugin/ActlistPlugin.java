@@ -1,7 +1,7 @@
 package org.silentsoft.actlist.plugin;
 
 import java.net.URL;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
@@ -63,7 +63,7 @@ public abstract class ActlistPlugin {
 	
 	private PluginConfig pluginConfig;
 	
-	private HashMap<String, Function> functionMap;
+	private LinkedHashMap<String, Function> functionMap;
 	
 	private BooleanProperty shouldShowLoadingBar;
 	
@@ -72,7 +72,7 @@ public abstract class ActlistPlugin {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public ActlistPlugin(String pluginName) {
 		this.pluginName = pluginName;
-		this.functionMap = new HashMap<>();
+		this.functionMap = new LinkedHashMap<>();
 		
 		shouldShowLoadingBar = new SimpleBooleanProperty(false);
 		exceptionObject = new SimpleObjectProperty(null);
@@ -220,7 +220,7 @@ public abstract class ActlistPlugin {
 		return graphic;
 	}
 	
-	HashMap<String, Function> getFunctionMap() {
+	LinkedHashMap<String, Function> getFunctionMap() {
 		return functionMap;
 	}
 	

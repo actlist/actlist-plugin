@@ -8,7 +8,7 @@ With Actlist plugin, You can create anything.
 ## Development setup
 
 To create an Actlist plugin, you need to do some of the following:
-* Clone projects as following command or clone via GUI.
+* Clone projects as following command or clone via GUI or download project and import into workspace.
 ```
 git clone https://github.com/silentsoft/silentsoft-io.git
 git clone https://github.com/silentsoft/silentsoft-core.git

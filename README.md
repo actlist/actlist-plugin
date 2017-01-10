@@ -134,13 +134,13 @@ public class Plugin extends ActlistPlugin {
 	  putFunction("printGoodMorning", new TextFunction("Good morning", () -> {
 		  System.out.println("Good morning !");
 	  }));
-	  putFunction("printGoodNight", new TextFunction("Good Night", () -> {
+	  putFunction("printGoodNight", new TextFunction("Good night", () -> {
 		  System.out.println("Good night !");
 	  }));
   }
   ```
   
-  ![](http://silentsoft.org/actlist/images/how-to-add-function-context-menu.png)
+  ![](http://silentsoft.org/actlist/images/how-to-add-function.png)
 
 ## How to generate graphic things
 

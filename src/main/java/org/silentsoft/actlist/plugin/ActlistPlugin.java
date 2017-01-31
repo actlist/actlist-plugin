@@ -130,6 +130,17 @@ public abstract class ActlistPlugin {
 		
 	}
 	
+	/**
+	 * This method is called when Actlist application got close request.</p>
+	 * 
+	 * It could be time that user clicks close button at task-manager, or press ALT+F4.
+	 * 
+	 * @throws Exception
+	 */
+	public void applicationCloseRequested() throws Exception {
+		
+	}
+	
 	public String getPluginName() {
 		return pluginName;
 	}

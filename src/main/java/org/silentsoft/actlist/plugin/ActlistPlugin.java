@@ -12,6 +12,8 @@ import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 
+import org.silentsoft.actlist.plugin.tray.TrayNotification;
+
 /**
  * Please generate executable main class called '<tt>Plugin</tt>' where in default package(please do not assign package).</br>
  * <em><tt>NOTE : you should not write any code in main method !</tt></em></p>
@@ -69,6 +71,8 @@ public abstract class ActlistPlugin {
 	
 	private ObjectProperty<Throwable> exceptionObject;
 	
+	private ObjectProperty<TrayNotification> trayNotificationObject;
+	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public ActlistPlugin(String pluginName) {
 		this.pluginName = pluginName;
@@ -76,12 +80,13 @@ public abstract class ActlistPlugin {
 		
 		shouldShowLoadingBar = new SimpleBooleanProperty(false);
 		exceptionObject = new SimpleObjectProperty(null);
+		trayNotificationObject = new SimpleObjectProperty(null);
 	}
 	
 	/**
 	 * Please write code inside of this method to initialize the plugin when first time.</p>
 	 * <em>
-	 * CRITICAL :</br>
+	 * <b>CRITICAL</b> :</br>
 	 * Please do not change this method's access modifier to public.</br>
 	 * b/c name that '<tt>initialize</tt>' is method that called by FXMLLoader automatically.</br>
 	 * so you should know that may occur change plugin's life cycle what if you change this method's access modifier to public from protected.
@@ -93,7 +98,14 @@ public abstract class ActlistPlugin {
 	 * This method is called when plugin is activated.</p>
 	 * 
 	 * Plugin will be activated when the user clicks to toggle button.</br>
-	 * also this method will be called if this plugin was activate when Actlist is started up.
+	 * also this method will be called if this plugin was activate when Actlist is started up.</p>
+	 * 
+	 * <em>
+	 * <b>CRITICAL</b> :</br>
+	 * This method is called via FxApplicationThread.
+	 * If your work needs a few seconds for finish, you <b>must</b> write your code into a new Thread. (I'm <b>hirely recomend</b> this option)
+     * If not, The Actlist's UI will be hang for few seconds.
+	 * </em></p>
 	 * 
 	 * @throws Exception
 	 */
@@ -102,7 +114,14 @@ public abstract class ActlistPlugin {
 	/**
 	 * This method is called when plugin is deactivated.</p>
 	 * 
-	 * Plugin will be deactivated when the user clicks the toggle button again after plugin is activated.
+	 * Plugin will be deactivated when the user clicks the toggle button again after plugin is activated.</p>
+	 * 
+	 * <em>
+	 * <b>CRITICAL</b> :</br>
+	 * This method is called via FxApplicationThread.
+	 * If your work needs a few seconds for finish, you <b>must</b> write your code into a new Thread. (I'm <b>hirely recomend</b> this option)
+     * If not, The Actlist's UI will be hang for few seconds.
+	 * </em></p>
 	 * 
 	 * @throws Exception
 	 */
@@ -243,6 +262,10 @@ public abstract class ActlistPlugin {
 		return exceptionObject;
 	}
 	
+	ObjectProperty<TrayNotification> trayNotificationObject() {
+		return trayNotificationObject;
+	}
+	
 	/**
 	 * @param functionName for display to user.
 	 * @param function executes when user choosed.
@@ -286,7 +309,7 @@ public abstract class ActlistPlugin {
 	/**
 	 * The plugin's toggle button will be toggle-off and displayed as RED color when you call to this method.</p>
 	 * <em>
-	 * CRITICAL :</br>
+	 * <b>CRITICAL</b> :</br>
 	 * if you created a thread and the thread is do something within infinite-while-loop,</br>
 	 * you must to do that finalize all kind of thread that you are created.</p>
 	 * 
@@ -324,5 +347,9 @@ public abstract class ActlistPlugin {
 	 */
 	public void throwException(Throwable exception) {
 		exceptionObject().set(exception);
+	}
+	
+	public void showTrayNotification(TrayNotification trayNotification) {
+		trayNotificationObject().set(trayNotification);
 	}
 }

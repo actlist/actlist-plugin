@@ -71,7 +71,9 @@ public abstract class ActlistPlugin {
 	
 	private ObjectProperty<Throwable> exceptionObject;
 	
-	private ObjectProperty<TrayNotification> trayNotificationObject;
+	private ObjectProperty<TrayNotification> showTrayNotificationObject;
+	private ObjectProperty<TrayNotification> dismissTrayNotificationObject;
+	private BooleanProperty shouldDismissTrayNotifications;
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public ActlistPlugin(String pluginName) {
@@ -80,7 +82,9 @@ public abstract class ActlistPlugin {
 		
 		shouldShowLoadingBar = new SimpleBooleanProperty(false);
 		exceptionObject = new SimpleObjectProperty(null);
-		trayNotificationObject = new SimpleObjectProperty(null);
+		showTrayNotificationObject = new SimpleObjectProperty(null);
+		dismissTrayNotificationObject = new SimpleObjectProperty(null);
+		shouldDismissTrayNotifications = new SimpleBooleanProperty(false);
 	}
 	
 	/**
@@ -262,8 +266,16 @@ public abstract class ActlistPlugin {
 		return exceptionObject;
 	}
 	
-	ObjectProperty<TrayNotification> trayNotificationObject() {
-		return trayNotificationObject;
+	ObjectProperty<TrayNotification> showTrayNotificationObject() {
+		return showTrayNotificationObject;
+	}
+	
+	ObjectProperty<TrayNotification> dismissTrayNotificationObject() {
+		return dismissTrayNotificationObject;
+	}
+	
+	BooleanProperty shouldDismissTrayNotifications() {
+		return shouldDismissTrayNotifications;
 	}
 	
 	/**
@@ -350,6 +362,14 @@ public abstract class ActlistPlugin {
 	}
 	
 	public void showTrayNotification(TrayNotification trayNotification) {
-		trayNotificationObject().set(trayNotification);
+		showTrayNotificationObject().set(trayNotification);
+	}
+	
+	public void dismissTrayNotification(TrayNotification trayNotification) {
+		dismissTrayNotificationObject().set(trayNotification);
+	}
+	
+	public void dismissTrayNotifications() {
+		shouldDismissTrayNotifications().set(true);
 	}
 }

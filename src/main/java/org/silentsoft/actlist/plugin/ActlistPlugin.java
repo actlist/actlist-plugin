@@ -3,6 +3,8 @@ package org.silentsoft.actlist.plugin;
 import java.net.URL;
 import java.util.LinkedHashMap;
 
+import org.silentsoft.actlist.plugin.tray.TrayNotification;
+
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -11,8 +13,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
-
-import org.silentsoft.actlist.plugin.tray.TrayNotification;
 
 /**
  * Please generate executable main class called '<tt>Plugin</tt>' where in default package(please do not assign package).</br>
@@ -63,6 +63,8 @@ public abstract class ActlistPlugin {
 	
 	private String pluginAuthor;
 	
+	private String minimumCompatibleVersion;
+	
 	private PluginConfig pluginConfig;
 	
 	private LinkedHashMap<String, Function> functionMap;
@@ -95,6 +97,8 @@ public abstract class ActlistPlugin {
 	 * b/c name that '<tt>initialize</tt>' is method that called by FXMLLoader automatically.</br>
 	 * so you should know that may occur change plugin's life cycle what if you change this method's access modifier to public from protected.
 	 * </em>
+	 * 
+	 * @since 1.0.0
 	 */
 	protected abstract void initialize() throws Exception;
 	
@@ -112,6 +116,7 @@ public abstract class ActlistPlugin {
 	 * </em></p>
 	 * 
 	 * @throws Exception
+	 * @since 1.0.0
 	 */
 	public abstract void pluginActivated() throws Exception;
 	
@@ -128,6 +133,7 @@ public abstract class ActlistPlugin {
 	 * </em></p>
 	 * 
 	 * @throws Exception
+	 * @since 1.0.0
 	 */
 	public abstract void pluginDeactivated() throws Exception;
 	
@@ -137,6 +143,7 @@ public abstract class ActlistPlugin {
 	 * It could be time that user clicks system tray icon, or press the global short cut to showing up.
 	 * 
 	 * @throws Exception
+	 * @since 1.0.0
 	 */
 	public void applicationActivated() throws Exception {
 		
@@ -148,6 +155,7 @@ public abstract class ActlistPlugin {
 	 * It could be time that user clicks minimize button or system tray icon again, or press the global short cut again when after shown.
 	 *  
 	 * @throws Exception
+	 * @since 1.0.0
 	 */
 	public void applicationDeactivated() throws Exception {
 		
@@ -159,39 +167,75 @@ public abstract class ActlistPlugin {
 	 * It could be time that user clicks close button at task-manager, or press ALT+F4.
 	 * 
 	 * @throws Exception
+	 * @since 1.2.2
 	 */
 	public void applicationCloseRequested() throws Exception {
 		
 	}
 	
+	/**
+	 * @since 1.0.0
+	 */
 	public String getPluginName() {
 		return pluginName;
 	}
 	
+	/**
+	 * @since 1.0.0
+	 */
 	public String getPluginDescription() {
 		return pluginDescription;
 	}
 
+	/**
+	 * @since 1.2.0
+	 */
 	protected void setPluginDescription(String pluginDescription) {
 		this.pluginDescription = pluginDescription;
 	}
 
+	/**
+	 * @since 1.2.0
+	 */
 	public String getPluginVersion() {
 		return pluginVersion;
 	}
 
+	/**
+	 * @since 1.2.0
+	 */
 	protected void setPluginVersion(String pluginVersion) {
 		this.pluginVersion = pluginVersion;
 	}
 
+	/**
+	 * @since 1.2.0
+	 */
 	public String getPluginAuthor() {
 		return pluginAuthor;
 	}
 
+	/**
+	 * @since 1.2.0
+	 */
 	protected void setPluginAuthor(String pluginAuthor) {
 		this.pluginAuthor = pluginAuthor;
 	}
 	
+	/**
+	 * @since 1.2.4
+	 */
+	public String getMinimumCompatibleVersion() {
+		return minimumCompatibleVersion;
+	}
+
+	/**
+	 * @since 1.2.4
+	 */
+	protected void setMinimumCompatibleVersion(int major, int minor, int patch) {
+		this.minimumCompatibleVersion = String.format("%d.%d.%d", major, minor, patch);
+	}
+
 	PluginConfig getPluginConfig() {
 		return pluginConfig;
 	}
@@ -209,6 +253,9 @@ public abstract class ActlistPlugin {
 	}
 	
 	private Boolean existsIcon;
+	/**
+	 * @since 1.2.0
+	 */
 	public boolean existsIcon() {
 		if (existsIcon == null) {
 			existsIcon = true;
@@ -223,6 +270,9 @@ public abstract class ActlistPlugin {
 	}
 	
 	private ImageView icon;
+	/**
+	 * @since 1.2.0
+	 */
 	public ImageView getIcon() throws Exception {
 		if (icon == null) {
 			icon = new ImageView(getPNG().toExternalForm());
@@ -231,6 +281,9 @@ public abstract class ActlistPlugin {
 	}
 	
 	private Boolean existsGraphic;
+	/**
+	 * @since 1.1.0
+	 */
 	public boolean existsGraphic() {
 		if (existsGraphic == null) {
 			existsGraphic = true;
@@ -245,6 +298,9 @@ public abstract class ActlistPlugin {
 	}
 	
 	private Node graphic;
+	/**
+	 * @since 1.0.0
+	 */
 	public Node getGraphic() throws Exception {
 		if (graphic == null) {
 			FXMLLoader fxmlLoader = new FXMLLoader(getFXML());
@@ -281,6 +337,7 @@ public abstract class ActlistPlugin {
 	/**
 	 * @param functionName for display to user.
 	 * @param function executes when user choosed.
+	 * @since 1.0.0
 	 */
 	protected void putFunction(String functionName, Function function) throws DuplicateNameException {
 		if (getFunctionMap().containsKey(functionName)) {
@@ -290,30 +347,51 @@ public abstract class ActlistPlugin {
 		getFunctionMap().put(functionName, function);
 	}
 	
+	/**
+	 * @since 1.0.0
+	 */
 	protected void removeFunction(String functionName) {
 		getFunctionMap().remove(functionName);
 	}
 	
+	/**
+	 * @since 1.0.0
+	 */
 	protected void replaceFunction(String functionName, Function function) {
 		getFunctionMap().replace(functionName, function);
 	}
 	
+	/**
+	 * @since 1.1.0
+	 */
 	public <T> T getConfig(String key) throws Exception {
 		return getPluginConfig().get(key);
 	}
 	
+	/**
+	 * @since 1.1.0
+	 */
 	public void putConfig(String key, Object value) throws Exception {
 		getPluginConfig().put(key, value);
 	}
 	
+	/**
+	 * @since 1.1.0
+	 */
 	public void removeConfig(String key) throws Exception {
 		getPluginConfig().remove(key);
 	}
 	
+	/**
+	 * @since 1.2.0
+	 */
 	public void showLoadingBar() {
 		shouldShowLoadingBar().set(true);
 	}
 	
+	/**
+	 * @since 1.2.0
+	 */
 	public void hideLoadingBar() {
 		shouldShowLoadingBar().set(false);
 	}
@@ -356,19 +434,29 @@ public abstract class ActlistPlugin {
 	 * </em>
 	 * 
 	 * @param exception that you can't handle
+	 * @since 1.2.1
 	 */
 	public void throwException(Throwable exception) {
 		exceptionObject().set(exception);
 	}
 	
+	/**
+	 * @since 1.2.4
+	 */
 	public void showTrayNotification(TrayNotification trayNotification) {
 		showTrayNotificationObject().set(trayNotification);
 	}
 	
+	/**
+	 * @since 1.2.4
+	 */
 	public void dismissTrayNotification(TrayNotification trayNotification) {
 		dismissTrayNotificationObject().set(trayNotification);
 	}
 	
+	/**
+	 * @since 1.2.4
+	 */
 	public void dismissTrayNotifications() {
 		shouldDismissTrayNotifications().set(true);
 	}

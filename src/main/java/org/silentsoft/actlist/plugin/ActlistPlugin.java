@@ -16,7 +16,7 @@ import javafx.scene.image.ImageView;
 
 /**
  * Please generate executable main class called '<tt>Plugin</tt>' where in default package(please do not assign package).</br>
- * <em><tt>NOTE : you should not write any code in main method !</tt></em></p>
+ * <em><tt>NOTE : You should not write any code other than calling the <code>debug();</code> method for debugging in the main method.</tt></em></p>
  * 
  * The Actlist core find the '<tt>Plugin</tt>' class in your jar that not defined any package.</br>
  * then export your project to runnable jar file(option : *'Extract required libraries into generated JAR') and put into <tt>/plugins</tt> directory that under the Actlist installed path.</p>
@@ -87,6 +87,13 @@ public abstract class ActlistPlugin {
 		showTrayNotificationObject = new SimpleObjectProperty(null);
 		dismissTrayNotificationObject = new SimpleObjectProperty(null);
 		shouldDismissTrayNotifications = new SimpleBooleanProperty(false);
+	}
+	
+	/**
+	 * @since 1.2.6
+	 */
+	protected static void debug() {
+		DebugApp.debug();
 	}
 	
 	/**

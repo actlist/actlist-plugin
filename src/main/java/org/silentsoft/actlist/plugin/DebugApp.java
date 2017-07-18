@@ -80,14 +80,22 @@ public class DebugApp extends Application {
 			root.getChildren().add(createBody(plugin));
 			
 			stage.setScene(new Scene(root));
+			
+			stage.setTitle("Actlist Debug App");
+			stage.show();
+			
+			if (plugin.existsGraphic()) {
+				plugin.getGraphic();
+			}
+			
+			plugin.initialize();
+			
+			Platform.runLater(() -> {
+				((JFXToggleButton) stage.getScene().lookup("#toggle")).getOnAction().handle(null);
+			});
+		} else {
+			throw new Exception("The Plugin class must be extends ActlistPlugin !");
 		}
-		
-		stage.setTitle("Actlist Debug App");
-		stage.show();
-		
-		Platform.runLater(() -> {
-			((JFXToggleButton) stage.getScene().lookup("#toggle")).getOnAction().handle(null);
-		});
 	}
 	
 	private JFXHamburger createHamburger() {

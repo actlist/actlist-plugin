@@ -69,6 +69,8 @@ public abstract class ActlistPlugin {
 	
 	private LinkedHashMap<String, Function> functionMap;
 	
+	private ObjectProperty<ClassLoader> classLoaderObject;
+	
 	private BooleanProperty shouldShowLoadingBar;
 	
 	private ObjectProperty<Throwable> exceptionObject;
@@ -82,6 +84,7 @@ public abstract class ActlistPlugin {
 		this.pluginName = pluginName;
 		this.functionMap = new LinkedHashMap<>();
 		
+		classLoaderObject = new SimpleObjectProperty(null);
 		shouldShowLoadingBar = new SimpleBooleanProperty(false);
 		exceptionObject = new SimpleObjectProperty(null);
 		showTrayNotificationObject = new SimpleObjectProperty(null);
@@ -252,11 +255,11 @@ public abstract class ActlistPlugin {
 	}
 	
 	private URL getPNG() {
-		return getClass().getResource(getClass().getSimpleName().concat(".png"));
+		return getClassLoader().getResource(getClass().getSimpleName().concat(".png"));
 	}
 	
 	private URL getFXML() {
-		return getClass().getResource(getClass().getSimpleName().concat(".fxml"));
+		return getClassLoader().getResource(getClass().getSimpleName().concat(".fxml"));
 	}
 	
 	private Boolean existsIcon;
@@ -311,6 +314,7 @@ public abstract class ActlistPlugin {
 	public Node getGraphic() throws Exception {
 		if (graphic == null) {
 			FXMLLoader fxmlLoader = new FXMLLoader(getFXML());
+			fxmlLoader.setClassLoader(getClassLoader());
 			fxmlLoader.setController(this);
 			graphic = fxmlLoader.load();
 		}
@@ -319,6 +323,10 @@ public abstract class ActlistPlugin {
 	
 	LinkedHashMap<String, Function> getFunctionMap() {
 		return functionMap;
+	}
+	
+	ObjectProperty<ClassLoader> classLoaderObject() {
+		return classLoaderObject;
 	}
 	
 	BooleanProperty shouldShowLoadingBar() {
@@ -387,6 +395,13 @@ public abstract class ActlistPlugin {
 	 */
 	public void removeConfig(String key) throws Exception {
 		getPluginConfig().remove(key);
+	}
+	
+	/**
+	 * @since 1.2.6
+	 */
+	public ClassLoader getClassLoader() {
+		return classLoaderObject().get();
 	}
 	
 	/**

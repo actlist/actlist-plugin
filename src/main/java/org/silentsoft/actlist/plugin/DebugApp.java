@@ -54,6 +54,8 @@ public class DebugApp extends Application {
 		if (ActlistPlugin.class.isAssignableFrom(clazz)) {
 			ActlistPlugin plugin = ActlistPlugin.class.cast(clazz.newInstance());
 			
+			plugin.classLoaderObject().set(getClass().getClassLoader());
+			
 			ChangeListener<Object> changeListener = new ChangeListener<Object>() {
 				@Override
 				public void changed(ObservableValue<? extends Object> observable, Object oldValue, Object newValue) {
@@ -191,8 +193,8 @@ public class DebugApp extends Application {
 		body.setLayoutX(35.0);
 		body.setLayoutY(51.0);
 		body.setPrefWidth(380.0);
-		AnchorPane.setLeftAnchor(body, 35.0);
 		AnchorPane.setRightAnchor(body, 20.0);
+		AnchorPane.setLeftAnchor(body, 35.0);
 		
 		return body;
 	}

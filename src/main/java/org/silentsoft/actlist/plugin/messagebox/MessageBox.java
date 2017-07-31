@@ -7,7 +7,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
+import com.sun.javafx.stage.StageHelper;
+
 import javafx.application.Platform;
+import javafx.collections.ObservableList;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
@@ -19,6 +22,7 @@ import javafx.scene.layout.Priority;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 
+@SuppressWarnings("restriction")
 public final class MessageBox {
 	
 	private static List<Image> getActlistIcons() {
@@ -55,7 +59,12 @@ public final class MessageBox {
 		alert.setHeaderText(masthead);
 		alert.setContentText(message);
 		
-		if (owner != null) {
+		if (owner == null) {
+			ObservableList<Stage> stages = StageHelper.getStages();
+			if (stages.isEmpty() == false) {
+				alert.initOwner(stages.get(0));
+			}
+		} else {
 			alert.initOwner((Window) owner);
 		}
 		
@@ -71,7 +80,12 @@ public final class MessageBox {
 		alert.setHeaderText(masthead);
 		alert.setContentText(message);
 		
-		if (owner != null) {
+		if (owner == null) {
+			ObservableList<Stage> stages = StageHelper.getStages();
+			if (stages.isEmpty() == false) {
+				alert.initOwner(stages.get(0));
+			}
+		} else {
 			alert.initOwner((Window) owner);
 		}
 		
@@ -99,7 +113,12 @@ public final class MessageBox {
 		alert.setHeaderText(masthead);
 		alert.setContentText(message);
 		
-		if (owner != null) {
+		if (owner == null) {
+			ObservableList<Stage> stages = StageHelper.getStages();
+			if (stages.isEmpty() == false) {
+				alert.initOwner(stages.get(0));
+			}
+		} else {
 			alert.initOwner((Window) owner);
 		}
 		
@@ -127,7 +146,12 @@ public final class MessageBox {
 		alert.setHeaderText(masthead);
 		alert.setContentText(message);
 		
-		if (owner != null) {
+		if (owner == null) {
+			ObservableList<Stage> stages = StageHelper.getStages();
+			if (stages.isEmpty() == false) {
+				alert.initOwner(stages.get(0));
+			}
+		} else {
 			alert.initOwner((Window) owner);
 		}
 		
@@ -164,7 +188,12 @@ public final class MessageBox {
 			alert.setHeaderText(masthead);
 			alert.setContentText(message);
 			
-			if (owner != null) {
+			if (owner == null) {
+				ObservableList<Stage> stages = StageHelper.getStages();
+				if (stages.isEmpty() == false) {
+					alert.initOwner(stages.get(0));
+				}
+			} else {
 				alert.initOwner((Window) owner);
 			}
 			

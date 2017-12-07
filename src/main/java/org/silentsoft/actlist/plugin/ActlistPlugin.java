@@ -184,6 +184,56 @@ public abstract class ActlistPlugin {
 	}
 	
 	/**
+	 * @since 1.2.6
+	 */
+	protected String getActlistVersion() {
+		String actlistVersion = null;
+		
+		Class<?> buildVersionClass = getBuildVersionClass();
+		if (buildVersionClass != null) {
+			try {
+				actlistVersion = (String) buildVersionClass.getField("VERSION").get(null);
+			} catch (Exception | Error e) {
+				
+			}
+		}
+		
+		return actlistVersion;
+	}
+	
+	/**
+	 * @since 1.2.6
+	 */
+	protected String getActlistBuildTime() {
+		String actlistBuildTime = null;
+		
+		Class<?> buildVersionClass = getBuildVersionClass();
+		if (buildVersionClass != null) {
+			try {
+				actlistBuildTime = (String) buildVersionClass.getField("BUILD_TIME").get(null);
+			} catch (Exception | Error e) {
+				
+			}
+		}
+		
+		return actlistBuildTime;
+	}
+	
+	
+	Class<?> buildVersionClass;
+	Class<?> getBuildVersionClass() {
+		if (buildVersionClass == null) {
+			try {
+				buildVersionClass = Class.forName("org.silentsoft.actlist.version.BuildVersion");
+			} catch (Exception | Error e) {
+				
+			}
+		}
+		
+		return buildVersionClass;
+	}
+	
+	/**
 	 * @since 1.0.0
 	 */
 	public String getPluginName() {

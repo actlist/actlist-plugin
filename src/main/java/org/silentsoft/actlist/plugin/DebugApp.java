@@ -38,14 +38,18 @@ import javafx.stage.Stage;
  * 
  * @author silentsoft
  */
-public class DebugApp extends Application {
+public final class DebugApp extends Application {
 
+	static boolean isDebugMode = false;
+	
 	public static void debug() {
+		isDebugMode = true;
+		
 		launch("");
 	}
-
-	private Stage stage;
 	
+	Stage stage;
+
 	@Override
 	public void start(Stage stage) throws Exception {
 		this.stage = stage;

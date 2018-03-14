@@ -33,7 +33,7 @@ import javafx.scene.image.ImageView;
  * @author silentsoft
  */
 public abstract class ActlistPlugin {
-
+	
 	public class Function {
 		Node graphic;
 		Runnable action;
@@ -97,6 +97,13 @@ public abstract class ActlistPlugin {
 	 */
 	protected static void debug() {
 		DebugApp.debug();
+	}
+	
+	/**
+	 * @since 1.2.6
+	 */
+	protected boolean isDebugMode() {
+		return DebugApp.isDebugMode;
 	}
 	
 	/**

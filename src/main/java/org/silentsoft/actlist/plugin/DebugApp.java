@@ -75,6 +75,7 @@ public final class DebugApp extends Application {
 			plugin.showTrayNotificationObject().addListener(changeListener);
 			plugin.dismissTrayNotificationObject().addListener(changeListener);
 			plugin.shouldDismissTrayNotifications().addListener(changeListener);
+			plugin.shouldBrowseActlistArchives().addListener(changeListener);
 			
 			AnchorPane root = new AnchorPane();
 			root.setPrefWidth(435.0);

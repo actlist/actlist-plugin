@@ -79,6 +79,8 @@ public abstract class ActlistPlugin {
 	private ObjectProperty<TrayNotification> dismissTrayNotificationObject;
 	private BooleanProperty shouldDismissTrayNotifications;
 	
+	private BooleanProperty shouldBrowseActlistArchives;
+	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public ActlistPlugin(String pluginName) {
 		this.pluginName = pluginName;
@@ -90,6 +92,7 @@ public abstract class ActlistPlugin {
 		showTrayNotificationObject = new SimpleObjectProperty(null);
 		dismissTrayNotificationObject = new SimpleObjectProperty(null);
 		shouldDismissTrayNotifications = new SimpleBooleanProperty(false);
+		shouldBrowseActlistArchives = new SimpleBooleanProperty(false);
 	}
 	
 	/**
@@ -406,6 +409,10 @@ public abstract class ActlistPlugin {
 		return shouldDismissTrayNotifications;
 	}
 	
+	BooleanProperty shouldBrowseActlistArchives() {
+		return shouldBrowseActlistArchives;
+	}
+	
 	/**
 	 * @param functionName for display to user.
 	 * @param function executes when user choosed.
@@ -538,5 +545,12 @@ public abstract class ActlistPlugin {
 	 */
 	public void dismissTrayNotifications() {
 		shouldDismissTrayNotifications().set(true);
+	}
+	
+	/**
+	 * @since 1.2.6
+	 */
+	public void browseActlistArchives() {
+		shouldBrowseActlistArchives().set(true);
 	}
 }

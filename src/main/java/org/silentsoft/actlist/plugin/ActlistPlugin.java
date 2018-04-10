@@ -1,5 +1,6 @@
 package org.silentsoft.actlist.plugin;
 
+import java.net.URI;
 import java.net.URL;
 import java.util.LinkedHashMap;
 
@@ -58,10 +59,18 @@ public abstract class ActlistPlugin {
 	private String pluginName;
 	
 	private String pluginDescription;
+	private URI pluginDescriptionURI;
+	
+	private String pluginChangeLog;
+	private URI pluginChangeLogURI;
+	
+	private String pluginLicense;
+	private URI pluginLicenseURI;
 	
 	private String pluginVersion;
 	
 	private String pluginAuthor;
+	private URI pluginAuthorURI;
 	
 	private String minimumCompatibleVersion;
 	
@@ -263,6 +272,76 @@ public abstract class ActlistPlugin {
 	protected void setPluginDescription(String pluginDescription) {
 		this.pluginDescription = pluginDescription;
 	}
+	
+	/**
+	 * @since 1.2.6
+	 */
+	protected void setPluginDescription(URI uri) {
+		this.pluginDescriptionURI = uri;
+	}
+	
+	/**
+	 * @since 1.2.6
+	 */
+	public URI getPluginDescriptionURI() {
+		return pluginDescriptionURI;
+	}
+	
+	/**
+	 * @since 1.2.6
+	 */
+	public String getPluginChangeLog() {
+		return pluginChangeLog;
+	}
+	
+	/**
+	 * @since 1.2.6
+	 */
+	protected void setPluginChangeLog(String pluginChangeLog) {
+		this.pluginChangeLog = pluginChangeLog;
+	}
+	
+	/**
+	 * @since 1.2.6
+	 */
+	protected void setPluginChangeLog(URI uri) {
+		this.pluginChangeLogURI = uri;
+	}
+	
+	/**
+	 * @since 1.2.6
+	 */
+	public URI getPluginChangeLogURI() {
+		return pluginChangeLogURI;
+	}
+	
+	/**
+	 * @since 1.2.6
+	 */
+	public String getPluginLicense() {
+		return pluginLicense;
+	}
+	
+	/**
+	 * @since 1.2.6
+	 */
+	protected void setPluginLicense(String pluginLicense) {
+		this.pluginLicense = pluginLicense;
+	}
+	
+	/**
+	 * @since 1.2.6
+	 */
+	protected void setPluginLicense(URI uri) {
+		this.pluginLicenseURI = uri;
+	}
+	
+	/**
+	 * @since 1.2.6
+	 */
+	public URI getPluginLicenseURI() {
+		return pluginLicenseURI;
+	}
 
 	/**
 	 * @since 1.2.0
@@ -290,6 +369,21 @@ public abstract class ActlistPlugin {
 	 */
 	protected void setPluginAuthor(String pluginAuthor) {
 		this.pluginAuthor = pluginAuthor;
+	}
+	
+	/**
+	 * @since 1.2.6
+	 */
+	protected void setPluginAuthor(String pluginAuthor, URI uri) {
+		this.pluginAuthor = pluginAuthor;
+		this.pluginAuthorURI = uri;
+	}
+	
+	/**
+	 * @since 1.2.6
+	 */
+	public URI getPluginAuthorURI() {
+		return pluginAuthorURI;
 	}
 	
 	/**

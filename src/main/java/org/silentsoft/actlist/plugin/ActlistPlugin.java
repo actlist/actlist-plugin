@@ -69,6 +69,9 @@ public abstract class ActlistPlugin {
 	
 	private String pluginVersion;
 	
+	private URI pluginUpdateCheckURI;
+	private URI pluginArchivesURI;
+	
 	private String pluginAuthor;
 	private URI pluginAuthorURI;
 	
@@ -384,6 +387,35 @@ public abstract class ActlistPlugin {
 	 */
 	public URI getPluginAuthorURI() {
 		return pluginAuthorURI;
+	}
+	
+	/**
+	 * @since 1.2.6
+	 */
+	public URI getPluginUpdateCheckURI() {
+		return pluginUpdateCheckURI;
+	}
+	
+	/**
+	 * @since 1.2.6
+	 */
+	public URI getPluginArchivesURI() {
+		return pluginArchivesURI;
+	}
+	
+	/**
+	 * @since 1.2.6
+	 */
+	public void setPluginUpdateCheckURI(URI pluginUpdateCheckURI) {
+		setPluginUpdateCheckURI(pluginUpdateCheckURI, null);
+	}
+	
+	/**
+	 * @since 1.2.6
+	 */
+	public void setPluginUpdateCheckURI(URI pluginUpdateCheckURI, URI pluginArchivesURI) {
+		this.pluginUpdateCheckURI = pluginUpdateCheckURI;
+		this.pluginArchivesURI = pluginArchivesURI;
 	}
 	
 	/**

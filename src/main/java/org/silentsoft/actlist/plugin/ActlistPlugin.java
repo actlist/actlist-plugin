@@ -4,6 +4,7 @@ import java.net.URI;
 import java.net.URL;
 import java.util.LinkedHashMap;
 
+import org.apache.http.HttpHost;
 import org.silentsoft.actlist.plugin.tray.TrayNotification;
 
 import javafx.beans.property.BooleanProperty;
@@ -83,6 +84,8 @@ public abstract class ActlistPlugin {
 	
 	private ObjectProperty<ClassLoader> classLoaderObject;
 	
+	private ObjectProperty<HttpHost> proxyHostObject;
+	
 	private BooleanProperty shouldShowLoadingBar;
 	
 	private ObjectProperty<Throwable> exceptionObject;
@@ -99,6 +102,7 @@ public abstract class ActlistPlugin {
 		this.functionMap = new LinkedHashMap<>();
 		
 		classLoaderObject = new SimpleObjectProperty(null);
+		proxyHostObject = new SimpleObjectProperty(null);
 		shouldShowLoadingBar = new SimpleBooleanProperty(false);
 		exceptionObject = new SimpleObjectProperty(null);
 		showTrayNotificationObject = new SimpleObjectProperty(null);
@@ -515,6 +519,10 @@ public abstract class ActlistPlugin {
 		return classLoaderObject;
 	}
 	
+	ObjectProperty<HttpHost> proxyHostObject() {
+		return proxyHostObject;
+	}
+	
 	BooleanProperty shouldShowLoadingBar() {
 		return shouldShowLoadingBar;
 	}
@@ -592,6 +600,13 @@ public abstract class ActlistPlugin {
 	 */
 	public ClassLoader getClassLoader() {
 		return classLoaderObject().get();
+	}
+	
+	/**
+	 * @since 1.2.6
+	 */
+	public HttpHost getProxyHost() {
+		return proxyHostObject().get();
 	}
 	
 	/**

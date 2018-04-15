@@ -25,6 +25,10 @@ __controlsfx 8.40.10__
  * https://bitbucket.org/controlsfx/controlsfx
  * BSD-3-Clause
 
+__httpcore 4.3.3__
+ * https://github.com/apache/httpcomponents-core
+ * Apache License 2.0
+
 __jackson-annotations 2.4.2__
  * https://github.com/FasterXML/jackson-annotations
  * Apache License 2.0

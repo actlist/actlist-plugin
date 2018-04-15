@@ -25,6 +25,7 @@
 		<!-- 3rd party -->
 		<jfoenix.version>1.0.0</jfoenix.version>
 		<controlsfx.version>8.40.10</controlsfx.version>
+		<apache-http-core.version>4.3.3</apache-http-core.version>
 	</properties>
 
 	<build>
@@ -73,6 +74,11 @@
 			<groupId>org.controlsfx</groupId>
 			<artifactId>controlsfx</artifactId>
 			<version>${controlsfx.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpcore</artifactId>
+			<version>${apache-http-core.version}</version>
 		</dependency>
 	</dependencies>
 </project>

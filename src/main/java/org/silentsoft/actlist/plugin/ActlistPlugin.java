@@ -2,6 +2,7 @@ package org.silentsoft.actlist.plugin;
 
 import java.net.URI;
 import java.net.URL;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 
 import org.apache.http.HttpHost;
@@ -260,6 +261,56 @@ public abstract class ActlistPlugin {
 		
 		return buildVersionClass;
 	}
+	
+	/**
+	 * @since 1.2.6
+	 */
+	protected boolean isActlistVersionLowerThan(int major, int minor, int patch) {
+		return versionComparator.compare(getActlistVersion(), String.format("%d.%d.%d", major, minor, patch)) < 0;
+	}
+	
+	/**
+	 * @since 1.2.6
+	 */
+	protected boolean isActlistVersionSameWith(int major, int minor, int patch) {
+		return versionComparator.compare(getActlistVersion(), String.format("%d.%d.%d", major, minor, patch)) == 0;
+	}
+	
+	/**
+	 * @since 1.2.6
+	 */
+	protected boolean isActlistVersionHigherThan(int major, int minor, int patch) {
+		return versionComparator.compare(getActlistVersion(), String.format("%d.%d.%d", major, minor, patch)) > 0;
+	}
+	
+	private Comparator<String> versionComparator = new Comparator<String>() {
+		@Override
+		public int compare(String o1, String o2) {
+			String[] _o1 = o1.split("\\.");
+			String[] _o2 = o2.split("\\.");
+			
+			Integer o1Major = Integer.valueOf(_o1[0]);
+			Integer o2Major = Integer.valueOf(_o2[0]);
+			
+			int majorCompare = o1Major.compareTo(o2Major);
+			if (majorCompare == 0) {
+				Integer o1Minor = Integer.valueOf(_o1[1]);
+				Integer o2Minor = Integer.valueOf(_o2[1]);
+				
+				int minorCompare = o1Minor.compareTo(o2Minor);
+				if (minorCompare == 0) {
+					Integer o1Patch = Integer.valueOf(_o1[2]);
+					Integer o2Patch = Integer.valueOf(_o2[2]);
+					
+					return o1Patch.compareTo(o2Patch);
+				} else {
+					return minorCompare;
+				}
+			}
+			
+			return majorCompare;
+		}
+	};
 	
 	/**
 	 * @since 1.0.0

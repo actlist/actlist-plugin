@@ -51,30 +51,59 @@ public final class MessageBox {
 	}
 	
 	public static void showAbout(Object owner, String masthead, String message) {
-		String title = "About";
-		
-		Alert alert = new Alert(AlertType.INFORMATION);
-		((Stage) alert.getDialogPane().getScene().getWindow()).getIcons().addAll(getActlistIcons());
-		alert.setTitle(title);
-		alert.setHeaderText(masthead);
-		alert.setContentText(message);
-		
-		if (owner == null) {
-			ObservableList<Stage> stages = StageHelper.getStages();
-			if (stages.isEmpty() == false) {
-				alert.initOwner(stages.get(0));
-			}
-		} else {
-			alert.initOwner((Window) owner);
-		}
-		
-		alert.showAndWait();
+		showMessage(AlertType.INFORMATION, "About", owner, masthead, message);
+	}
+	
+	public static void showInformation(String message) {
+		showInformation(null, null, message);
+	}
+	
+	public static void showInformation(Object owner, String message) {
+		showInformation(owner, null, message);
+	}
+	
+	public static void showInformation(String masthead, String message) {
+		showInformation(null, masthead, message);
 	}
 	
 	public static void showInformation(Object owner, String masthead, String message) {
-		String title = "Information";
-		
-		Alert alert = new Alert(AlertType.INFORMATION);
+		showMessage(AlertType.INFORMATION, "Information", owner, masthead, message);
+	}
+	
+	public static void showWarning(String message) {
+		showWarning(null, null, message);
+	}
+	
+	public static void showWarning(Object owner, String message) {
+		showWarning(owner, null, message);
+	}
+	
+	public static void showWarning(String masthead, String message) {
+		showWarning(null, masthead, message);
+	}
+	
+	public static void showWarning(Object owner, String masthead, String message) {
+		showMessage(AlertType.WARNING, "Warning", owner, masthead, message);
+	}
+	
+	public static void showError(String message) {
+		showError(null, null, message);
+	}
+	
+	public static void showError(Object owner, String message) {
+		showError(owner, null, message);
+	}
+	
+	public static void showError(String masthead, String message) {
+		showError(null, masthead, message);
+	}
+	
+	public static void showError(Object owner, String masthead, String message) {
+		showMessage(AlertType.ERROR, "Error", owner, masthead, message);
+	}
+	
+	private static void showMessage(AlertType alertType, String title, Object owner, String masthead, String message) {
+		Alert alert = new Alert(alertType);
 		((Stage) alert.getDialogPane().getScene().getWindow()).getIcons().addAll(getActlistIcons());
 		alert.setTitle(title);
 		alert.setHeaderText(masthead);
@@ -123,39 +152,6 @@ public final class MessageBox {
 		}
 		
 		return alert.showAndWait();
-	}
-	
-	public static void showError(String message) {
-		showError(null, null, message);
-	}
-	
-	public static void showError(Object owner, String message) {
-		showError(owner, null, message);
-	}
-	
-	public static void showError(String masthead, String message) {
-		showError(null, masthead, message);
-	}
-	
-	public static void showError(Object owner, String masthead, String message) {
-		String title = "Error";
-		
-		Alert alert = new Alert(AlertType.ERROR);
-		((Stage) alert.getDialogPane().getScene().getWindow()).getIcons().addAll(getActlistIcons());
-		alert.setTitle(title);
-		alert.setHeaderText(masthead);
-		alert.setContentText(message);
-		
-		if (owner == null) {
-			ObservableList<Stage> stages = StageHelper.getStages();
-			if (stages.isEmpty() == false) {
-				alert.initOwner(stages.get(0));
-			}
-		} else {
-			alert.initOwner((Window) owner);
-		}
-		
-		alert.showAndWait();
 	}
 	
 	public static void showException(Throwable exception) {

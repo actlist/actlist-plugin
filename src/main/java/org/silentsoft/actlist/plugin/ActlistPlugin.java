@@ -78,6 +78,8 @@ public abstract class ActlistPlugin {
 	
 	private String minimumCompatibleVersion;
 	
+	private String warningText;
+	
 	private PluginConfig pluginConfig;
 	
 	private LinkedHashMap<String, Function> functionMap;
@@ -434,6 +436,20 @@ public abstract class ActlistPlugin {
 	 */
 	protected void setMinimumCompatibleVersion(int major, int minor, int patch) {
 		this.minimumCompatibleVersion = String.format("%d.%d.%d", major, minor, patch);
+	}
+	
+	/**
+	 * @since 1.2.6
+	 */
+	public String getWarningText() {
+		return warningText;
+	}
+	
+	/**
+	 * @since 1.2.6
+	 */
+	protected void setWarningText(String warningText) {
+		this.warningText = warningText;
 	}
 
 	PluginConfig getPluginConfig() {

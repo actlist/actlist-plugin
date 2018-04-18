@@ -142,14 +142,14 @@ public abstract class ActlistPlugin {
 	protected abstract void initialize() throws Exception;
 	
 	/**
-	 * This method is called when plugin is activated.</p>
+	 * This method will be called when plugin is activated.</p>
 	 * 
 	 * Plugin will be activated when the user clicks to toggle button.</br>
 	 * also this method will be called if this plugin was activate when Actlist is started up.</p>
 	 * 
 	 * <em>
 	 * <b>CRITICAL</b> :</br>
-	 * This method is called via FxApplicationThread.
+	 * This method will be called via FxApplicationThread.
 	 * If your work needs a few seconds for finish, you <b>must</b> write your code into a new Thread. (I'm <b>hirely recomend</b> this option)
      * If not, The Actlist's UI will be hang for few seconds.
 	 * </em></p>
@@ -160,13 +160,13 @@ public abstract class ActlistPlugin {
 	public abstract void pluginActivated() throws Exception;
 	
 	/**
-	 * This method is called when plugin is deactivated.</p>
+	 * This method will be called when plugin is deactivated.</p>
 	 * 
 	 * Plugin will be deactivated when the user clicks the toggle button again after plugin is activated.</p>
 	 * 
 	 * <em>
 	 * <b>CRITICAL</b> :</br>
-	 * This method is called via FxApplicationThread.
+	 * This method will be called via FxApplicationThread.
 	 * If your work needs a few seconds for finish, you <b>must</b> write your code into a new Thread. (I'm <b>hirely recomend</b> this option)
      * If not, The Actlist's UI will be hang for few seconds.
 	 * </em></p>
@@ -177,7 +177,26 @@ public abstract class ActlistPlugin {
 	public abstract void pluginDeactivated() throws Exception;
 	
 	/**
-	 * This method is called when Actlist application is activated.</p>
+	 * This method will be called when the update check response's <code>available</code> value is <code>true</code>.</p>
+	 * 
+	 * If you set pluginArchivesURI here, the second parameter of {@link #setPluginUpdateCheckURI(URI, URI)} and
+	 * 'url' in the server response will be ignored and it will be browse to the url that you set within this method.</p>
+	 * 
+	 * <em>
+	 * <b>CRITICAL</b> :</br>
+	 * This method will be called via non-FxApplicationThread.
+	 * so if you wanna do control some of the your graphic Node, you should writes code within FxApplicationThread.
+	 * <em></p>
+	 * 
+	 * @throws Exception
+	 * @since 1.2.6
+	 */
+	public void pluginUpdateFound() throws Exception {
+		
+	}
+	
+	/**
+	 * This method will be called when Actlist application is activated.</p>
 	 * 
 	 * It could be time that user clicks system tray icon, or press the global short cut to showing up.
 	 * 
@@ -189,7 +208,7 @@ public abstract class ActlistPlugin {
 	}
 	
 	/**
-	 * This method is called when Actlist application is deactivated.</p>
+	 * This method will be called when Actlist application is deactivated.</p>
 	 * 
 	 * It could be time that user clicks minimize button or system tray icon again, or press the global short cut again when after shown.
 	 *  
@@ -201,7 +220,7 @@ public abstract class ActlistPlugin {
 	}
 	
 	/**
-	 * This method is called when Actlist application got close request.</p>
+	 * This method will be called when Actlist application got close request.</p>
 	 * 
 	 * It could be time that user clicks close button at task-manager, or press ALT+F4.
 	 * 
@@ -445,19 +464,26 @@ public abstract class ActlistPlugin {
 	public URI getPluginAuthorURI() {
 		return pluginAuthorURI;
 	}
+
+	/**
+	 * @since 1.2.6
+	 */
+	public URI getPluginArchivesURI() {
+		return pluginArchivesURI;
+	}
+
+	/**
+	 * @since 1.2.6
+	 */
+	public void setPluginArchivesURI(URI pluginArchivesURI) {
+		this.pluginArchivesURI = pluginArchivesURI;
+	}
 	
 	/**
 	 * @since 1.2.6
 	 */
 	public URI getPluginUpdateCheckURI() {
 		return pluginUpdateCheckURI;
-	}
-	
-	/**
-	 * @since 1.2.6
-	 */
-	public URI getPluginArchivesURI() {
-		return pluginArchivesURI;
 	}
 	
 	/**

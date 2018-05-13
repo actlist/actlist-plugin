@@ -1,6 +1,11 @@
 package org.silentsoft.actlist.plugin;
 
+import java.io.File;
+import java.nio.file.Paths;
+
 import org.silentsoft.actlist.plugin.messagebox.MessageBox;
+import org.silentsoft.core.util.FileUtil;
+import org.silentsoft.core.util.JSONUtil;
 
 import com.jfoenix.controls.JFXHamburger;
 import com.jfoenix.controls.JFXToggleButton;
@@ -59,6 +64,16 @@ public final class DebugApp extends Application {
 			ActlistPlugin plugin = ActlistPlugin.class.cast(clazz.newInstance());
 			
 			plugin.classLoaderObject().set(getClass().getClassLoader());
+			
+			plugin.setPluginConfig(new PluginConfig("debug"));
+			File configFile = Paths.get(System.getProperty("user.dir"), "plugins", "config", "debug.config").toFile();
+			if (configFile.exists()) {
+				String configContent = FileUtil.readFile(configFile);
+				PluginConfig pluginConfig = JSONUtil.JSONToObject(configContent, PluginConfig.class);
+				if (pluginConfig != null) {
+					plugin.setPluginConfig(pluginConfig);
+				}
+			}
 			
 			ChangeListener<Object> changeListener = new ChangeListener<Object>() {
 				@Override

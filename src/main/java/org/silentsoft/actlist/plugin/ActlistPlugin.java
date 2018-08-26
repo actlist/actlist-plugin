@@ -186,7 +186,7 @@ public abstract class ActlistPlugin {
 	 * <b>CRITICAL</b> :</br>
 	 * This method will be called via non-FxApplicationThread.
 	 * so if you wanna do control some of the your graphic Node, you should writes code within FxApplicationThread.
-	 * <em></p>
+	 * </em></p>
 	 * 
 	 * @throws Exception
 	 * @since 1.2.6
@@ -668,6 +668,13 @@ public abstract class ActlistPlugin {
 	}
 	
 	/**
+	 * Returns specific value that depends on <code>key</code> from own config file.</p>
+	 * 
+	 * <em>
+	 * <b>IMPORTANT</b> :</br>
+	 * Do not call this method on plugin's constructor.
+	 * </em></p>
+	 * 
 	 * @since 1.1.0
 	 */
 	public <T> T getConfig(String key) throws Exception {
@@ -675,6 +682,13 @@ public abstract class ActlistPlugin {
 	}
 	
 	/**
+	 * Each <code>key</code> and </code>value</code> will be put into own config file.</p>
+	 * 
+	 * <em>
+	 * <b>IMPORTANT</b> :</br>
+	 * Do not call this method on plugin's constructor.
+	 * </em></p>
+	 * 
 	 * @since 1.1.0
 	 */
 	public void putConfig(String key, Object value) throws Exception {
@@ -682,6 +696,13 @@ public abstract class ActlistPlugin {
 	}
 	
 	/**
+	 * Removes entire key-value from own config file.</p>
+	 * 
+	 * <em>
+	 * <b>IMPORTANT</b> :</br>
+	 * Do not call this method on plugin's constructor.
+	 * </em></p>
+	 * 
 	 * @since 1.1.0
 	 */
 	public void removeConfig(String key) throws Exception {

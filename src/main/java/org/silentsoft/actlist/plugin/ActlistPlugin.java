@@ -60,6 +60,8 @@ public abstract class ActlistPlugin {
 	
 	private String pluginName;
 	
+	private boolean oneTimePlugin;
+	
 	private String pluginDescription;
 	private URI pluginDescriptionURI;
 	
@@ -99,9 +101,14 @@ public abstract class ActlistPlugin {
 	
 	private BooleanProperty shouldBrowseActlistArchives;
 	
+	private ObjectProperty<Boolean> shouldRequestShowActlist;
+	
+	private BooleanProperty shouldRequestDeactivate;
+	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public ActlistPlugin(String pluginName) {
 		this.pluginName = pluginName;
+		this.oneTimePlugin = false;
 		this.functionMap = new LinkedHashMap<>();
 		
 		classLoaderObject = new SimpleObjectProperty(null);
@@ -112,6 +119,8 @@ public abstract class ActlistPlugin {
 		dismissTrayNotificationObject = new SimpleObjectProperty(null);
 		shouldDismissTrayNotifications = new SimpleBooleanProperty(false);
 		shouldBrowseActlistArchives = new SimpleBooleanProperty(false);
+		shouldRequestShowActlist = new SimpleObjectProperty(null);
+		shouldRequestDeactivate = new SimpleBooleanProperty(false);
 	}
 	
 	/**
@@ -305,6 +314,10 @@ public abstract class ActlistPlugin {
 	private Comparator<String> versionComparator = new Comparator<String>() {
 		@Override
 		public int compare(String o1, String o2) {
+			if (o1.equals(o2)) {
+				return 0;
+			}
+			
 			String[] _o1 = o1.split("\\.");
 			String[] _o2 = o2.split("\\.");
 			
@@ -336,6 +349,20 @@ public abstract class ActlistPlugin {
 	 */
 	public String getPluginName() {
 		return pluginName;
+	}
+	
+	/**
+	 * @since 1.2.10
+	 */
+	public boolean isOneTimePlugin() {
+		return oneTimePlugin;
+	}
+	
+	/**
+	 * @since 1.2.10
+	 */
+	public void setOneTimePlugin(boolean oneTimePlugin) {
+		this.oneTimePlugin = oneTimePlugin;
 	}
 	
 	/**
@@ -640,6 +667,14 @@ public abstract class ActlistPlugin {
 		return shouldBrowseActlistArchives;
 	}
 	
+	ObjectProperty<Boolean> shouldRequestShowActlist() {
+		return shouldRequestShowActlist;
+	}
+	
+	BooleanProperty shouldRequestDeactivate() {
+		return shouldRequestDeactivate;
+	}
+	
 	/**
 	 * @param functionName for display to user.
 	 * @param function executes when user choosed.
@@ -808,4 +843,26 @@ public abstract class ActlistPlugin {
 	public void browseActlistArchives() {
 		shouldBrowseActlistArchives().set(true);
 	}
+	
+	/**
+	 * @since 1.2.10
+	 */
+	public void requestShowActlist() {
+		shouldRequestShowActlist().set(true);
+	}
+	
+	/**
+	 * @since 1.2.10
+	 */
+	public void requestHideActlist() {
+		shouldRequestShowActlist().set(false);
+	}
+
+	/**
+	 * @since 1.2.10
+	 */
+	public void requestDeactivate() {
+		shouldRequestDeactivate().set(true);
+	}
+	
 }

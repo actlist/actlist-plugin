@@ -1,0 +1,7 @@
+/target/
+.settings/
+.classpath
+.project
+.DS_Store
+.NOTICE.md.html
+.README.md.html

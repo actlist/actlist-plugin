@@ -75,22 +75,46 @@ public final class DebugApp extends Application {
 				}
 			}
 			
-			ChangeListener<Object> changeListener = new ChangeListener<Object>() {
-				@Override
-				public void changed(ObservableValue<? extends Object> observable, Object oldValue, Object newValue) {
-					if (oldValue == newValue) {
-						return;
+			{
+				ChangeListener<Object> changeListener = new ChangeListener<Object>() {
+					@Override
+					public void changed(ObservableValue<? extends Object> observable, Object oldValue, Object newValue) {
+						if (oldValue == newValue) {
+							return;
+						}
+						
+						Platform.runLater(() -> {
+							MessageBox.showError("Not supported feature on debug mode.");
+						});
 					}
-					
-					MessageBox.showError("Not supported feature on debug mode.");
-				}
-			};
-			plugin.shouldShowLoadingBar().addListener(changeListener);
-			plugin.exceptionObject().addListener(changeListener);
-			plugin.showTrayNotificationObject().addListener(changeListener);
-			plugin.dismissTrayNotificationObject().addListener(changeListener);
-			plugin.shouldDismissTrayNotifications().addListener(changeListener);
-			plugin.shouldBrowseActlistArchives().addListener(changeListener);
+				};
+				plugin.shouldShowLoadingBar().addListener(changeListener);
+				plugin.exceptionObject().addListener(changeListener);
+				plugin.showTrayNotificationObject().addListener(changeListener);
+				plugin.dismissTrayNotificationObject().addListener(changeListener);
+				plugin.shouldDismissTrayNotifications().addListener(changeListener);
+				plugin.shouldBrowseActlistArchives().addListener(changeListener);
+				plugin.shouldRequestShowActlist().addListener(changeListener);
+			}
+			{
+				// This will be the first and last ChangeListener on DebugApp.
+				ChangeListener<Boolean> changeListener = new ChangeListener<Boolean>() {
+					@Override
+					public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+						if (newValue) {
+							JFXToggleButton toggle = (JFXToggleButton) stage.getScene().lookup("#toggle");
+							boolean isActivated = toggle.selectedProperty().get();
+							if (isActivated) {
+								toggle.setSelected(false);
+								toggle.getOnAction().handle(null);
+							}
+							
+							plugin.shouldRequestDeactivate().set(false);
+						}
+					}
+				};
+				plugin.shouldRequestDeactivate().addListener(changeListener);
+			}
 			
 			AnchorPane root = new AnchorPane();
 			root.setPrefWidth(435.0);
@@ -112,9 +136,9 @@ public final class DebugApp extends Application {
 			
 			plugin.initialize();
 			
-			Platform.runLater(() -> {
+			if (plugin.isOneTimePlugin() == false) {
 				((JFXToggleButton) stage.getScene().lookup("#toggle")).getOnAction().handle(null);
-			});
+			}
 		} else {
 			throw new Exception("The Plugin class must be extends ActlistPlugin !");
 		}
@@ -157,40 +181,42 @@ public final class DebugApp extends Application {
 		toggle.setId("toggle");
 		toggle.setLayoutX(199.0);
 		toggle.setLayoutY(-2.0);
-		toggle.setSelected(true);
 		toggle.setText(" ");
+		toggle.setSelected(!plugin.isOneTimePlugin());
 		toggle.setToggleColor(Paint.valueOf("#fafafa"));
 		toggle.setToggleLineColor(Paint.valueOf("#59bf53"));
 		toggle.setUnToggleLineColor(Paint.valueOf("#e0e0e0"));
 		AnchorPane.setRightAnchor(toggle, -0.203125);
 		
 		toggle.setOnAction(actionEvent -> {
-			try {
-				VBox body = (VBox) stage.getScene().lookup("#body");
-				
-				if (toggle.selectedProperty().get()) {
-					if (plugin.existsGraphic()) {
-						Node pluginContent = plugin.getGraphic();
-						if (pluginContent != null) {
-							body.getChildren().add(new BorderPane(pluginContent));
-							Separator contentLine = new Separator();
-							contentLine.setPrefWidth(215.0);
-							contentLine.setPadding(new Insets(5.0, 0.0, 0.0, 0.0));
-							body.getChildren().add(contentLine);
+			Platform.runLater(() -> {
+				try {
+					VBox body = (VBox) stage.getScene().lookup("#body");
+					
+					if (toggle.selectedProperty().get()) {
+						if (plugin.existsGraphic()) {
+							Node pluginContent = plugin.getGraphic();
+							if (pluginContent != null) {
+								body.getChildren().add(new BorderPane(pluginContent));
+								Separator contentLine = new Separator();
+								contentLine.setPrefWidth(215.0);
+								contentLine.setPadding(new Insets(5.0, 0.0, 0.0, 0.0));
+								body.getChildren().add(contentLine);
+							}
 						}
+						
+						plugin.pluginActivated();
+					} else {
+						body.getChildren().clear();
+						
+						plugin.pluginDeactivated();
 					}
 					
-					plugin.pluginActivated();
-				} else {
-					body.getChildren().clear();
+					stage.getScene().getWindow().sizeToScene();
+				} catch (Exception e) {
 					
-					plugin.pluginDeactivated();
 				}
-				
-				stage.getScene().getWindow().sizeToScene();
-			} catch (Exception e) {
-				
-			}
+			});
 		});
 		
 		return toggle;

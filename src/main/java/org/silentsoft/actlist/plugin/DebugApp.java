@@ -158,7 +158,7 @@ public final class DebugApp extends Application {
 	
 	private HBox createHead(ActlistPlugin plugin) {
 		Label lblPluginName = new Label();
-		lblPluginName.setText(plugin.getPluginName());
+		lblPluginName.setText((plugin.getPluginName() == null || plugin.getPluginName().trim().isEmpty()) ? "(empty name)" : plugin.getPluginName());
 		lblPluginName.setPrefHeight(16.0);
 		lblPluginName.setPrefWidth(302.0);
 		HBox.setHgrow(lblPluginName, Priority.SOMETIMES);

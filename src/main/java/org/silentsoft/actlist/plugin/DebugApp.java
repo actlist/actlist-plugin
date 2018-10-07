@@ -3,9 +3,11 @@ package org.silentsoft.actlist.plugin;
 import java.io.File;
 import java.nio.file.Paths;
 
+import org.silentsoft.actlist.plugin.ActlistPlugin.SupportedPlatform;
 import org.silentsoft.actlist.plugin.messagebox.MessageBox;
 import org.silentsoft.core.util.FileUtil;
 import org.silentsoft.core.util.JSONUtil;
+import org.silentsoft.core.util.SystemUtil;
 
 import com.jfoenix.controls.JFXHamburger;
 import com.jfoenix.controls.JFXToggleButton;
@@ -62,6 +64,20 @@ public final class DebugApp extends Application {
 		Class<?> clazz = Class.forName("Plugin");
 		if (ActlistPlugin.class.isAssignableFrom(clazz)) {
 			ActlistPlugin plugin = ActlistPlugin.class.cast(clazz.newInstance());
+			
+			SupportedPlatform currentPlatform = null;
+			{
+				if (SystemUtil.isWindows()) {
+					currentPlatform = SupportedPlatform.WINDOWS;
+				} else if (SystemUtil.isMac()) {
+					currentPlatform = SupportedPlatform.MACOSX;
+				} /* else if (SystemUtil.isLinux()) {
+					currentPlatform = SupportedPlatform.LINUX;
+				} else {
+					currentPlatform = SupportedPlatform.UNKNOWN;
+				} */
+			}
+			plugin.currentPlatformObject().set(currentPlatform);
 			
 			plugin.classLoaderObject().set(getClass().getClassLoader());
 			

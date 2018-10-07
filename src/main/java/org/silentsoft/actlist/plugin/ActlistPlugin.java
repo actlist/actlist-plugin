@@ -37,6 +37,10 @@ import javafx.scene.image.ImageView;
  */
 public abstract class ActlistPlugin {
 	
+	public enum SupportedPlatform {
+		WINDOWS, MACOSX
+	}
+	
 	public class Function {
 		Node graphic;
 		Runnable action;
@@ -59,6 +63,8 @@ public abstract class ActlistPlugin {
 	}
 	
 	private String pluginName;
+	
+	private SupportedPlatform[] supportedPlatforms;
 	
 	private boolean oneTimePlugin;
 	
@@ -87,6 +93,8 @@ public abstract class ActlistPlugin {
 	
 	private LinkedHashMap<String, Function> functionMap;
 	
+	private ObjectProperty<SupportedPlatform> currentPlatformObject;
+	
 	private ObjectProperty<ClassLoader> classLoaderObject;
 	
 	private ObjectProperty<HttpHost> proxyHostObject;
@@ -111,6 +119,7 @@ public abstract class ActlistPlugin {
 		this.oneTimePlugin = false;
 		this.functionMap = new LinkedHashMap<>();
 		
+		currentPlatformObject = new SimpleObjectProperty(null);
 		classLoaderObject = new SimpleObjectProperty(null);
 		proxyHostObject = new SimpleObjectProperty(null);
 		shouldShowLoadingBar = new SimpleBooleanProperty(false);
@@ -349,6 +358,20 @@ public abstract class ActlistPlugin {
 	 */
 	public String getPluginName() {
 		return pluginName;
+	}
+	
+	/**
+	 * @since 1.3.0
+	 */
+	public SupportedPlatform[] getSupportedPlatforms() {
+		return supportedPlatforms;
+	}
+	
+	/**
+	 * @since 1.3.0
+	 */
+	public void setSupportedPlatforms(SupportedPlatform... supportedPlatforms) {
+		this.supportedPlatforms = supportedPlatforms;
 	}
 	
 	/**
@@ -635,6 +658,10 @@ public abstract class ActlistPlugin {
 		return functionMap;
 	}
 	
+	ObjectProperty<SupportedPlatform> currentPlatformObject() {
+		return currentPlatformObject;
+	}
+	
 	ObjectProperty<ClassLoader> classLoaderObject() {
 		return classLoaderObject;
 	}
@@ -742,6 +769,13 @@ public abstract class ActlistPlugin {
 	 */
 	public void removeConfig(String key) throws Exception {
 		getPluginConfig().remove(key);
+	}
+	
+	/**
+	 * @since 1.3.0
+	 */
+	public SupportedPlatform getCurrentPlatform() {
+		return currentPlatformObject().get();
 	}
 	
 	/**

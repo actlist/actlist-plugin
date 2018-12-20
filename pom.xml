@@ -6,7 +6,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.silentsoft</groupId>
 	<artifactId>actlist-plugin</artifactId>
-	<version>1.4.1</version>
+	<version>1.4.2-SNAPSHOT</version>
 
 	<repositories>
 		<repository>
@@ -94,6 +94,10 @@
 			<id>maven-releases</id>
 			<url>http://nexus.silentsoft.org/repository/maven-releases</url>
 		</repository>
+		<snapshotRepository>
+			<id>maven-snapshots</id>
+			<url>http://nexus.silentsoft.org/repository/maven-snapshots</url>
+		</snapshotRepository>
 	</distributionManagement>
 
 </project>

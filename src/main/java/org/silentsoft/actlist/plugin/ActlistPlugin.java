@@ -18,22 +18,20 @@ import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 
 /**
- * Please generate executable main class called '<tt>Plugin</tt>' where in default package(please do not assign package).</br>
+ * Please generate executable main class called '<tt>Plugin</tt>' where in default package(please do not assign package).
+ * and inherit this <tt>ActlistPlugin</tt> class in your <tt>Plugin</tt> class.</br>
  * <em><tt>NOTE : You should not write any code other than calling the <code>debug();</code> method for debugging in the main method.</tt></em></p>
- * 
- * The Actlist core find the '<tt>Plugin</tt>' class in your jar that not defined any package.</br>
- * then export your project to runnable jar file(option : *'Extract required libraries into generated JAR') and put into <tt>/plugins</tt> directory that under the Actlist installed path.</p>
  * 
  * To make a plugin that contains graphic things, you can write the 'Plugin.fxml' file where in the same location of your <tt>Plguin</tt> class.
  * Also you can set the plugin's icon image that display where in about section (Right click -> About) through 'Plugin.png'</br>
  * <em><tt>NOTE : the recommended size of image is 48x48.</tt></em></p>
  * 
- * If you wanna make it jar as compact and light version, you should remove unused classes from exported jar file.</br>
- * this is very important because the *Extract option is contains all dependent libraries (even unused).</p>
+ * Finally, run maven command via CLI or GUI with <tt>clean package</tt> goals.</p>
  * 
- * All done. Happy enjoy it !
+ * All done. Happy enjoy it !</p>
  * 
  * @author silentsoft
+ * @see https://actlist.silentsoft.org/docs/quick-start/
  */
 public abstract class ActlistPlugin {
 	
@@ -41,7 +39,7 @@ public abstract class ActlistPlugin {
 	 * Actlist engine will reflects this variable to determine what the version of the ActlistPlugin is.
 	 */
 	@SuppressWarnings("unused")
-	private String version = "1.4.1";
+	private String version = "1.4.2-SNAPSHOT";
 	
 	public enum SupportedPlatform {
 		WINDOWS, MACOSX
@@ -121,6 +119,8 @@ public abstract class ActlistPlugin {
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public ActlistPlugin(String pluginName) {
+		instance = this;
+		
 		this.pluginName = pluginName;
 		this.oneTimePlugin = false;
 		this.functionMap = new LinkedHashMap<>();
@@ -136,6 +136,15 @@ public abstract class ActlistPlugin {
 		shouldBrowseActlistArchives = new SimpleBooleanProperty(false);
 		shouldRequestShowActlist = new SimpleObjectProperty(null);
 		shouldRequestDeactivate = new SimpleBooleanProperty(false);
+	}
+	
+	private static ActlistPlugin instance;
+	/**
+	 * @since 1.4.2
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> T getInstance() {
+		return (T) instance;
 	}
 	
 	/**

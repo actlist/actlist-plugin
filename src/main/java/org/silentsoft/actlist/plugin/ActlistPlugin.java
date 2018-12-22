@@ -31,7 +31,7 @@ import javafx.scene.image.ImageView;
  * All done. Happy enjoy it !</p>
  * 
  * @author silentsoft
- * @see https://actlist.silentsoft.org/docs/quick-start/
+ * @see <a href="https://actlist.silentsoft.org/docs/quick-start/">Plugin Development Guide</a>
  */
 public abstract class ActlistPlugin {
 	

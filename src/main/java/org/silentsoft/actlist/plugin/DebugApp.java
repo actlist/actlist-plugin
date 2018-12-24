@@ -10,6 +10,7 @@ import org.silentsoft.core.util.JSONUtil;
 import org.silentsoft.core.util.SystemUtil;
 
 import com.jfoenix.controls.JFXHamburger;
+import com.jfoenix.controls.JFXSpinner;
 import com.jfoenix.controls.JFXToggleButton;
 
 import javafx.application.Application;
@@ -38,10 +39,13 @@ import javafx.stage.Stage;
  * This class is designed for debugging the Actlist plugin.</p>
  * 
  * <tt>included features</tt></br>
- * <li>calls pluginActivated(), pluginDeactivated() via toggle button.</li>
+ * <li>pluginActivated(), pluginDeactivated()</li>
+ * <li>showLoadingBar(), hideLoadingBar()</li>
  * </p>
+ * 
  * <tt>excluded features</tt></br>
- * <li>all but except pluginActivated() and pluginDeactivated().</li>
+ * <li>except all but included features</li>
+ * </p>
  * 
  * @author silentsoft
  */
@@ -104,7 +108,6 @@ public final class DebugApp extends Application {
 						});
 					}
 				};
-				plugin.shouldShowLoadingBar().addListener(changeListener);
 				plugin.exceptionObject().addListener(changeListener);
 				plugin.showTrayNotificationObject().addListener(changeListener);
 				plugin.dismissTrayNotificationObject().addListener(changeListener);
@@ -113,7 +116,19 @@ public final class DebugApp extends Application {
 				plugin.shouldRequestShowActlist().addListener(changeListener);
 			}
 			{
-				// This will be the first and last ChangeListener on DebugApp.
+				ChangeListener<Boolean> changeListener = new ChangeListener<Boolean>() {
+					@Override
+					public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+						if (oldValue == newValue) {
+							return;
+						}
+						
+						displayLoadingBar(plugin, newValue);
+					}
+				};
+				plugin.shouldShowLoadingBar().addListener(changeListener);
+			}
+			{
 				ChangeListener<Boolean> changeListener = new ChangeListener<Boolean>() {
 					@Override
 					public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
@@ -139,7 +154,8 @@ public final class DebugApp extends Application {
 			root.getChildren().add(createHead(plugin));
 			root.getChildren().add(createToggle(plugin));
 			root.getChildren().add(createSeparator());
-			root.getChildren().add(createBody(plugin));
+			root.getChildren().add(createContentBox());
+			root.getChildren().add(createContentLoadingBox());
 			
 			stage.setScene(new Scene(root));
 			
@@ -157,6 +173,33 @@ public final class DebugApp extends Application {
 			}
 		} else {
 			throw new Exception("The Plugin class must be extends ActlistPlugin !");
+		}
+	}
+	
+	private void displayLoadingBar(ActlistPlugin plugin, boolean shouldShowLoadingBar) {
+		if (plugin.existsGraphic()) {
+			Runnable runnable = new Runnable() {
+				@Override
+				public void run() {
+					VBox contentLoadingBox = (VBox) stage.getScene().lookup("#contentLoadingBox");
+					
+					contentLoadingBox.getChildren().clear();
+					
+					if (shouldShowLoadingBar) {
+						contentLoadingBox.getChildren().add(new JFXSpinner());
+					}
+					
+					contentLoadingBox.setVisible(shouldShowLoadingBar);
+				}
+			};
+			
+			if (Platform.isFxApplicationThread()) {
+				runnable.run();
+			} else {
+				Platform.runLater(() -> {
+					runnable.run();
+				});
+			}
 		}
 	}
 	
@@ -207,23 +250,25 @@ public final class DebugApp extends Application {
 		toggle.setOnAction(actionEvent -> {
 			Platform.runLater(() -> {
 				try {
-					VBox body = (VBox) stage.getScene().lookup("#body");
+					VBox contentBox = (VBox) stage.getScene().lookup("#contentBox");
+					VBox contentLoadingBox = (VBox) stage.getScene().lookup("#contentLoadingBox");
 					
 					if (toggle.selectedProperty().get()) {
 						if (plugin.existsGraphic()) {
 							Node pluginContent = plugin.getGraphic();
 							if (pluginContent != null) {
-								body.getChildren().add(new BorderPane(pluginContent));
+								contentBox.getChildren().add(new BorderPane(pluginContent));
 								Separator contentLine = new Separator();
 								contentLine.setPrefWidth(215.0);
 								contentLine.setPadding(new Insets(5.0, 0.0, 0.0, 0.0));
-								body.getChildren().add(contentLine);
+								contentBox.getChildren().add(contentLine);
 							}
 						}
 						
 						plugin.pluginActivated();
 					} else {
-						body.getChildren().clear();
+						contentBox.getChildren().clear();
+						contentLoadingBox.getChildren().clear();
 						
 						plugin.pluginDeactivated();
 					}
@@ -249,15 +294,32 @@ public final class DebugApp extends Application {
 		return separator;
 	}
 	
-	private VBox createBody(ActlistPlugin plugin) {
-		VBox body = new VBox();
-		body.setId("body");
-		body.setLayoutX(35.0);
-		body.setLayoutY(51.0);
-		body.setPrefWidth(380.0);
-		AnchorPane.setRightAnchor(body, 20.0);
-		AnchorPane.setLeftAnchor(body, 35.0);
+	private VBox createContentBox() {
+		VBox contentBox = new VBox();
+		contentBox.setId("contentBox");
+		contentBox.setLayoutX(35.0);
+		contentBox.setLayoutY(51.0);
+		contentBox.setPrefWidth(380.0);
+		AnchorPane.setRightAnchor(contentBox, 20.0);
+		AnchorPane.setLeftAnchor(contentBox, 35.0);
 		
-		return body;
+		return contentBox;
+	}
+	
+	private VBox createContentLoadingBox() {
+		VBox contentLoadingBox = new VBox();
+		contentLoadingBox.setId("contentLoadingBox");
+		contentLoadingBox.setAlignment(Pos.CENTER);
+		contentLoadingBox.setLayoutX(35.0);
+		contentLoadingBox.setLayoutY(51.0);
+		contentLoadingBox.setPrefWidth(380.0);
+		contentLoadingBox.setStyle("-fx-background-color: white;");
+		contentLoadingBox.setVisible(false);
+		AnchorPane.setBottomAnchor(contentLoadingBox, 3.0);
+		AnchorPane.setLeftAnchor(contentLoadingBox, 35.0);
+		AnchorPane.setRightAnchor(contentLoadingBox, 0.0);
+		AnchorPane.setTopAnchor(contentLoadingBox, 51.0);
+		
+		return contentLoadingBox;
 	}
 }

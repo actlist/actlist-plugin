@@ -10,6 +10,13 @@
 			<id>silentsoft-repository</id>
 			<url>http://nexus.silentsoft.org/repository/maven-releases</url>
 		</repository>
+		<repository>
+			<id>silentsoft-snapshot-repository</id>
+			<url>http://nexus.silentsoft.org/repository/maven-snapshots</url>
+			<snapshots>
+				<updatePolicy>always</updatePolicy>
+			</snapshots>
+		</repository>
 	</repositories>
 
 	<properties>
@@ -24,9 +31,9 @@
 		<slf4j.version>1.7.5</slf4j.version>
 
 		<!-- Silentsoft -->
-		<silentsoft.core.version>1.1.0</silentsoft.core.version>
-		<silentsoft.ui.version>1.1.0</silentsoft.ui.version>
-		<silentsoft.net.version>1.1.0</silentsoft.net.version>
+		<silentsoft.core.version>1.1.1-SNAPSHOT</silentsoft.core.version>
+		<silentsoft.ui.version>1.1.1-SNAPSHOT</silentsoft.ui.version>
+		<silentsoft.net.version>1.1.1-SNAPSHOT</silentsoft.net.version>
 
 		<!-- 3rd party -->
 		<jfoenix.version>1.0.0</jfoenix.version>

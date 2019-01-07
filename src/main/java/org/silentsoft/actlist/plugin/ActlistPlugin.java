@@ -157,7 +157,7 @@ public abstract class ActlistPlugin {
 	/**
 	 * @since 1.2.6
 	 */
-	protected boolean isDebugMode() {
+	public boolean isDebugMode() {
 		return DebugApp.isDebugMode;
 	}
 	

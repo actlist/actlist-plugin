@@ -143,6 +143,7 @@ public abstract class ActlistPlugin {
 	 * @since 1.4.2
 	 */
 	@SuppressWarnings("unchecked")
+	@Deprecated
 	public static <T> T getInstance() {
 		return (T) instance;
 	}

@@ -119,8 +119,6 @@ public abstract class ActlistPlugin {
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public ActlistPlugin(String pluginName) {
-		instance = this;
-		
 		this.pluginName = pluginName;
 		this.oneTimePlugin = false;
 		this.functionMap = new LinkedHashMap<>();
@@ -136,16 +134,6 @@ public abstract class ActlistPlugin {
 		shouldBrowseActlistArchives = new SimpleBooleanProperty(false);
 		shouldRequestShowActlist = new SimpleObjectProperty(null);
 		shouldRequestDeactivate = new SimpleBooleanProperty(false);
-	}
-	
-	private static ActlistPlugin instance;
-	/**
-	 * @since 1.4.2
-	 */
-	@SuppressWarnings("unchecked")
-	@Deprecated
-	public static <T> T getInstance() {
-		return (T) instance;
 	}
 	
 	/**

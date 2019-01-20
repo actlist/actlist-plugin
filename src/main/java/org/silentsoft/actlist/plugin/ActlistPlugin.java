@@ -592,11 +592,11 @@ public abstract class ActlistPlugin {
 	}
 	
 	private URL getPNG() {
-		return getClassLoader().getResource(getClass().getSimpleName().concat(".png"));
+		return getClassLoader().getResource(getClass().getName().replaceAll("\\.", "/").concat(".png"));
 	}
 	
 	private URL getFXML() {
-		return getClassLoader().getResource(getClass().getSimpleName().concat(".fxml"));
+		return getClassLoader().getResource(getClass().getName().replaceAll("\\.", "/").concat(".fxml"));
 	}
 	
 	private Boolean existsIcon;

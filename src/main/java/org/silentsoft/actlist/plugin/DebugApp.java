@@ -1,12 +1,19 @@
 package org.silentsoft.actlist.plugin;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.nio.file.Paths;
+import java.util.jar.Attributes;
+import java.util.jar.Manifest;
 
+import org.controlsfx.control.PopOver;
+import org.silentsoft.actlist.plugin.ActlistPlugin.Function;
 import org.silentsoft.actlist.plugin.ActlistPlugin.SupportedPlatform;
 import org.silentsoft.actlist.plugin.messagebox.MessageBox;
 import org.silentsoft.core.util.FileUtil;
 import org.silentsoft.core.util.JSONUtil;
+import org.silentsoft.core.util.ObjectUtil;
 import org.silentsoft.core.util.SystemUtil;
 
 import com.jfoenix.controls.JFXHamburger;
@@ -17,13 +24,18 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -60,14 +72,54 @@ public final class DebugApp extends Application {
 	}
 	
 	Stage stage;
+	
+	PopOver popOver;
+	
+	ObservableList<Node> functions;
 
 	@Override
 	public void start(Stage stage) throws Exception {
 		this.stage = stage;
 		
-		Class<?> clazz = Class.forName("Plugin");
-		if (ActlistPlugin.class.isAssignableFrom(clazz)) {
-			ActlistPlugin plugin = ActlistPlugin.class.cast(clazz.newInstance());
+		String mainClass = null;
+		Class<?> pluginClass = null;
+		InputStream inputStream = null;
+		
+		try {
+			inputStream = new FileInputStream(Paths.get(System.getProperty("user.dir"), "target", "classes", "META-INF", "MANIFEST.MF").toString());
+			
+			Manifest manifest = new Manifest(inputStream);
+			mainClass = manifest.getMainAttributes().getValue(Attributes.Name.MAIN_CLASS).trim();
+			if (ObjectUtil.isEmpty(mainClass)) {
+				mainClass = "Plugin";
+			}
+		} catch (Exception | Error e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				pluginClass = getClass().getClassLoader().loadClass(mainClass);
+			} catch (ClassNotFoundException e) {
+				StringBuffer message = new StringBuffer();
+				message.append(String.join("", "[ERROR] '", mainClass, "' class is not exists. Please check 'mainClass' property in pom.xml", "\r\n"));
+				message.append(String.join("", ">>", "\r\n"));
+				message.append(String.join("", "    <properties>", "\r\n"));
+				message.append(String.join("", "        <mainClass>your.pkg.Plugin</mainClass>", "\r\n"));
+				message.append(String.join("", "    </properties>", "\r\n"));
+				message.append(String.join("", "<<", "\r\n"));
+				System.err.println(message.toString());
+			}
+			
+			if (inputStream != null) {
+				inputStream.close();
+			}
+		}
+		
+		if (ActlistPlugin.class.isAssignableFrom(pluginClass)) {
+			ActlistPlugin plugin = ActlistPlugin.class.cast(pluginClass.newInstance());
+			
+			popOver = new PopOver(new VBox());
+			((VBox) popOver.getContentNode()).setPadding(new Insets(3, 3, 3, 3));
+			popOver.setArrowLocation(PopOver.ArrowLocation.TOP_LEFT);
 			
 			SupportedPlatform currentPlatform = null;
 			{
@@ -168,6 +220,11 @@ public final class DebugApp extends Application {
 			
 			plugin.initialize();
 			
+			functions = FXCollections.observableArrayList();
+			for (Function function : plugin.getFunctionMap().values()) {
+				addFunction(function);
+			}
+			
 			if (plugin.isOneTimePlugin() == false) {
 				((JFXToggleButton) stage.getScene().lookup("#toggle")).getOnAction().handle(null);
 			}
@@ -203,6 +260,36 @@ public final class DebugApp extends Application {
 		}
 	}
 	
+	private void addFunction(Function function) {
+		functions.add(createFunctionBox(new Label("", function.graphic), mouseEvent -> {
+			try {
+				if (function.action != null) {
+					function.action.run();
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			} finally {
+				popOver.hide();
+			}
+		}));
+	}
+	
+	private HBox createFunctionBox(Node node, javafx.event.EventHandler<? super MouseEvent> action) {
+		HBox hBox = new HBox(node);
+		hBox.setAlignment(Pos.CENTER);
+		hBox.setPadding(new Insets(3, 3, 3, 3));
+		hBox.setStyle("-fx-background-color: white;");
+		hBox.setOnMouseEntered(mouseEvent -> {
+			hBox.setStyle("-fx-background-color: lightgray;");
+		});
+		hBox.setOnMouseExited(mouseEvent -> {
+			hBox.setStyle("-fx-background-color: white;");
+		});
+		hBox.addEventFilter(MouseEvent.MOUSE_CLICKED, action);
+		
+		return hBox;
+	}
+	
 	private JFXHamburger createHamburger() {
 		JFXHamburger hamburger = new JFXHamburger();
 		hamburger.setLayoutX(13.0);
@@ -231,6 +318,28 @@ public final class DebugApp extends Application {
 		AnchorPane.setTopAnchor(head, 0.0);
 		head.setOpaqueInsets(Insets.EMPTY);
 		head.setPadding(new Insets(5.0, 0.0, 0.0, 0.0));
+		head.setOnMouseClicked(e -> {
+			if (e.getButton() == MouseButton.SECONDARY) {
+				if (popOver != null) {
+					((VBox) popOver.getContentNode()).getChildren().clear();
+					
+					/* ((VBox) popOver.getContentNode()).getChildren().add(createAboutFunction()); */
+					
+					JFXToggleButton toggle = (JFXToggleButton) stage.getScene().lookup("#toggle");
+					if (toggle.selectedProperty().get()) {
+						/*
+						if (plugin.getFunctionMap().size() > 0) {
+							((VBox) popOver.getContentNode()).getChildren().add(new Separator(Orientation.HORIZONTAL));
+						}
+						*/
+						
+						((VBox) popOver.getContentNode()).getChildren().addAll(functions);
+					}
+					
+					popOver.show(stage.getScene().lookup("#contentLoadingBox"), e.getScreenX(), e.getScreenY());
+				}
+			}
+		});
 		
 		return head;
 	}
@@ -269,6 +378,10 @@ public final class DebugApp extends Application {
 					} else {
 						contentBox.getChildren().clear();
 						contentLoadingBox.getChildren().clear();
+						
+						if (popOver != null) {
+							popOver.hide();
+						}
 						
 						plugin.pluginDeactivated();
 					}

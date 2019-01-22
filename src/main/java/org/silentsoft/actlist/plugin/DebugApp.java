@@ -3,6 +3,7 @@ package org.silentsoft.actlist.plugin;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.net.URI;
 import java.nio.file.Paths;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
@@ -27,7 +28,6 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
-import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
@@ -44,6 +44,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 /**
  * <em><tt>WARNING : This Debug application's source code is independent with real Actlist application's source code. So this application might not be same with real Actlist application.</tt></em></p>
@@ -71,11 +72,16 @@ public final class DebugApp extends Application {
 		launch("");
 	}
 	
+	ActlistPlugin plugin;
+	
 	Stage stage;
 	
 	PopOver popOver;
 	
 	ObservableList<Node> functions;
+	
+	boolean isAvailableNewPlugin = false;
+	URI newPluginURI;
 
 	@Override
 	public void start(Stage stage) throws Exception {
@@ -115,7 +121,7 @@ public final class DebugApp extends Application {
 		}
 		
 		if (ActlistPlugin.class.isAssignableFrom(pluginClass)) {
-			ActlistPlugin plugin = ActlistPlugin.class.cast(pluginClass.newInstance());
+			this.plugin = ActlistPlugin.class.cast(pluginClass.newInstance());
 			
 			popOver = new PopOver(new VBox());
 			((VBox) popOver.getContentNode()).setPadding(new Insets(3, 3, 3, 3));
@@ -185,7 +191,7 @@ public final class DebugApp extends Application {
 					@Override
 					public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
 						if (newValue) {
-							JFXToggleButton toggle = (JFXToggleButton) stage.getScene().lookup("#toggle");
+							JFXToggleButton toggle = (JFXToggleButton) stage.getScene().lookup("#togActivator");
 							boolean isActivated = toggle.selectedProperty().get();
 							if (isActivated) {
 								toggle.setSelected(false);
@@ -203,8 +209,8 @@ public final class DebugApp extends Application {
 			root.setPrefWidth(435.0);
 			root.setStyle("-fx-background-color: #ffffff;");
 			root.getChildren().add(createHamburger());
-			root.getChildren().add(createHead(plugin));
-			root.getChildren().add(createToggle(plugin));
+			root.getChildren().add(createHead());
+			root.getChildren().add(createToggleBox());
 			root.getChildren().add(createSeparator());
 			root.getChildren().add(createContentBox());
 			root.getChildren().add(createContentLoadingBox());
@@ -226,7 +232,7 @@ public final class DebugApp extends Application {
 			}
 			
 			if (plugin.isOneTimePlugin() == false) {
-				((JFXToggleButton) stage.getScene().lookup("#toggle")).getOnAction().handle(null);
+				((JFXToggleButton) stage.getScene().lookup("#togActivator")).getOnAction().handle(null);
 			}
 		} else {
 			throw new Exception("The Plugin class must be extends ActlistPlugin !");
@@ -302,19 +308,18 @@ public final class DebugApp extends Application {
 		return hamburger;
 	}
 	
-	private HBox createHead(ActlistPlugin plugin) {
+	private HBox createHead() {
 		Label lblPluginName = new Label();
 		lblPluginName.setText((plugin.getPluginName() == null || plugin.getPluginName().trim().isEmpty()) ? "(empty name)" : plugin.getPluginName());
 		lblPluginName.setPrefHeight(16.0);
-		lblPluginName.setPrefWidth(302.0);
-		HBox.setHgrow(lblPluginName, Priority.SOMETIMES);
+		HBox.setHgrow(lblPluginName, Priority.ALWAYS);
 		lblPluginName.setFont(Font.font("Arial", 14.0));
 		
 		HBox head = new HBox(lblPluginName);
 		head.setAlignment(Pos.CENTER_LEFT);
 		head.setPrefHeight(45.0);
 		AnchorPane.setLeftAnchor(head, 35.0);
-		AnchorPane.setRightAnchor(head, 60.0);
+		AnchorPane.setRightAnchor(head, 102.0);
 		AnchorPane.setTopAnchor(head, 0.0);
 		head.setOpaqueInsets(Insets.EMPTY);
 		head.setPadding(new Insets(5.0, 0.0, 0.0, 0.0));
@@ -323,9 +328,11 @@ public final class DebugApp extends Application {
 				if (popOver != null) {
 					((VBox) popOver.getContentNode()).getChildren().clear();
 					
-					/* ((VBox) popOver.getContentNode()).getChildren().add(createAboutFunction()); */
+					/*
+					((VBox) popOver.getContentNode()).getChildren().add(createAboutFunction());
+					*/
 					
-					JFXToggleButton toggle = (JFXToggleButton) stage.getScene().lookup("#toggle");
+					JFXToggleButton toggle = (JFXToggleButton) stage.getScene().lookup("#togActivator");
 					if (toggle.selectedProperty().get()) {
 						/*
 						if (plugin.getFunctionMap().size() > 0) {
@@ -344,25 +351,87 @@ public final class DebugApp extends Application {
 		return head;
 	}
 	
-	private JFXToggleButton createToggle(ActlistPlugin plugin) {
-		JFXToggleButton toggle = new JFXToggleButton();
-		toggle.setId("toggle");
-		toggle.setLayoutX(199.0);
-		toggle.setLayoutY(-2.0);
-		toggle.setText(" ");
-		toggle.setSelected(!plugin.isOneTimePlugin());
-		toggle.setToggleColor(Paint.valueOf("#fafafa"));
-		toggle.setToggleLineColor(Paint.valueOf("#59bf53"));
-		toggle.setUnToggleLineColor(Paint.valueOf("#e0e0e0"));
-		AnchorPane.setRightAnchor(toggle, -0.203125);
+	Stage aboutStage;
+	private HBox createAboutFunction() {
+		return createFunctionBox(new Label("About"), mouseEvent -> {
+			stage.getScene().lookup("#updateAlarmLabel").getOnMouseClicked().handle(null);
+		});
+	}
+	private HBox createToggleBox() {
+		Label warningLabel = new Label();
+		warningLabel.setId("warningLabel");
+		warningLabel.setMaxHeight(6.0);
+		warningLabel.setMaxWidth(6.0);
+		warningLabel.setMinHeight(6.0);
+		warningLabel.setMinWidth(6.0);
+		warningLabel.setOnMouseClicked(mouseEvent -> {
+			warningLabel.setVisible(false);
+			
+			try {
+				String warningText = plugin.getWarningText();
+				if (ObjectUtil.isNotEmpty(warningText)) {
+					MessageBox.showWarning(stage, warningText);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		});
+		warningLabel.setStyle("-fx-background-color: orange; -fx-background-radius: 5em;");
+		warningLabel.setVisible(false);
+		warningLabel.setCursor(Cursor.HAND);
 		
-		toggle.setOnAction(actionEvent -> {
+		Label updateAlarmLabel = new Label();
+		updateAlarmLabel.setId("updateAlarmLabel");
+		updateAlarmLabel.setMaxHeight(6.0);
+		updateAlarmLabel.setMaxWidth(6.0);
+		updateAlarmLabel.setMinHeight(6.0);
+		updateAlarmLabel.setMinWidth(6.0);
+		updateAlarmLabel.setOnMouseClicked(mouseEvent -> {
+			updateAlarmLabel.setVisible(false);
+			
+			/**
+			 * this aboutStage must be closed when if already opened.
+			 * because the newPluginURI variable will be set by another thread.
+			 */
+			if (aboutStage != null) {
+				aboutStage.close();
+				aboutStage = null;
+			}
+			
+			aboutStage = new Stage();
+			aboutStage.initOwner(this.stage);
+			aboutStage.initStyle(StageStyle.UTILITY);
+			{
+				BorderPane scene = new BorderPane();
+				//scene.setCenter(new PluginAbout(this.plugin, this.isAvailableNewPlugin, this.newPluginURI).getViewer());
+				
+				aboutStage.setScene(new Scene(scene));
+			}
+			aboutStage.show();
+		});
+		updateAlarmLabel.setStyle("-fx-background-color: red; -fx-background-radius: 5em;");
+		updateAlarmLabel.setVisible(false);
+		updateAlarmLabel.setCursor(Cursor.HAND);
+		
+		HBox innerBox = new HBox(warningLabel, updateAlarmLabel);
+		innerBox.setAlignment(Pos.CENTER);
+		innerBox.setSpacing(8.0);
+		HBox.setMargin(innerBox, Insets.EMPTY);
+		
+		JFXToggleButton togActivator = new JFXToggleButton();
+		togActivator.setId("togActivator");
+		togActivator.setText(" ");
+		togActivator.setSelected(!plugin.isOneTimePlugin());
+		togActivator.setToggleColor(Paint.valueOf("#fafafa"));
+		togActivator.setToggleLineColor(Paint.valueOf("#59bf53"));
+		togActivator.setUnToggleLineColor(Paint.valueOf("#e0e0e0"));
+		togActivator.setOnAction(actionEvent -> {
 			Platform.runLater(() -> {
 				try {
 					VBox contentBox = (VBox) stage.getScene().lookup("#contentBox");
 					VBox contentLoadingBox = (VBox) stage.getScene().lookup("#contentLoadingBox");
 					
-					if (toggle.selectedProperty().get()) {
+					if (togActivator.selectedProperty().get()) {
 						if (plugin.existsGraphic()) {
 							Node pluginContent = plugin.getGraphic();
 							if (pluginContent != null) {
@@ -393,7 +462,14 @@ public final class DebugApp extends Application {
 			});
 		});
 		
-		return toggle;
+		HBox toggleBox = new HBox(innerBox, togActivator);
+		toggleBox.setAlignment(Pos.CENTER_LEFT);
+		toggleBox.setLayoutX(361.0);
+		toggleBox.setLayoutY(-2.0);
+		toggleBox.setSpacing(8.0);
+		AnchorPane.setRightAnchor(toggleBox, 0.0);
+		
+		return toggleBox;
 	}
 	
 	private Separator createSeparator() {

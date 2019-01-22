@@ -5,6 +5,10 @@ This product includes software developed by silentsoft.org.
 
 This product includes software developed by The Apache Software Foundation (http://www.apache.org/).
 
+__commons-codec 1.6__
+ * https://github.com/apache/commons-codec
+ * Apache License 2.0
+
 __commons-daemon 1.0.10__
  * https://github.com/apache/commons-daemon
  * Apache License 2.0
@@ -17,17 +21,40 @@ __commons-lang 2.6__
  * https://github.com/apache/commons-lang
  * Apache License 2.0
 
+__commons-logging 1.1.3__
+ * https://github.com/apache/commons-logging
+ * Apache License 2.0
+
 __commons-net 3.3__
  * https://github.com/apache/commons-net
  * Apache License 2.0
+
+__httpclient 4.3.6__
+ * https://github.com/apache/httpcomponents-client
+ * Apache License 2.0
+
+__httpcore 4.3.3__
+ * https://github.com/apache/httpcomponents-core
+ * Apache License 2.0
+
+__httpmime 4.3.6__
+ * Apache License 2.0
+
+__log4j 1.2.17__
+ * https://github.com/apache/log4j
+ * Apache License 2.0
+
+__centerdevice-nsmenufx 2.1.5__
+ * https://github.com/codecentric/NSMenuFX
+ * BSD-3-Clause
 
 __controlsfx 8.40.10__
  * https://bitbucket.org/controlsfx/controlsfx
  * BSD-3-Clause
 
-__httpcore 4.3.3__
- * https://github.com/apache/httpcomponents-core
- * Apache License 2.0
+__json 20141113__
+ * https://github.com/douglascrockford/JSON-java
+ * JSON License
 
 __jackson-annotations 2.4.2__
  * https://github.com/FasterXML/jackson-annotations
@@ -53,13 +80,17 @@ __jna-platform 4.5.1__
  * https://github.com/java-native-access/jna
  * Apache License 2.0
 
-__json 20141113__
- * https://github.com/douglascrockford/JSON-java
- * JSON License
-
-__log4j 1.2.17__
- * https://github.com/apache/log4j
+__proxy-vole 1.0.3__
+ * https://github.com/MarkusBernhardt/proxy-vole
  * Apache License 2.0
+
+__ini4j 0.5.4__
+ * https://github.com/michaelPf85/ini4j
+ * Apache License 2.0
+
+__PlusHaze-TrayNotification__
+ * https://github.com/PlusHaze/TrayNotification
+ * MIT License
 
 __slf4j-api 1.7.5__
  * https://github.com/qos-ch/slf4j

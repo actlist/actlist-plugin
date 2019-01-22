@@ -36,6 +36,7 @@
 		<silentsoft.net.version>1.1.1-SNAPSHOT</silentsoft.net.version>
 
 		<!-- 3rd party -->
+		<centerdevice-nsmenufx.version>2.1.5</centerdevice-nsmenufx.version>
 		<jfoenix.version>1.0.0</jfoenix.version>
 		<controlsfx.version>8.40.10</controlsfx.version>
 		<apache-http-core.version>4.3.3</apache-http-core.version>
@@ -106,6 +107,11 @@
 			<version>${silentsoft.net.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>de.codecentric.centerdevice</groupId>
+			<artifactId>centerdevice-nsmenufx</artifactId>
+			<version>${centerdevice-nsmenufx.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>com.jfoenix</groupId>
 			<artifactId>jfoenix</artifactId>
 			<version>${jfoenix.version}</version>
@@ -119,6 +125,13 @@
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpcore</artifactId>
 			<version>${apache-http-core.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>TrayNotification</groupId>
+			<artifactId>TrayNotification</artifactId>
+			<version>TrayNotification</version>
+			<scope>system</scope>
+			<systemPath>${basedir}/libs/TrayNotification.jar</systemPath>
 		</dependency>
 	</dependencies>
 

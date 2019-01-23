@@ -7,9 +7,8 @@ import java.awt.Robot;
 import java.awt.event.InputEvent;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -31,8 +30,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
-import java.util.jar.Attributes;
-import java.util.jar.Manifest;
 import java.util.stream.Collectors;
 
 import javax.script.ScriptEngine;
@@ -43,6 +40,8 @@ import org.apache.http.HttpHost;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.maven.model.Model;
+import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.controlsfx.control.PopOver;
 import org.silentsoft.actlist.plugin.ActlistPlugin.Function;
 import org.silentsoft.actlist.plugin.ActlistPlugin.SupportedPlatform;
@@ -147,13 +146,12 @@ public final class DebugApp extends Application {
 		
 		String mainClass = null;
 		Class<?> pluginClass = null;
-		InputStream inputStream = null;
 		
 		try {
-			inputStream = new FileInputStream(Paths.get(System.getProperty("user.dir"), "target", "classes", "META-INF", "MANIFEST.MF").toString());
+			MavenXpp3Reader reader = new MavenXpp3Reader();
+			Model model = reader.read(new FileReader("pom.xml"));
 			
-			Manifest manifest = new Manifest(inputStream);
-			mainClass = manifest.getMainAttributes().getValue(Attributes.Name.MAIN_CLASS).trim();
+			mainClass = (String) model.getProperties().get("mainClass");
 			if (ObjectUtil.isEmpty(mainClass)) {
 				mainClass = "Plugin";
 			}
@@ -171,10 +169,6 @@ public final class DebugApp extends Application {
 				message.append(String.join("", "    </properties>", "\r\n"));
 				message.append(String.join("", "<<", "\r\n"));
 				System.err.println(message.toString());
-			}
-			
-			if (inputStream != null) {
-				inputStream.close();
 			}
 		}
 		

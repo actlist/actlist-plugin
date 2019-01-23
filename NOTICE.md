@@ -44,6 +44,10 @@ __log4j 1.2.17__
  * https://github.com/apache/log4j
  * Apache License 2.0
 
+__maven-model 3.6.0__
+ * https://github.com/apache/maven
+ * Apache License 2.0
+
 __centerdevice-nsmenufx 2.1.5__
  * https://github.com/codecentric/NSMenuFX
  * BSD-3-Clause

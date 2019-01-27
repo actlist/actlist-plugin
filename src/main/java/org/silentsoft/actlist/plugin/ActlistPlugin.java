@@ -18,7 +18,7 @@ import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 
 /**
- * Please generate executable main class called '<tt>Plugin</tt>' where in default package(please do not assign package).
+ * Please generate executable main class called <tt>your.pkg.Plugin.java</tt> that you assigned from <tt>mainClass</tt> property on <tt>pom.xml</tt>
  * and inherit this <tt>ActlistPlugin</tt> class in your <tt>Plugin</tt> class.</br>
  * <em><tt>NOTE : You should not write any code other than calling the <code>debug();</code> method for debugging in the main method.</tt></em></p>
  * 

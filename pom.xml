@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.silentsoft</groupId>
 	<artifactId>actlist-plugin</artifactId>
-	<version>1.4.2-SNAPSHOT</version>
+	<version>1.4.2</version>
 
 	<repositories>
 		<repository>
@@ -31,9 +31,9 @@
 		<slf4j.version>1.7.5</slf4j.version>
 
 		<!-- Silentsoft -->
-		<silentsoft.core.version>1.1.1-SNAPSHOT</silentsoft.core.version>
-		<silentsoft.ui.version>1.1.1-SNAPSHOT</silentsoft.ui.version>
-		<silentsoft.net.version>1.1.1-SNAPSHOT</silentsoft.net.version>
+		<silentsoft.core.version>1.1.1</silentsoft.core.version>
+		<silentsoft.ui.version>1.1.1</silentsoft.ui.version>
+		<silentsoft.net.version>1.1.1</silentsoft.net.version>
 
 		<!-- 3rd party -->
 		<maven-model.version>3.6.0</maven-model.version>

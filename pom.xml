@@ -1,9 +1,10 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.silentsoft</groupId>
 	<artifactId>actlist-plugin</artifactId>
-	<version>1.4.2</version>
+	<version>1.4.3</version>
 
 	<repositories>
 		<repository>
@@ -16,6 +17,10 @@
 			<snapshots>
 				<updatePolicy>always</updatePolicy>
 			</snapshots>
+		</repository>
+		<repository>
+			<id>jitpack.io</id>
+			<url>http://jitpack.io</url>
 		</repository>
 	</repositories>
 
@@ -39,8 +44,7 @@
 		<maven-model.version>3.6.0</maven-model.version>
 		<centerdevice-nsmenufx.version>2.1.5</centerdevice-nsmenufx.version>
 		<jfoenix.version>1.0.0</jfoenix.version>
-		<controlsfx.version>8.40.10</controlsfx.version>
-		<apache-http-core.version>4.3.3</apache-http-core.version>
+		<plushaze-traynotification.tag>5393c3a54f</plushaze-traynotification.tag>
 	</properties>
 
 	<build>
@@ -123,21 +127,9 @@
 			<version>${jfoenix.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.controlsfx</groupId>
-			<artifactId>controlsfx</artifactId>
-			<version>${controlsfx.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpcore</artifactId>
-			<version>${apache-http-core.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>TrayNotification</groupId>
+			<groupId>com.github.PlusHaze</groupId>
 			<artifactId>TrayNotification</artifactId>
-			<version>TrayNotification</version>
-			<scope>system</scope>
-			<systemPath>${basedir}/libs/TrayNotification.jar</systemPath>
+			<version>${plushaze-traynotification.tag}</version>
 		</dependency>
 	</dependencies>
 

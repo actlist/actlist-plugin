@@ -54,6 +54,7 @@ import org.silentsoft.core.util.ObjectUtil;
 import org.silentsoft.core.util.SystemUtil;
 
 import com.github.markusbernhardt.proxy.ProxySearch;
+import com.github.plushaze.traynotification.animations.Animations;
 import com.jfoenix.controls.JFXHamburger;
 import com.jfoenix.controls.JFXSpinner;
 import com.jfoenix.controls.JFXToggleButton;
@@ -98,7 +99,6 @@ import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
-import tray.animations.AnimationType;
 
 /**
  * <em><tt>WARNING : This Debug application's source code is independent with real Actlist application's source code. So this application might not be same with real Actlist application.</tt></em></p>
@@ -135,7 +135,7 @@ public final class DebugApp extends Application {
 	
 	ObservableList<Node> functions;
 	
-	HashMap<org.silentsoft.actlist.plugin.tray.TrayNotification, tray.notification.TrayNotification> trayNotifications = new HashMap<org.silentsoft.actlist.plugin.tray.TrayNotification, tray.notification.TrayNotification>();
+	HashMap<org.silentsoft.actlist.plugin.tray.TrayNotification, com.github.plushaze.traynotification.notification.TrayNotification> trayNotifications = new HashMap<org.silentsoft.actlist.plugin.tray.TrayNotification, com.github.plushaze.traynotification.notification.TrayNotification>();
 	
 	boolean isAvailableNewPlugin = false;
 	URI newPluginURI;
@@ -258,7 +258,7 @@ public final class DebugApp extends Application {
 			});
 			plugin.showTrayNotificationObject().addListener((observable, oldValue, newValue) -> {
 				if (newValue != null) {
-					tray.notification.TrayNotification trayNotification = new tray.notification.TrayNotification();
+					com.github.plushaze.traynotification.notification.TrayNotification trayNotification = new com.github.plushaze.traynotification.notification.TrayNotification();
 					
 					synchronized (trayNotifications) {
 						trayNotifications.put(newValue, trayNotification);
@@ -266,7 +266,7 @@ public final class DebugApp extends Application {
 					
 					trayNotification.setRectangleFill(Paint.valueOf("#222222"));
 					trayNotification.setImage(new Image("/images/icon/actlist_128.png"));
-					trayNotification.setAnimationType(AnimationType.POPUP);
+					trayNotification.setAnimation(Animations.POPUP);
 					
 					String titleValue = (plugin.getPluginName() == null || plugin.getPluginName().trim().isEmpty()) ? "(empty name)" : plugin.getPluginName();
 					String titlePrefix = String.format("[%s] ", titleValue);
@@ -304,7 +304,7 @@ public final class DebugApp extends Application {
 				}
 			});
 			{
-				Consumer<tray.notification.TrayNotification> dismiss = (trayNotification) -> {
+				Consumer<com.github.plushaze.traynotification.notification.TrayNotification> dismiss = (trayNotification) -> {
 					new Thread(() -> {
 						while (trayNotification.isTrayShowing() == false) {
 							try {
@@ -322,7 +322,7 @@ public final class DebugApp extends Application {
 					if (newValue != null) {
 						synchronized (trayNotifications) {
 							if (trayNotifications.containsKey(newValue)) {
-								tray.notification.TrayNotification trayNotification = trayNotifications.get(newValue);
+								com.github.plushaze.traynotification.notification.TrayNotification trayNotification = trayNotifications.get(newValue);
 								dismiss.accept(trayNotification);
 							}
 						}
@@ -333,8 +333,8 @@ public final class DebugApp extends Application {
 				plugin.shouldDismissTrayNotifications().addListener((observable, oldValue, newValue) -> {
 					if (newValue) {
 						synchronized (trayNotifications) {
-							for (Entry<TrayNotification, tray.notification.TrayNotification> entrySet : trayNotifications.entrySet()) {
-								tray.notification.TrayNotification trayNotification = entrySet.getValue();
+							for (Entry<TrayNotification, com.github.plushaze.traynotification.notification.TrayNotification> entrySet : trayNotifications.entrySet()) {
+								com.github.plushaze.traynotification.notification.TrayNotification trayNotification = entrySet.getValue();
 								dismiss.accept(trayNotification);
 							}
 							

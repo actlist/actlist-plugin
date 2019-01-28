@@ -39,7 +39,7 @@ public abstract class ActlistPlugin {
 	 * Actlist engine will reflects this variable to determine what the version of the ActlistPlugin is.
 	 */
 	@SuppressWarnings("unused")
-	private String version = "1.4.2";
+	private String version = "1.4.3";
 	
 	public enum SupportedPlatform {
 		WINDOWS, MACOSX

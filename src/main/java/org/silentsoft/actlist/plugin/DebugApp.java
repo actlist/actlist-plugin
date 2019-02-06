@@ -994,7 +994,7 @@ public final class DebugApp extends Application {
 									BufferedReader reader = null;
 									try {
 										if (ObjectUtil.isNotEmpty(uri)) {
-											if ("jar".equals(uri.getScheme())) {
+											if ("jar".equals(uri.getScheme()) || "file".equals(uri.getScheme())) {
 												reader = new BufferedReader(new InputStreamReader(uri.toURL().openStream(), Charset.forName("UTF-8")));
 												StringBuffer buffer = new StringBuffer();
 												for (String value=null; (value=reader.readLine()) != null; ) {

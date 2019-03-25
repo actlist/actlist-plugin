@@ -33,6 +33,7 @@ import javafx.scene.image.ImageView;
  * @author silentsoft
  * @see <a href="https://actlist.silentsoft.org/docs/quick-start/">Plugin Development Guide</a>
  */
+@SuppressWarnings({ "unchecked", "rawtypes" })
 public abstract class ActlistPlugin {
 	
 	/**
@@ -66,74 +67,59 @@ public abstract class ActlistPlugin {
 		}
 	}
 	
-	private String pluginName;
+	private String pluginName = null;
 	
-	private SupportedPlatform[] supportedPlatforms;
+	private SupportedPlatform[] supportedPlatforms = null;
 	
-	private boolean oneTimePlugin;
+	private boolean oneTimePlugin = false;
 	
-	private String pluginDescription;
-	private URI pluginDescriptionURI;
+	private String pluginDescription = null;
+	private URI pluginDescriptionURI = null;
 	
-	private String pluginChangeLog;
-	private URI pluginChangeLogURI;
+	private String pluginChangeLog = null;
+	private URI pluginChangeLogURI = null;
 	
-	private String pluginLicense;
-	private URI pluginLicenseURI;
+	private String pluginLicense = null;
+	private URI pluginLicenseURI = null;
 	
-	private String pluginVersion;
+	private String pluginVersion = null;
 	
-	private URI pluginUpdateCheckURI;
-	private URI pluginArchivesURI;
+	private URI pluginUpdateCheckURI = null;
+	private URI pluginArchivesURI = null;
 	
-	private String pluginAuthor;
-	private URI pluginAuthorURI;
+	private String pluginAuthor = null;
+	private URI pluginAuthorURI = null;
 	
-	private String minimumCompatibleVersion;
+	private String minimumCompatibleVersion = null;
 	
-	private String warningText;
+	private String warningText = null;
 	
-	private PluginConfig pluginConfig;
+	private PluginConfig pluginConfig = null;
 	
-	private LinkedHashMap<String, Function> functionMap;
+	private LinkedHashMap<String, Function> functionMap = new LinkedHashMap<>();
 	
-	private ObjectProperty<SupportedPlatform> currentPlatformObject;
+	private ObjectProperty<SupportedPlatform> currentPlatformObject = new SimpleObjectProperty(null);
 	
-	private ObjectProperty<ClassLoader> classLoaderObject;
+	private ObjectProperty<ClassLoader> classLoaderObject = new SimpleObjectProperty(null);
 	
-	private ObjectProperty<HttpHost> proxyHostObject;
+	private ObjectProperty<HttpHost> proxyHostObject = new SimpleObjectProperty(null);
 	
-	private BooleanProperty shouldShowLoadingBar;
+	private BooleanProperty shouldShowLoadingBar = new SimpleBooleanProperty(false);
 	
-	private ObjectProperty<Throwable> exceptionObject;
+	private ObjectProperty<Throwable> exceptionObject = new SimpleObjectProperty(null);
 	
-	private ObjectProperty<TrayNotification> showTrayNotificationObject;
-	private ObjectProperty<TrayNotification> dismissTrayNotificationObject;
-	private BooleanProperty shouldDismissTrayNotifications;
+	private ObjectProperty<TrayNotification> showTrayNotificationObject = new SimpleObjectProperty(null);
+	private ObjectProperty<TrayNotification> dismissTrayNotificationObject = new SimpleObjectProperty(null);
+	private BooleanProperty shouldDismissTrayNotifications = new SimpleBooleanProperty(false);
 	
-	private BooleanProperty shouldBrowseActlistArchives;
+	private BooleanProperty shouldBrowseActlistArchives = new SimpleBooleanProperty(false);
 	
-	private ObjectProperty<Boolean> shouldRequestShowActlist;
+	private ObjectProperty<Boolean> shouldRequestShowActlist = new SimpleObjectProperty(null);
 	
-	private BooleanProperty shouldRequestDeactivate;
+	private BooleanProperty shouldRequestDeactivate = new SimpleBooleanProperty(false);
 	
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public ActlistPlugin(String pluginName) {
 		this.pluginName = pluginName;
-		this.oneTimePlugin = false;
-		this.functionMap = new LinkedHashMap<>();
-		
-		currentPlatformObject = new SimpleObjectProperty(null);
-		classLoaderObject = new SimpleObjectProperty(null);
-		proxyHostObject = new SimpleObjectProperty(null);
-		shouldShowLoadingBar = new SimpleBooleanProperty(false);
-		exceptionObject = new SimpleObjectProperty(null);
-		showTrayNotificationObject = new SimpleObjectProperty(null);
-		dismissTrayNotificationObject = new SimpleObjectProperty(null);
-		shouldDismissTrayNotifications = new SimpleBooleanProperty(false);
-		shouldBrowseActlistArchives = new SimpleBooleanProperty(false);
-		shouldRequestShowActlist = new SimpleObjectProperty(null);
-		shouldRequestDeactivate = new SimpleBooleanProperty(false);
 	}
 	
 	/**

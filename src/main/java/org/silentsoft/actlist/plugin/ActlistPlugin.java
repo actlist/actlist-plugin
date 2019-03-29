@@ -187,8 +187,9 @@ public abstract class ActlistPlugin {
 	/**
 	 * This method will be called when the update check response's <code>available</code> value is <code>true</code>.</p>
 	 * 
-	 * If you set pluginArchivesURI here, the second parameter of {@link #setPluginUpdateCheckURI(URI, URI)} and
-	 * 'url' in the server response will be ignored and it will be browse to the url that you set within this method.</p>
+	 * <em>
+	 * You can't set pluginArchivesURI here. there will be no change and no effect. the pluginArchivesURI must be declared in the consturctor or update check response.
+	 * </em></p>
 	 * 
 	 * <em>
 	 * <b>CRITICAL</b> :</br>

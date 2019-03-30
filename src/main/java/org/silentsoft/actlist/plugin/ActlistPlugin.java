@@ -4,8 +4,10 @@ import java.net.URI;
 import java.net.URL;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
+import java.util.function.Consumer;
 
 import org.apache.http.HttpHost;
+import org.apache.http.HttpRequest;
 import org.silentsoft.actlist.plugin.tray.TrayNotification;
 
 import javafx.beans.property.BooleanProperty;
@@ -86,6 +88,7 @@ public abstract class ActlistPlugin {
 	
 	private URI pluginUpdateCheckURI = null;
 	private URI pluginArchivesURI = null;
+	private Consumer<HttpRequest> beforeRequest = null;
 	
 	private String pluginAuthor = null;
 	private URI pluginAuthorURI = null;
@@ -521,6 +524,20 @@ public abstract class ActlistPlugin {
 	}
 	
 	/**
+	 * @since 1.5.0
+	 */
+	public Consumer<HttpRequest> getBeforeRequest() {
+		return beforeRequest;
+	}
+	
+	/**
+	 * @since 1.5.0
+	 */
+	public void setBeforeRequest(Consumer<HttpRequest> beforeRequest) {
+		this.beforeRequest = beforeRequest;
+	}
+	
+	/**
 	 * @since 1.2.6
 	 */
 	public URI getPluginUpdateCheckURI() {
@@ -531,7 +548,7 @@ public abstract class ActlistPlugin {
 	 * @since 1.2.6
 	 */
 	public void setPluginUpdateCheckURI(URI pluginUpdateCheckURI) {
-		setPluginUpdateCheckURI(pluginUpdateCheckURI, null);
+		this.pluginUpdateCheckURI = pluginUpdateCheckURI;
 	}
 	
 	/**
@@ -540,6 +557,14 @@ public abstract class ActlistPlugin {
 	public void setPluginUpdateCheckURI(URI pluginUpdateCheckURI, URI pluginArchivesURI) {
 		this.pluginUpdateCheckURI = pluginUpdateCheckURI;
 		this.pluginArchivesURI = pluginArchivesURI;
+	}
+	
+	/**
+	 * @since 1.5.0
+	 */
+	public void setPluginUpdateCheckURI(URI pluginUpdateCheckURI, Consumer<HttpRequest> beforeRequest) {
+		this.pluginUpdateCheckURI = pluginUpdateCheckURI;
+		this.beforeRequest = beforeRequest;
 	}
 	
 	/**

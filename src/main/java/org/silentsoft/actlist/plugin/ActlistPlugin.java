@@ -4,8 +4,10 @@ import java.net.URI;
 import java.net.URL;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
+import java.util.function.Consumer;
 
 import org.apache.http.HttpHost;
+import org.apache.http.HttpRequest;
 import org.silentsoft.actlist.plugin.tray.TrayNotification;
 
 import javafx.beans.property.BooleanProperty;
@@ -33,13 +35,14 @@ import javafx.scene.image.ImageView;
  * @author silentsoft
  * @see <a href="https://actlist.silentsoft.org/docs/quick-start/">Plugin Development Guide</a>
  */
+@SuppressWarnings({ "unchecked", "rawtypes" })
 public abstract class ActlistPlugin {
 	
 	/**
 	 * Actlist engine will reflects this variable to determine what the version of the ActlistPlugin is.
 	 */
 	@SuppressWarnings("unused")
-	private String version = "1.4.3";
+	private String version = "1.5.0";
 	
 	public enum SupportedPlatform {
 		WINDOWS, MACOSX
@@ -66,74 +69,60 @@ public abstract class ActlistPlugin {
 		}
 	}
 	
-	private String pluginName;
+	private String pluginName = null;
 	
-	private SupportedPlatform[] supportedPlatforms;
+	private SupportedPlatform[] supportedPlatforms = null;
 	
-	private boolean oneTimePlugin;
+	private boolean oneTimePlugin = false;
 	
-	private String pluginDescription;
-	private URI pluginDescriptionURI;
+	private String pluginDescription = null;
+	private URI pluginDescriptionURI = null;
 	
-	private String pluginChangeLog;
-	private URI pluginChangeLogURI;
+	private String pluginChangeLog = null;
+	private URI pluginChangeLogURI = null;
 	
-	private String pluginLicense;
-	private URI pluginLicenseURI;
+	private String pluginLicense = null;
+	private URI pluginLicenseURI = null;
 	
-	private String pluginVersion;
+	private String pluginVersion = null;
 	
-	private URI pluginUpdateCheckURI;
-	private URI pluginArchivesURI;
+	private URI pluginUpdateCheckURI = null;
+	private URI pluginArchivesURI = null;
+	private Consumer<HttpRequest> beforeRequest = null;
 	
-	private String pluginAuthor;
-	private URI pluginAuthorURI;
+	private String pluginAuthor = null;
+	private URI pluginAuthorURI = null;
 	
-	private String minimumCompatibleVersion;
+	private String minimumCompatibleVersion = null;
 	
-	private String warningText;
+	private String warningText = null;
 	
-	private PluginConfig pluginConfig;
+	private PluginConfig pluginConfig = null;
 	
-	private LinkedHashMap<String, Function> functionMap;
+	private LinkedHashMap<String, Function> functionMap = new LinkedHashMap<>();
 	
-	private ObjectProperty<SupportedPlatform> currentPlatformObject;
+	private ObjectProperty<SupportedPlatform> currentPlatformObject = new SimpleObjectProperty(null);
 	
-	private ObjectProperty<ClassLoader> classLoaderObject;
+	private ObjectProperty<ClassLoader> classLoaderObject = new SimpleObjectProperty(null);
 	
-	private ObjectProperty<HttpHost> proxyHostObject;
+	private ObjectProperty<HttpHost> proxyHostObject = new SimpleObjectProperty(null);
 	
-	private BooleanProperty shouldShowLoadingBar;
+	private BooleanProperty shouldShowLoadingBar = new SimpleBooleanProperty(false);
 	
-	private ObjectProperty<Throwable> exceptionObject;
+	private ObjectProperty<Throwable> exceptionObject = new SimpleObjectProperty(null);
 	
-	private ObjectProperty<TrayNotification> showTrayNotificationObject;
-	private ObjectProperty<TrayNotification> dismissTrayNotificationObject;
-	private BooleanProperty shouldDismissTrayNotifications;
+	private ObjectProperty<TrayNotification> showTrayNotificationObject = new SimpleObjectProperty(null);
+	private ObjectProperty<TrayNotification> dismissTrayNotificationObject = new SimpleObjectProperty(null);
+	private BooleanProperty shouldDismissTrayNotifications = new SimpleBooleanProperty(false);
 	
-	private BooleanProperty shouldBrowseActlistArchives;
+	private BooleanProperty shouldBrowseActlistArchives = new SimpleBooleanProperty(false);
 	
-	private ObjectProperty<Boolean> shouldRequestShowActlist;
+	private ObjectProperty<Boolean> shouldRequestShowActlist = new SimpleObjectProperty(null);
 	
-	private BooleanProperty shouldRequestDeactivate;
+	private BooleanProperty shouldRequestDeactivate = new SimpleBooleanProperty(false);
 	
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public ActlistPlugin(String pluginName) {
 		this.pluginName = pluginName;
-		this.oneTimePlugin = false;
-		this.functionMap = new LinkedHashMap<>();
-		
-		currentPlatformObject = new SimpleObjectProperty(null);
-		classLoaderObject = new SimpleObjectProperty(null);
-		proxyHostObject = new SimpleObjectProperty(null);
-		shouldShowLoadingBar = new SimpleBooleanProperty(false);
-		exceptionObject = new SimpleObjectProperty(null);
-		showTrayNotificationObject = new SimpleObjectProperty(null);
-		dismissTrayNotificationObject = new SimpleObjectProperty(null);
-		shouldDismissTrayNotifications = new SimpleBooleanProperty(false);
-		shouldBrowseActlistArchives = new SimpleBooleanProperty(false);
-		shouldRequestShowActlist = new SimpleObjectProperty(null);
-		shouldRequestDeactivate = new SimpleBooleanProperty(false);
 	}
 	
 	/**
@@ -201,8 +190,9 @@ public abstract class ActlistPlugin {
 	/**
 	 * This method will be called when the update check response's <code>available</code> value is <code>true</code>.</p>
 	 * 
-	 * If you set pluginArchivesURI here, the second parameter of {@link #setPluginUpdateCheckURI(URI, URI)} and
-	 * 'url' in the server response will be ignored and it will be browse to the url that you set within this method.</p>
+	 * <em>
+	 * You can't set pluginArchivesURI here. there will be no change and no effect. the pluginArchivesURI must be declared in the consturctor or update check response.
+	 * </em></p>
 	 * 
 	 * <em>
 	 * <b>CRITICAL</b> :</br>
@@ -534,6 +524,20 @@ public abstract class ActlistPlugin {
 	}
 	
 	/**
+	 * @since 1.5.0
+	 */
+	public Consumer<HttpRequest> getBeforeRequest() {
+		return beforeRequest;
+	}
+	
+	/**
+	 * @since 1.5.0
+	 */
+	public void setBeforeRequest(Consumer<HttpRequest> beforeRequest) {
+		this.beforeRequest = beforeRequest;
+	}
+	
+	/**
 	 * @since 1.2.6
 	 */
 	public URI getPluginUpdateCheckURI() {
@@ -544,7 +548,7 @@ public abstract class ActlistPlugin {
 	 * @since 1.2.6
 	 */
 	public void setPluginUpdateCheckURI(URI pluginUpdateCheckURI) {
-		setPluginUpdateCheckURI(pluginUpdateCheckURI, null);
+		this.pluginUpdateCheckURI = pluginUpdateCheckURI;
 	}
 	
 	/**
@@ -553,6 +557,14 @@ public abstract class ActlistPlugin {
 	public void setPluginUpdateCheckURI(URI pluginUpdateCheckURI, URI pluginArchivesURI) {
 		this.pluginUpdateCheckURI = pluginUpdateCheckURI;
 		this.pluginArchivesURI = pluginArchivesURI;
+	}
+	
+	/**
+	 * @since 1.5.0
+	 */
+	public void setPluginUpdateCheckURI(URI pluginUpdateCheckURI, Consumer<HttpRequest> beforeRequest) {
+		this.pluginUpdateCheckURI = pluginUpdateCheckURI;
+		this.beforeRequest = beforeRequest;
 	}
 	
 	/**

@@ -37,6 +37,8 @@ import javax.script.ScriptEngineManager;
 
 import org.apache.http.Header;
 import org.apache.http.HttpHost;
+import org.apache.http.HttpRequest;
+import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicNameValuePair;
@@ -176,11 +178,11 @@ public final class DebugApp extends Application {
 		
 		AtomicBoolean shouldTraceException = new AtomicBoolean(true);
 		if (ActlistPlugin.class.isAssignableFrom(pluginClass)) {
-			this.plugin = ActlistPlugin.class.cast(pluginClass.newInstance());
-			
 			popOver = new PopOver(new VBox());
 			((VBox) popOver.getContentNode()).setPadding(new Insets(3, 3, 3, 3));
 			popOver.setArrowLocation(PopOver.ArrowLocation.TOP_LEFT);
+			
+			this.plugin = ActlistPlugin.class.cast(pluginClass.newInstance());
 			
 			SupportedPlatform currentPlatform = null;
 			{
@@ -438,7 +440,7 @@ public final class DebugApp extends Application {
 							if (uri.matches("(?i).*\\.js")) {
 								StringBuffer script = new StringBuffer();
 								script.append(String.format("var version = '%s';", plugin.getPluginVersion())).append("\r\n");
-								script.append(RESTfulAPI.doGet(pluginUpdateCheckURI.toString(), param, String.class));
+								script.append(RESTfulAPI.doGet(pluginUpdateCheckURI.toString(), param, String.class, plugin.getBeforeRequest()));
 								
 								ScriptEngine scriptEngine = new ScriptEngineManager().getEngineByName("nashorn");
 								Object _result = scriptEngine.eval(script.toString());
@@ -446,7 +448,7 @@ public final class DebugApp extends Application {
 									result = (Map) _result;
 								}
 							} else {
-				    			result = RESTfulAPI.doGet(pluginUpdateCheckURI.toString(), param, Map.class);
+				    			result = RESTfulAPI.doGet(pluginUpdateCheckURI.toString(), param, Map.class, plugin.getBeforeRequest());
 							}
 			    			
 			    			if (result == null) {
@@ -456,30 +458,35 @@ public final class DebugApp extends Application {
 			    			if (result.containsKey("available")) {
 			    				isAvailableNewPlugin = Boolean.parseBoolean(String.valueOf(result.get("available")));
 			    				if (isAvailableNewPlugin) {
-			    					if (result.containsKey("url")) {
+			    					URI pluginArchivesURI = plugin.getPluginArchivesURI();
+									if (pluginArchivesURI != null) {
+										newPluginURI = pluginArchivesURI;
+									}
+									
+									if (result.containsKey("url")) {
 			    						try {
 			    							newPluginURI = new URI(String.valueOf(result.get("url")));
+			    							plugin.setPluginArchivesURI(newPluginURI);
 			        					} catch (Exception e) {
 			        						e.printStackTrace();
 			        					}
 			    					}
+									
+									if (newPluginURI != null) {
+			    						updateAlarmLabel.setVisible(true);
+			    						playFadeTransition(updateAlarmLabel);
+			    					} else {
+			    						updateAlarmLabel.setVisible(false);
+			    					}
+									
+									if (result.containsKey("jar")) {
+										System.out.println(String.join("", "[skip automatic update] jar=", String.valueOf(result.get("jar"))));
+									}
 			    					
 			    					try {
 			    						plugin.pluginUpdateFound();
 			    					} catch (Exception e) {
 			    						e.printStackTrace();
-			    					}
-
-			    					URI pluginArchivesURI = plugin.getPluginArchivesURI();
-		    						if (pluginArchivesURI != null) {
-		    							newPluginURI = pluginArchivesURI;
-		    						}
-			    					
-			    					if (newPluginURI != null) {
-			    						updateAlarmLabel.setVisible(true);
-			    						playFadeTransition(updateAlarmLabel);
-			    					} else {
-			    						updateAlarmLabel.setVisible(false);
 			    					}
 			    				}
 			    			}
@@ -534,6 +541,10 @@ public final class DebugApp extends Application {
 		} else {
 			throw new Exception("The Plugin class must be extends ActlistPlugin !");
 		}
+	}
+	
+	private boolean isInitialized() {
+		return (plugin == null) ? false : true;
 	}
 	
 	private void showOrHide() {
@@ -717,8 +728,6 @@ public final class DebugApp extends Application {
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
-			} finally {
-				popOver.hide();
 			}
 		}));
 	}
@@ -734,7 +743,26 @@ public final class DebugApp extends Application {
 		hBox.setOnMouseExited(mouseEvent -> {
 			hBox.setStyle("-fx-background-color: white;");
 		});
-		hBox.addEventFilter(MouseEvent.MOUSE_CLICKED, action);
+		hBox.addEventFilter(MouseEvent.MOUSE_CLICKED, mouseEvent -> {
+			try {
+				popOver.hide();
+			} catch (Exception e) {
+				
+			}
+			
+			// for immediately hiding popover
+			new Thread(() -> {
+				Platform.runLater(() -> {
+					try {
+						if (action != null) {
+							action.handle(mouseEvent);
+						}
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				});
+			}).start();
+		});
 		
 		return hBox;
 	}
@@ -781,26 +809,32 @@ public final class DebugApp extends Application {
 		head.setPadding(new Insets(5.0, 0.0, 0.0, 0.0));
 		head.setOnMouseClicked(e -> {
 			if (e.getButton() == MouseButton.SECONDARY) {
-				if (popOver != null) {
-					((VBox) popOver.getContentNode()).getChildren().clear();
-					
+				((VBox) popOver.getContentNode()).getChildren().clear();
+				
+				if (isInitialized()) {
 					((VBox) popOver.getContentNode()).getChildren().add(createAboutFunction());
 					
 					JFXToggleButton toggle = (JFXToggleButton) stage.getScene().lookup("#togActivator");
 					if (toggle.selectedProperty().get()) {
 						if (plugin.getFunctionMap().size() > 0) {
-							((VBox) popOver.getContentNode()).getChildren().add(new Separator(Orientation.HORIZONTAL));
+							((VBox) popOver.getContentNode()).getChildren().add(createCustomSeparator());
 						}
 						
 						((VBox) popOver.getContentNode()).getChildren().addAll(functions);
 					}
-					
-					popOver.show(stage.getScene().lookup("#contentLoadingBox"), e.getScreenX(), e.getScreenY());
 				}
+				
+				popOver.show(stage.getScene().lookup("#contentLoadingBox"), e.getScreenX(), e.getScreenY());
 			}
 		});
 		
 		return head;
+	}
+	
+	private Separator createCustomSeparator() {
+		Separator separator = new Separator(Orientation.HORIZONTAL);
+		separator.setStyle("-fx-padding: 0.083333em 0.0em 0.0em 0.0em;"); /* 1 0 0 0 */
+		return separator;
 	}
 	
 	private HBox createToggleBox() {
@@ -1263,6 +1297,27 @@ public final class DebugApp extends Application {
 			});
 		}
 		
+		public static <T> T doGet(String uri, Object param, Class<T> returnType, Consumer<HttpRequest> beforeRequest) throws Exception {
+			return doGet(uri, getProxyHost(), param, returnType, (request) -> {
+				if (beforeRequest != null) {
+					beforeRequest.accept(request);
+				}
+				
+				request.setHeaders(createHeaders(request.getAllHeaders()));
+			});
+		}
+		
+		
+		public static <T> T doGet(String uri, Consumer<HttpRequest> beforeRequest, Consumer<HttpResponse> afterResponse) throws Exception {
+			return doGet(uri, getProxyHost(), null, (request) -> {
+				if (beforeRequest != null) {
+					beforeRequest.accept(request);
+				}
+				
+				request.setHeaders(createHeaders(request.getAllHeaders()));
+			}, afterResponse);
+		}
+		
 		public static <T> T doPost(String uri, Object param, Class<T> returnType) throws Exception {
 			return doPost(uri, getProxyHost(), param, returnType, (request) -> {
 				request.setHeaders(createHeaders());
@@ -1298,28 +1353,35 @@ public final class DebugApp extends Application {
 		}
 		
 		private static Header[] createHeaders() {
+			return createHeaders(null);
+		}
+		
+		private static Header[] createHeaders(Header[] append) {
 			ArrayList<Header> headers = new ArrayList<Header>();
 			
-			StringBuffer userAgent = new StringBuffer();
-			userAgent.append("Actlist-0.0.0");
-			
-			if (SystemUtil.isWindows()) {
-				userAgent.append(" windows-");
-			} else if (SystemUtil.isMac()) {
-				userAgent.append(" macosx-");
-			} else if (SystemUtil.isLinux()) {
-				userAgent.append(" linux-");
-			} else {
-				userAgent.append(" unknown-");
+			if (append != null) {
+				headers.addAll(Arrays.asList(append));
 			}
-			userAgent.append(SystemUtil.getOSArchitecture());
 			
-			userAgent.append(" platform-");
-			userAgent.append(SystemUtil.getPlatformArchitecture());
-			
+			StringBuffer userAgent = new StringBuffer();
+			{
+				userAgent.append("Actlist-0.0.0");
+				if (SystemUtil.isWindows()) {
+					userAgent.append(" windows-");
+				} else if (SystemUtil.isMac()) {
+					userAgent.append(" macosx-");
+				} else if (SystemUtil.isLinux()) {
+					userAgent.append(" linux-");
+				} else {
+					userAgent.append(" unknown-");
+				}
+				userAgent.append(SystemUtil.getOSArchitecture());
+				userAgent.append(" platform-");
+				userAgent.append(SystemUtil.getPlatformArchitecture());
+			}
 			headers.add(new BasicHeader("user-agent", userAgent.toString()));
 			
-			return headers.size() == 0 ? null : headers.toArray(new Header[headers.size()]);
+			return headers.toArray(new Header[headers.size()]);
 		}
 		
 	}

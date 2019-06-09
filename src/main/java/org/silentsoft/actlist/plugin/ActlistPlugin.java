@@ -133,6 +133,14 @@ public abstract class ActlistPlugin {
 	}
 	
 	/**
+	 * @param proxyHost e.g. "http://1.2.3.4:8080"
+	 * @since 1.5.1
+	 */
+	protected static void debug(String proxyHost) {
+		DebugApp.debug(proxyHost);
+	}
+	
+	/**
 	 * @since 1.2.6
 	 */
 	public boolean isDebugMode() {

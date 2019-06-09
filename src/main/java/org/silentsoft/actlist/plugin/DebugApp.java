@@ -126,6 +126,8 @@ public final class DebugApp extends Application {
 		DebugApp.isDebugMode = true;
 		DebugApp.proxyHost   = proxyHost;
 		
+		updateProxyHost();
+		
 		launch("");
 	}
 	
@@ -141,6 +143,23 @@ public final class DebugApp extends Application {
 	
 	boolean isAvailableNewPlugin = false;
 	URI newPluginURI;
+	
+	private static void updateProxyHost() {
+		String proxyHost = "";
+		String proxyPort = "";
+		
+		HttpHost proxy = RESTfulAPI.getProxyHost();
+		if (proxy != null) {
+			proxyHost = proxy.getHostName();
+			proxyPort = String.valueOf(proxy.getPort());
+		}
+		
+		System.setProperty("http.proxyHost", proxyHost);
+		System.setProperty("http.proxyPort", proxyPort);
+		
+		System.setProperty("https.proxyHost", proxyHost);
+		System.setProperty("https.proxyPort", proxyPort);
+	}
 
 	@Override
 	public void start(Stage stage) throws Exception {

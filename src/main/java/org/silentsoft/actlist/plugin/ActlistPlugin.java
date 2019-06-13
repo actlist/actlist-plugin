@@ -133,6 +133,14 @@ public abstract class ActlistPlugin {
 	}
 	
 	/**
+	 * @param isDebugMode if this value set to <code>false</code>, then {@link ActlistPlugin#isDebugMode()} will returns <code>false</code>. otherwise, <code>true</code>.
+	 * @since 1.5.1
+	 */
+	protected static void debug(boolean isDebugMode) {
+		DebugApp.debug(isDebugMode);
+	}
+	
+	/**
 	 * @param proxyHost e.g. "http://1.2.3.4:8080"
 	 * @since 1.5.1
 	 */
@@ -141,9 +149,18 @@ public abstract class ActlistPlugin {
 	}
 	
 	/**
+	 * @param isDebugMode if this value set to <code>false</code>, then {@link ActlistPlugin#isDebugMode()} will returns <code>false</code>. otherwise, <code>true</code>.
+	 * @param proxyHost e.g. "http://1.2.3.4:8080"
+	 * @since 1.5.1
+	 */
+	protected static void debug(boolean isDebugMode, String proxyHost) {
+		DebugApp.debug(isDebugMode, proxyHost);
+	}
+	
+	/**
 	 * @since 1.2.6
 	 */
-	public boolean isDebugMode() {
+	public static boolean isDebugMode() {
 		return DebugApp.isDebugMode;
 	}
 	

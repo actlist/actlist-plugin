@@ -158,7 +158,8 @@ public abstract class ActlistPlugin {
 	}
 	
 	/**
-	 * @since 1.2.6
+	 * @since 1.2.6 created as a non-static method
+	 * @since 1.5.1 breaking changes as a static method
 	 */
 	public static boolean isDebugMode() {
 		return DebugApp.isDebugMode;

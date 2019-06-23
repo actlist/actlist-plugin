@@ -42,7 +42,7 @@ public abstract class ActlistPlugin {
 	 * Actlist engine will reflects this variable to determine what the version of the ActlistPlugin is.
 	 */
 	@SuppressWarnings("unused")
-	private String version = "1.5.0";
+	private String version = "1.5.1";
 	
 	public enum SupportedPlatform {
 		WINDOWS, MACOSX
@@ -133,9 +133,35 @@ public abstract class ActlistPlugin {
 	}
 	
 	/**
-	 * @since 1.2.6
+	 * @param isDebugMode if this value set to <code>false</code>, then {@link ActlistPlugin#isDebugMode()} will returns <code>false</code>. otherwise, <code>true</code>.
+	 * @since 1.5.1
 	 */
-	public boolean isDebugMode() {
+	protected static void debug(boolean isDebugMode) {
+		DebugApp.debug(isDebugMode);
+	}
+	
+	/**
+	 * @param proxyHost e.g. "http://1.2.3.4:8080"
+	 * @since 1.5.1
+	 */
+	protected static void debug(String proxyHost) {
+		DebugApp.debug(proxyHost);
+	}
+	
+	/**
+	 * @param isDebugMode if this value set to <code>false</code>, then {@link ActlistPlugin#isDebugMode()} will returns <code>false</code>. otherwise, <code>true</code>.
+	 * @param proxyHost e.g. "http://1.2.3.4:8080"
+	 * @since 1.5.1
+	 */
+	protected static void debug(boolean isDebugMode, String proxyHost) {
+		DebugApp.debug(isDebugMode, proxyHost);
+	}
+	
+	/**
+	 * @since 1.2.6 created as a non-static method
+	 * @since 1.5.1 breaking changes as a static method
+	 */
+	public static boolean isDebugMode() {
 		return DebugApp.isDebugMode;
 	}
 	

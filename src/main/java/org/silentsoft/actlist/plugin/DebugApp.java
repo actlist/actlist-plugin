@@ -116,15 +116,32 @@ public final class DebugApp extends Application {
 	static String proxyHost = null;
 	
 	public static void debug() {
-		debug(null);
+		debug(true, null);
+	}
+	
+	/**
+	 * @param isDebugMode if this value set to <code>false</code>, then {@link ActlistPlugin#isDebugMode()} will returns <code>false</code>. otherwise, <code>true</code>.
+	 */
+	public static void debug(boolean isDebugMode) {
+		debug(isDebugMode, null);
 	}
 	
 	/**
 	 * @param proxyHost e.g. "http://1.2.3.4:8080"
 	 */
 	public static void debug(String proxyHost) {
-		DebugApp.isDebugMode = true;
+		debug(true, proxyHost);
+	}
+	
+	/**
+	 * @param isDebugMode if this value set to <code>false</code>, then {@link ActlistPlugin#isDebugMode()} will returns <code>false</code>. otherwise, <code>true</code>.
+	 * @param proxyHost e.g. "http://1.2.3.4:8080"
+	 */
+	public static void debug(boolean isDebugMode, String proxyHost) {
+		DebugApp.isDebugMode = isDebugMode;
 		DebugApp.proxyHost   = proxyHost;
+		
+		updateProxyHost();
 		
 		launch("");
 	}
@@ -141,6 +158,23 @@ public final class DebugApp extends Application {
 	
 	boolean isAvailableNewPlugin = false;
 	URI newPluginURI;
+	
+	private static void updateProxyHost() {
+		String proxyHost = "";
+		String proxyPort = "";
+		
+		HttpHost proxy = RESTfulAPI.getProxyHost();
+		if (proxy != null) {
+			proxyHost = proxy.getHostName();
+			proxyPort = String.valueOf(proxy.getPort());
+		}
+		
+		System.setProperty("http.proxyHost", proxyHost);
+		System.setProperty("http.proxyPort", proxyPort);
+		
+		System.setProperty("https.proxyHost", proxyHost);
+		System.setProperty("https.proxyPort", proxyPort);
+	}
 
 	@Override
 	public void start(Stage stage) throws Exception {

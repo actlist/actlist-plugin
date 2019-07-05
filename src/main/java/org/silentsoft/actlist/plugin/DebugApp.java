@@ -275,6 +275,12 @@ public final class DebugApp extends Application {
 				String configContent = FileUtil.readFile(configFile);
 				PluginConfig pluginConfig = JSONUtil.JSONToObject(configContent, PluginConfig.class);
 				if (pluginConfig != null) {
+					// defense logic for wrong interactions with plugin
+					if ("debug".equals(pluginConfig.getPlugin()) == false) {
+						pluginConfig.setPlugin("debug");
+						pluginConfig.commit();
+					}
+					
 					plugin.setPluginConfig(pluginConfig);
 				}
 			}

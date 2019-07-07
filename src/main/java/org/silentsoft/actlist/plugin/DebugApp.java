@@ -142,6 +142,7 @@ public final class DebugApp extends Application {
 		DebugApp.proxyHost   = proxyHost;
 		
 		updateProxyHost();
+		generateUserAgent();
 		
 		launch("");
 	}
@@ -174,6 +175,26 @@ public final class DebugApp extends Application {
 		
 		System.setProperty("https.proxyHost", proxyHost);
 		System.setProperty("https.proxyPort", proxyPort);
+	}
+	
+	static StringBuffer userAgent;
+	private static void generateUserAgent() {
+		userAgent = new StringBuffer();
+		{
+			userAgent.append("Actlist-0.0.0");
+			if (SystemUtil.isWindows()) {
+				userAgent.append(" windows-");
+			} else if (SystemUtil.isMac()) {
+				userAgent.append(" macosx-");
+			} else if (SystemUtil.isLinux()) {
+				userAgent.append(" linux-");
+			} else {
+				userAgent.append(" unknown-");
+			}
+			userAgent.append(SystemUtil.getOSArchitecture());
+			userAgent.append(" platform-");
+			userAgent.append(SystemUtil.getPlatformArchitecture());
+		}
 	}
 
 	@Override
@@ -1403,22 +1424,6 @@ public final class DebugApp extends Application {
 				headers.addAll(Arrays.asList(append));
 			}
 			
-			StringBuffer userAgent = new StringBuffer();
-			{
-				userAgent.append("Actlist-0.0.0");
-				if (SystemUtil.isWindows()) {
-					userAgent.append(" windows-");
-				} else if (SystemUtil.isMac()) {
-					userAgent.append(" macosx-");
-				} else if (SystemUtil.isLinux()) {
-					userAgent.append(" linux-");
-				} else {
-					userAgent.append(" unknown-");
-				}
-				userAgent.append(SystemUtil.getOSArchitecture());
-				userAgent.append(" platform-");
-				userAgent.append(SystemUtil.getPlatformArchitecture());
-			}
 			headers.add(new BasicHeader("user-agent", userAgent.toString()));
 			
 			return headers.toArray(new Header[headers.size()]);

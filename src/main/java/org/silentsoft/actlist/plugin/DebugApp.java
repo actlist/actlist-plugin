@@ -94,6 +94,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.SVGPath;
 import javafx.scene.text.Font;
@@ -112,34 +113,14 @@ import javafx.util.Duration;
  */
 public final class DebugApp extends Application {
 
-	static boolean isDebugMode = false;
-	static String proxyHost = null;
-	
+	static DebugParameter debugParameter;
+		
 	public static void debug() {
-		debug(true, null);
+		debug(DebugParameter.custom().build());
 	}
 	
-	/**
-	 * @param isDebugMode if this value set to <code>false</code>, then {@link ActlistPlugin#isDebugMode()} will returns <code>false</code>. otherwise, <code>true</code>.
-	 */
-	public static void debug(boolean isDebugMode) {
-		debug(isDebugMode, null);
-	}
-	
-	/**
-	 * @param proxyHost e.g. "http://1.2.3.4:8080"
-	 */
-	public static void debug(String proxyHost) {
-		debug(true, proxyHost);
-	}
-	
-	/**
-	 * @param isDebugMode if this value set to <code>false</code>, then {@link ActlistPlugin#isDebugMode()} will returns <code>false</code>. otherwise, <code>true</code>.
-	 * @param proxyHost e.g. "http://1.2.3.4:8080"
-	 */
-	public static void debug(boolean isDebugMode, String proxyHost) {
-		DebugApp.isDebugMode = isDebugMode;
-		DebugApp.proxyHost   = proxyHost;
+	public static void debug(DebugParameter debugParameter) {
+		DebugApp.debugParameter = debugParameter;
 		
 		updateProxyHost();
 		generateUserAgent();
@@ -444,8 +425,13 @@ public final class DebugApp extends Application {
 			});
 			
 			AnchorPane root = new AnchorPane();
+			root.setId("body");
 			root.setPrefWidth(435.0);
-			root.setStyle("-fx-background-color: #ffffff;");
+			if (DebugApp.debugParameter.isDarkMode()) {
+				root.setStyle("-fx-base: rgb(35, 35, 35); -fx-background-color: -fx-base;");
+			} else {
+				root.setStyle("-fx-background-color: #ffffff;");
+			}
 			root.getChildren().add(createHamburger());
 			root.getChildren().add(createHead());
 			root.getChildren().add(createToggleBox());
@@ -453,7 +439,7 @@ public final class DebugApp extends Application {
 			root.getChildren().add(createContentBox());
 			root.getChildren().add(createContentLoadingBox());
 			
-			stage.setScene(new Scene(root));
+			stage.setScene(new Scene(root, Color.TRANSPARENT));
 			
 			stage.setTitle("Actlist Debug App");
 			stage.show();
@@ -839,7 +825,7 @@ public final class DebugApp extends Application {
 		JFXHamburger hamburger = new JFXHamburger();
 		hamburger.setLayoutX(13.0);
 		hamburger.setLayoutY(19.0);
-		hamburger.setOpacity(0.2);
+		hamburger.setOpacity(DebugApp.debugParameter.isDarkMode() ? 1.0 : 0.2);
 		hamburger.setPrefHeight(14.0);
 		hamburger.setPrefWidth(11.0);
 		hamburger.setCursor(Cursor.MOVE);
@@ -885,7 +871,7 @@ public final class DebugApp extends Application {
 					}
 				}
 				
-				popOver.show(stage.getScene().lookup("#contentLoadingBox"), e.getScreenX(), e.getScreenY());
+				popOver.show(stage, e.getScreenX()-40, e.getScreenY()-10); // -40, -10 : offset of PopOver control
 			}
 		});
 		
@@ -1153,6 +1139,7 @@ public final class DebugApp extends Application {
 		JFXToggleButton togActivator = new JFXToggleButton();
 		togActivator.setId("togActivator");
 		togActivator.setText(" ");
+		togActivator.setFocusTraversable(false);
 		togActivator.setSelected(false);
 		togActivator.setToggleColor(Paint.valueOf("#fafafa"));
 		togActivator.setToggleLineColor(Paint.valueOf("#59bf53"));
@@ -1219,7 +1206,6 @@ public final class DebugApp extends Application {
 		contentLoadingBox.setLayoutX(35.0);
 		contentLoadingBox.setLayoutY(51.0);
 		contentLoadingBox.setPrefWidth(380.0);
-		contentLoadingBox.setStyle("-fx-background-color: white;");
 		contentLoadingBox.setVisible(false);
 		AnchorPane.setBottomAnchor(contentLoadingBox, 3.0);
 		AnchorPane.setLeftAnchor(contentLoadingBox, 35.0);
@@ -1234,6 +1220,7 @@ public final class DebugApp extends Application {
 			Runnable runnable = new Runnable() {
 				@Override
 				public void run() {
+					VBox contentBox = (VBox) stage.getScene().lookup("#contentBox");
 					VBox contentLoadingBox = (VBox) stage.getScene().lookup("#contentLoadingBox");
 					
 					contentLoadingBox.getChildren().clear();
@@ -1242,6 +1229,7 @@ public final class DebugApp extends Application {
 						contentLoadingBox.getChildren().add(new JFXSpinner());
 					}
 					
+					contentBox.setVisible(!shouldShowLoadingBar);
 					contentLoadingBox.setVisible(shouldShowLoadingBar);
 				}
 			};
@@ -1390,7 +1378,7 @@ public final class DebugApp extends Application {
 			HttpHost proxyHost = null;
 			
 			try {
-				if (DebugApp.proxyHost == null) {
+				if (DebugApp.debugParameter.getProxyHost() == null) {
 					List<Proxy> proxies = ProxySearch.getDefaultProxySearch().getProxySelector().select(URI.create("http://actlist.silentsoft.org"));
 					if (proxies != null && proxies.isEmpty() == false) {
 						for (Proxy proxy : proxies) {
@@ -1403,7 +1391,7 @@ public final class DebugApp extends Application {
 						}
 					}
 				} else {
-					URI uri = URI.create(DebugApp.proxyHost);
+					URI uri = URI.create(DebugApp.debugParameter.getProxyHost());
 					proxyHost = new HttpHost(uri.getHost(), uri.getPort(), uri.getScheme());
 				}
 			} catch (Exception e) {

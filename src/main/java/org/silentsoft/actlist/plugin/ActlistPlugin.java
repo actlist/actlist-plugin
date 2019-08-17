@@ -42,7 +42,7 @@ public abstract class ActlistPlugin {
 	 * Actlist engine will reflects this variable to determine what the version of the ActlistPlugin is.
 	 */
 	@SuppressWarnings("unused")
-	private String version = "1.5.2";
+	private String version = "1.6.0";
 	
 	public enum SupportedPlatform {
 		WINDOWS, MACOSX
@@ -107,6 +107,8 @@ public abstract class ActlistPlugin {
 	
 	private ObjectProperty<HttpHost> proxyHostObject = new SimpleObjectProperty(null);
 	
+	private BooleanProperty darkModeProperty = new SimpleBooleanProperty(false);
+	
 	private BooleanProperty shouldShowLoadingBar = new SimpleBooleanProperty(false);
 	
 	private ObjectProperty<Throwable> exceptionObject = new SimpleObjectProperty(null);
@@ -135,26 +137,40 @@ public abstract class ActlistPlugin {
 	/**
 	 * @param isDebugMode if this value set to <code>false</code>, then {@link ActlistPlugin#isDebugMode()} will returns <code>false</code>. otherwise, <code>true</code>.
 	 * @since 1.5.1
+	 * @see #debug(DebugParameter)
 	 */
+	@Deprecated
 	protected static void debug(boolean isDebugMode) {
-		DebugApp.debug(isDebugMode);
+		DebugApp.debug(DebugParameter.custom().setDebugMode(isDebugMode).build());
 	}
 	
 	/**
 	 * @param proxyHost e.g. "http://1.2.3.4:8080"
 	 * @since 1.5.1
+	 * @see #debug(DebugParameter)
 	 */
+	@Deprecated
 	protected static void debug(String proxyHost) {
-		DebugApp.debug(proxyHost);
+		DebugApp.debug(DebugParameter.custom().setProxyHost(proxyHost).build());
 	}
 	
 	/**
 	 * @param isDebugMode if this value set to <code>false</code>, then {@link ActlistPlugin#isDebugMode()} will returns <code>false</code>. otherwise, <code>true</code>.
 	 * @param proxyHost e.g. "http://1.2.3.4:8080"
 	 * @since 1.5.1
+	 * @see #debug(DebugParameter)
 	 */
+	@Deprecated
 	protected static void debug(boolean isDebugMode, String proxyHost) {
-		DebugApp.debug(isDebugMode, proxyHost);
+		DebugApp.debug(DebugParameter.custom().setDebugMode(isDebugMode).setProxyHost(proxyHost).build());
+	}
+	
+	/**
+	 * @param debugParameter e.g. <code>DebugParameter.custom().setProxyHost("http://1.2.3.4:8080").setDarkMode(true).build()</code>
+	 * @since 1.6.0
+	 */
+	protected static void debug(DebugParameter debugParameter) {
+		DebugApp.debug(debugParameter);
 	}
 	
 	/**
@@ -162,7 +178,12 @@ public abstract class ActlistPlugin {
 	 * @since 1.5.1 breaking changes as a static method
 	 */
 	public static boolean isDebugMode() {
-		return DebugApp.isDebugMode;
+		// release mode
+		if (DebugApp.debugParameter == null) {
+			return false;
+		}
+		
+		return DebugApp.debugParameter.isDebugMode();
 	}
 	
 	/**
@@ -266,6 +287,22 @@ public abstract class ActlistPlugin {
 	 * @since 1.2.2
 	 */
 	public void applicationCloseRequested() throws Exception {
+		
+	}
+	
+	/**
+	 * This method will be called when Actlist application's config has been changed.</p>
+	 * 
+	 * Supported config event
+	 * <ul>
+	 * <li>proxy host</li>
+	 * <li>dark mode</li>
+	 * </ul>
+	 * 
+	 * @throws Exception
+	 * @since 1.6.0
+	 */
+	public void applicationConfigChanged() throws Exception {
 		
 	}
 	
@@ -712,6 +749,10 @@ public abstract class ActlistPlugin {
 		return proxyHostObject;
 	}
 	
+	BooleanProperty darkModeProperty() {
+		return darkModeProperty;
+	}
+	
 	BooleanProperty shouldShowLoadingBar() {
 		return shouldShowLoadingBar;
 	}
@@ -832,6 +873,13 @@ public abstract class ActlistPlugin {
 	 */
 	public HttpHost getProxyHost() {
 		return proxyHostObject().get();
+	}
+	
+	/**
+	 * @since 1.6.0
+	 */
+	public boolean isDarkMode() {
+		return darkModeProperty().get();
 	}
 	
 	/**

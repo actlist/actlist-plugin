@@ -97,6 +97,8 @@ public abstract class ActlistPlugin {
 	
 	private SupportedPlatform[] supportedPlatforms = null;
 	
+	private String pluginStatisticsUUID = null;
+	
 	private PluginConfig pluginConfig = null;
 	
 	private LinkedHashMap<String, Function> functionMap = new LinkedHashMap<>();
@@ -663,6 +665,20 @@ public abstract class ActlistPlugin {
 	 */
 	protected void setSupportedPlatforms(SupportedPlatform... supportedPlatforms) {
 		this.supportedPlatforms = supportedPlatforms;
+	}
+	
+	/**
+	 * @since 1.6.0
+	 */
+	public String getPluginStatisticsUUID() {
+		return pluginStatisticsUUID;
+	}
+	
+	/**
+	 * @since 1.6.0
+	 */
+	protected void setPluginStatisticsUUID(String pluginStatisticsUUID) {
+		this.pluginStatisticsUUID = pluginStatisticsUUID;
 	}
 	
 	PluginConfig getPluginConfig() {

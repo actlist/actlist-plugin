@@ -70,44 +70,36 @@ public abstract class ActlistPlugin {
 	}
 	
 	private String pluginName = null;
-	
-	private SupportedPlatform[] supportedPlatforms = null;
-	
-	private boolean oneTimePlugin = false;
+
+	private String pluginVersion = null;
 	
 	private String pluginDescription = null;
 	private URI pluginDescriptionURI = null;
+	
+	private String pluginAuthor = null;
+	private URI pluginAuthorURI = null;
 	
 	private String pluginChangeLog = null;
 	private URI pluginChangeLogURI = null;
 	
 	private String pluginLicense = null;
 	private URI pluginLicenseURI = null;
+
+	private String minimumCompatibleVersion = null;
 	
-	private String pluginVersion = null;
+	private String warningText = null;
 	
 	private URI pluginUpdateCheckURI = null;
 	private URI pluginArchivesURI = null;
 	private Consumer<HttpRequest> beforeRequest = null;
 	
-	private String pluginAuthor = null;
-	private URI pluginAuthorURI = null;
+	private boolean oneTimePlugin = false;
 	
-	private String minimumCompatibleVersion = null;
-	
-	private String warningText = null;
+	private SupportedPlatform[] supportedPlatforms = null;
 	
 	private PluginConfig pluginConfig = null;
 	
 	private LinkedHashMap<String, Function> functionMap = new LinkedHashMap<>();
-	
-	private ObjectProperty<SupportedPlatform> currentPlatformObject = new SimpleObjectProperty(null);
-	
-	private ObjectProperty<ClassLoader> classLoaderObject = new SimpleObjectProperty(null);
-	
-	private ObjectProperty<HttpHost> proxyHostObject = new SimpleObjectProperty(null);
-	
-	private BooleanProperty darkModeProperty = new SimpleBooleanProperty(false);
 	
 	private BooleanProperty shouldShowLoadingBar = new SimpleBooleanProperty(false);
 	
@@ -117,11 +109,19 @@ public abstract class ActlistPlugin {
 	private ObjectProperty<TrayNotification> dismissTrayNotificationObject = new SimpleObjectProperty(null);
 	private BooleanProperty shouldDismissTrayNotifications = new SimpleBooleanProperty(false);
 	
+	private ObjectProperty<ClassLoader> classLoaderObject = new SimpleObjectProperty(null);
+	
+	private ObjectProperty<HttpHost> proxyHostObject = new SimpleObjectProperty(null);
+	
 	private BooleanProperty shouldBrowseActlistArchives = new SimpleBooleanProperty(false);
 	
 	private ObjectProperty<Boolean> shouldRequestShowActlist = new SimpleObjectProperty(null);
 	
 	private BooleanProperty shouldRequestDeactivate = new SimpleBooleanProperty(false);
+	
+	private ObjectProperty<SupportedPlatform> currentPlatformObject = new SimpleObjectProperty(null);
+	
+	private BooleanProperty darkModeProperty = new SimpleBooleanProperty(false);
 	
 	public ActlistPlugin(String pluginName) {
 		this.pluginName = pluginName;
@@ -418,33 +418,17 @@ public abstract class ActlistPlugin {
 	}
 	
 	/**
-	 * @since 1.3.0
+	 * @since 1.2.0
 	 */
-	public SupportedPlatform[] getSupportedPlatforms() {
-		return supportedPlatforms;
+	public String getPluginVersion() {
+		return pluginVersion;
 	}
-	
+
 	/**
-	 * @since 1.3.0 created as a public method
-	 * @since 1.6.0 breaking changes as a protected method
+	 * @since 1.2.0
 	 */
-	protected void setSupportedPlatforms(SupportedPlatform... supportedPlatforms) {
-		this.supportedPlatforms = supportedPlatforms;
-	}
-	
-	/**
-	 * @since 1.2.10
-	 */
-	public boolean isOneTimePlugin() {
-		return oneTimePlugin;
-	}
-	
-	/**
-	 * @since 1.2.10 created as a public method
-	 * @since 1.6.0 breaking changes as a protected method
-	 */
-	protected void setOneTimePlugin(boolean oneTimePlugin) {
-		this.oneTimePlugin = oneTimePlugin;
+	protected void setPluginVersion(String pluginVersion) {
+		this.pluginVersion = pluginVersion;
 	}
 	
 	/**
@@ -473,6 +457,35 @@ public abstract class ActlistPlugin {
 	 */
 	public URI getPluginDescriptionURI() {
 		return pluginDescriptionURI;
+	}
+	
+	/**
+	 * @since 1.2.0
+	 */
+	public String getPluginAuthor() {
+		return pluginAuthor;
+	}
+
+	/**
+	 * @since 1.2.0
+	 */
+	protected void setPluginAuthor(String pluginAuthor) {
+		this.pluginAuthor = pluginAuthor;
+	}
+	
+	/**
+	 * @since 1.2.6
+	 */
+	protected void setPluginAuthor(String pluginAuthor, URI uri) {
+		this.pluginAuthor = pluginAuthor;
+		this.pluginAuthorURI = uri;
+	}
+	
+	/**
+	 * @since 1.2.6
+	 */
+	public URI getPluginAuthorURI() {
+		return pluginAuthorURI;
 	}
 	
 	/**
@@ -530,78 +543,33 @@ public abstract class ActlistPlugin {
 	public URI getPluginLicenseURI() {
 		return pluginLicenseURI;
 	}
-
+	
 	/**
-	 * @since 1.2.0
+	 * @since 1.2.4
 	 */
-	public String getPluginVersion() {
-		return pluginVersion;
+	public String getMinimumCompatibleVersion() {
+		return minimumCompatibleVersion;
 	}
 
 	/**
-	 * @since 1.2.0
+	 * @since 1.2.4
 	 */
-	protected void setPluginVersion(String pluginVersion) {
-		this.pluginVersion = pluginVersion;
-	}
-
-	/**
-	 * @since 1.2.0
-	 */
-	public String getPluginAuthor() {
-		return pluginAuthor;
-	}
-
-	/**
-	 * @since 1.2.0
-	 */
-	protected void setPluginAuthor(String pluginAuthor) {
-		this.pluginAuthor = pluginAuthor;
+	protected void setMinimumCompatibleVersion(int major, int minor, int patch) {
+		this.minimumCompatibleVersion = String.format("%d.%d.%d", major, minor, patch);
 	}
 	
 	/**
 	 * @since 1.2.6
 	 */
-	protected void setPluginAuthor(String pluginAuthor, URI uri) {
-		this.pluginAuthor = pluginAuthor;
-		this.pluginAuthorURI = uri;
+	public String getWarningText() {
+		return warningText;
 	}
 	
 	/**
 	 * @since 1.2.6
 	 */
-	public URI getPluginAuthorURI() {
-		return pluginAuthorURI;
-	}
-
-	/**
-	 * @since 1.2.6
-	 */
-	public URI getPluginArchivesURI() {
-		return pluginArchivesURI;
-	}
-
-	/**
-	 * @since 1.2.6 created as a public method
-	 * @since 1.6.0 breaking changes as a protected method
-	 */
-	protected void setPluginArchivesURI(URI pluginArchivesURI) {
-		this.pluginArchivesURI = pluginArchivesURI;
-	}
-	
-	/**
-	 * @since 1.5.0
-	 */
-	public Consumer<HttpRequest> getBeforeRequest() {
-		return beforeRequest;
-	}
-	
-	/**
-	 * @since 1.5.0 created as a public method
-	 * @since 1.6.0 breaking changes as a protected method
-	 */
-	protected void setBeforeRequest(Consumer<HttpRequest> beforeRequest) {
-		this.beforeRequest = beforeRequest;
+	protected void setWarningText(String warningText) {
+		this.warningText = warningText;
 	}
 	
 	/**
@@ -638,33 +606,65 @@ public abstract class ActlistPlugin {
 	}
 	
 	/**
-	 * @since 1.2.4
+	 * @since 1.2.6
 	 */
-	public String getMinimumCompatibleVersion() {
-		return minimumCompatibleVersion;
+	public URI getPluginArchivesURI() {
+		return pluginArchivesURI;
 	}
 
 	/**
-	 * @since 1.2.4
+	 * @since 1.2.6 created as a public method
+	 * @since 1.6.0 breaking changes as a protected method
 	 */
-	protected void setMinimumCompatibleVersion(int major, int minor, int patch) {
-		this.minimumCompatibleVersion = String.format("%d.%d.%d", major, minor, patch);
+	protected void setPluginArchivesURI(URI pluginArchivesURI) {
+		this.pluginArchivesURI = pluginArchivesURI;
 	}
 	
 	/**
-	 * @since 1.2.6
+	 * @since 1.5.0
 	 */
-	public String getWarningText() {
-		return warningText;
+	public Consumer<HttpRequest> getBeforeRequest() {
+		return beforeRequest;
 	}
 	
 	/**
-	 * @since 1.2.6
+	 * @since 1.5.0 created as a public method
+	 * @since 1.6.0 breaking changes as a protected method
 	 */
-	protected void setWarningText(String warningText) {
-		this.warningText = warningText;
+	protected void setBeforeRequest(Consumer<HttpRequest> beforeRequest) {
+		this.beforeRequest = beforeRequest;
 	}
-
+	
+	/**
+	 * @since 1.2.10
+	 */
+	public boolean isOneTimePlugin() {
+		return oneTimePlugin;
+	}
+	
+	/**
+	 * @since 1.2.10 created as a public method
+	 * @since 1.6.0 breaking changes as a protected method
+	 */
+	protected void setOneTimePlugin(boolean oneTimePlugin) {
+		this.oneTimePlugin = oneTimePlugin;
+	}
+	
+	/**
+	 * @since 1.3.0
+	 */
+	public SupportedPlatform[] getSupportedPlatforms() {
+		return supportedPlatforms;
+	}
+	
+	/**
+	 * @since 1.3.0 created as a public method
+	 * @since 1.6.0 breaking changes as a protected method
+	 */
+	protected void setSupportedPlatforms(SupportedPlatform... supportedPlatforms) {
+		this.supportedPlatforms = supportedPlatforms;
+	}
+	
 	PluginConfig getPluginConfig() {
 		return pluginConfig;
 	}
@@ -744,22 +744,6 @@ public abstract class ActlistPlugin {
 		return functionMap;
 	}
 	
-	ObjectProperty<SupportedPlatform> currentPlatformObject() {
-		return currentPlatformObject;
-	}
-	
-	ObjectProperty<ClassLoader> classLoaderObject() {
-		return classLoaderObject;
-	}
-	
-	ObjectProperty<HttpHost> proxyHostObject() {
-		return proxyHostObject;
-	}
-	
-	BooleanProperty darkModeProperty() {
-		return darkModeProperty;
-	}
-	
 	BooleanProperty shouldShowLoadingBar() {
 		return shouldShowLoadingBar;
 	}
@@ -780,6 +764,14 @@ public abstract class ActlistPlugin {
 		return shouldDismissTrayNotifications;
 	}
 	
+	ObjectProperty<ClassLoader> classLoaderObject() {
+		return classLoaderObject;
+	}
+	
+	ObjectProperty<HttpHost> proxyHostObject() {
+		return proxyHostObject;
+	}
+	
 	BooleanProperty shouldBrowseActlistArchives() {
 		return shouldBrowseActlistArchives;
 	}
@@ -790,6 +782,14 @@ public abstract class ActlistPlugin {
 	
 	BooleanProperty shouldRequestDeactivate() {
 		return shouldRequestDeactivate;
+	}
+	
+	ObjectProperty<SupportedPlatform> currentPlatformObject() {
+		return currentPlatformObject;
+	}
+	
+	BooleanProperty darkModeProperty() {
+		return darkModeProperty;
 	}
 	
 	/**
@@ -859,34 +859,6 @@ public abstract class ActlistPlugin {
 	 */
 	public void removeConfig(String key) throws Exception {
 		getPluginConfig().remove(key);
-	}
-	
-	/**
-	 * @since 1.3.0
-	 */
-	public SupportedPlatform getCurrentPlatform() {
-		return currentPlatformObject().get();
-	}
-	
-	/**
-	 * @since 1.2.6
-	 */
-	public ClassLoader getClassLoader() {
-		return classLoaderObject().get();
-	}
-	
-	/**
-	 * @since 1.2.6
-	 */
-	public HttpHost getProxyHost() {
-		return proxyHostObject().get();
-	}
-	
-	/**
-	 * @since 1.6.0
-	 */
-	public boolean isDarkMode() {
-		return darkModeProperty().get();
 	}
 	
 	/**
@@ -976,6 +948,20 @@ public abstract class ActlistPlugin {
 	}
 	
 	/**
+	 * @since 1.2.6
+	 */
+	public ClassLoader getClassLoader() {
+		return classLoaderObject().get();
+	}
+	
+	/**
+	 * @since 1.2.6
+	 */
+	public HttpHost getProxyHost() {
+		return proxyHostObject().get();
+	}
+	
+	/**
 	 * @since 1.2.10
 	 */
 	public void requestShowActlist() {
@@ -994,6 +980,20 @@ public abstract class ActlistPlugin {
 	 */
 	public void requestDeactivate() {
 		shouldRequestDeactivate().set(true);
+	}
+	
+	/**
+	 * @since 1.3.0
+	 */
+	public SupportedPlatform getCurrentPlatform() {
+		return currentPlatformObject().get();
+	}
+	
+	/**
+	 * @since 1.6.0
+	 */
+	public boolean isDarkMode() {
+		return darkModeProperty().get();
 	}
 	
 }

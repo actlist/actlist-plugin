@@ -425,9 +425,10 @@ public abstract class ActlistPlugin {
 	}
 	
 	/**
-	 * @since 1.3.0
+	 * @since 1.3.0 created as a public method
+	 * @since 1.6.0 breaking changes as a protected method
 	 */
-	public void setSupportedPlatforms(SupportedPlatform... supportedPlatforms) {
+	protected void setSupportedPlatforms(SupportedPlatform... supportedPlatforms) {
 		this.supportedPlatforms = supportedPlatforms;
 	}
 	
@@ -439,9 +440,10 @@ public abstract class ActlistPlugin {
 	}
 	
 	/**
-	 * @since 1.2.10
+	 * @since 1.2.10 created as a public method
+	 * @since 1.6.0 breaking changes as a protected method
 	 */
-	public void setOneTimePlugin(boolean oneTimePlugin) {
+	protected void setOneTimePlugin(boolean oneTimePlugin) {
 		this.oneTimePlugin = oneTimePlugin;
 	}
 	
@@ -580,9 +582,10 @@ public abstract class ActlistPlugin {
 	}
 
 	/**
-	 * @since 1.2.6
+	 * @since 1.2.6 created as a public method
+	 * @since 1.6.0 breaking changes as a protected method
 	 */
-	public void setPluginArchivesURI(URI pluginArchivesURI) {
+	protected void setPluginArchivesURI(URI pluginArchivesURI) {
 		this.pluginArchivesURI = pluginArchivesURI;
 	}
 	
@@ -594,9 +597,10 @@ public abstract class ActlistPlugin {
 	}
 	
 	/**
-	 * @since 1.5.0
+	 * @since 1.5.0 created as a public method
+	 * @since 1.6.0 breaking changes as a protected method
 	 */
-	public void setBeforeRequest(Consumer<HttpRequest> beforeRequest) {
+	protected void setBeforeRequest(Consumer<HttpRequest> beforeRequest) {
 		this.beforeRequest = beforeRequest;
 	}
 	
@@ -608,24 +612,27 @@ public abstract class ActlistPlugin {
 	}
 	
 	/**
-	 * @since 1.2.6
+	 * @since 1.2.6 created as a public method
+	 * @since 1.6.0 breaking changes as a protected method
 	 */
-	public void setPluginUpdateCheckURI(URI pluginUpdateCheckURI) {
+	protected void setPluginUpdateCheckURI(URI pluginUpdateCheckURI) {
 		this.pluginUpdateCheckURI = pluginUpdateCheckURI;
 	}
 	
 	/**
-	 * @since 1.2.6
+	 * @since 1.2.6 created as a public method
+	 * @since 1.6.0 breaking changes as a protected method
 	 */
-	public void setPluginUpdateCheckURI(URI pluginUpdateCheckURI, URI pluginArchivesURI) {
+	protected void setPluginUpdateCheckURI(URI pluginUpdateCheckURI, URI pluginArchivesURI) {
 		this.pluginUpdateCheckURI = pluginUpdateCheckURI;
 		this.pluginArchivesURI = pluginArchivesURI;
 	}
 	
 	/**
-	 * @since 1.5.0
+	 * @since 1.5.0 created as a public method
+	 * @since 1.6.0 breaking changes as a protected method
 	 */
-	public void setPluginUpdateCheckURI(URI pluginUpdateCheckURI, Consumer<HttpRequest> beforeRequest) {
+	protected void setPluginUpdateCheckURI(URI pluginUpdateCheckURI, Consumer<HttpRequest> beforeRequest) {
 		this.pluginUpdateCheckURI = pluginUpdateCheckURI;
 		this.beforeRequest = beforeRequest;
 	}

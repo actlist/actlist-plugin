@@ -428,7 +428,7 @@ public final class DebugApp extends Application {
 			root.setId("body");
 			root.setPrefWidth(435.0);
 			if (DebugApp.debugParameter.isDarkMode()) {
-				root.setStyle("-fx-base: rgb(35, 35, 35); -fx-background-color: -fx-base;");
+				root.setStyle("-fx-base: rgb(40, 40, 40); -fx-background-color: -fx-base;");
 			} else {
 				root.setStyle("-fx-background-color: #ffffff;");
 			}

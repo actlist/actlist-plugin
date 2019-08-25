@@ -26,7 +26,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -212,7 +211,6 @@ public final class DebugApp extends Application {
 		
 		/* source mirroring from real Actlist application */
 		
-		AtomicBoolean shouldTraceException = new AtomicBoolean(true);
 		if (ActlistPlugin.class.isAssignableFrom(pluginClass)) {
 			popOver = new PopOver(new VBox());
 			((VBox) popOver.getContentNode()).setPadding(new Insets(3, 3, 3, 3));
@@ -237,29 +235,10 @@ public final class DebugApp extends Application {
 			SupportedPlatform[] supportedPlatforms = plugin.getSupportedPlatforms();
 			if (supportedPlatforms != null) {
 				if (supportedPlatforms.length > 0 && Arrays.asList(supportedPlatforms).contains(currentPlatform) == false) {
-					shouldTraceException.set(false);
-					
 					List<String> listOfSupportedPlatform = Arrays.stream(supportedPlatforms).map(Enum::name).collect(Collectors.toList());
 					String errorMessage = String.join("", "This plugin only supports ", String.join(", ", listOfSupportedPlatform));
-					Runnable errorDialog = () -> {
-						Alert alert = new Alert(AlertType.ERROR);
-						alert.setTitle("Error");
-						alert.setHeaderText("Unsupported platform");
-						alert.setContentText(errorMessage);
-						alert.showAndWait();
-					};
-					Label lblPluginName = (Label) stage.getScene().lookup("#lblPluginName");
-					lblPluginName.setOnMouseClicked(mouseEvent -> {
-						if (mouseEvent.getButton() == MouseButton.PRIMARY) {
-							errorDialog.run();
-						}
-					});
-					Label warningLabel = (Label) stage.getScene().lookup("#warningLabel");
-					warningLabel.setOnMouseClicked(mouseEvent -> {
-						errorDialog.run();
-					});
-					warningLabel.setVisible(true);
-					playFadeTransition(warningLabel);
+					
+					/* skip node control */
 					
 					throw new Exception(errorMessage);
 				}
@@ -270,6 +249,8 @@ public final class DebugApp extends Application {
 			plugin.classLoaderObject().set(getClass().getClassLoader());
 			
 			plugin.proxyHostObject().set(RESTfulAPI.getProxyHost());
+			
+			plugin.darkModeProperty().set(DebugApp.debugParameter.isDarkMode());
 			
 			plugin.setPluginConfig(new PluginConfig("debug"));
 			File configFile = Paths.get(System.getProperty("user.dir"), "plugins", "config", "debug.config").toFile();
@@ -425,7 +406,6 @@ public final class DebugApp extends Application {
 			});
 			
 			AnchorPane root = new AnchorPane();
-			root.setId("body");
 			root.setPrefWidth(435.0);
 			if (DebugApp.debugParameter.isDarkMode()) {
 				root.setStyle("-fx-base: rgb(40, 40, 40); -fx-background-color: -fx-base;");
@@ -435,11 +415,12 @@ public final class DebugApp extends Application {
 			root.getChildren().add(createHamburger());
 			root.getChildren().add(createHead());
 			root.getChildren().add(createToggleBox());
+			root.getChildren().add(createPluginLoadingBox());
 			root.getChildren().add(createSeparator());
 			root.getChildren().add(createContentBox());
 			root.getChildren().add(createContentLoadingBox());
 			
-			stage.setScene(new Scene(root, Color.TRANSPARENT));
+			stage.setScene(new Scene(new BorderPane(root), Color.TRANSPARENT));
 			
 			stage.setTitle("Actlist Debug App");
 			stage.show();
@@ -465,115 +446,15 @@ public final class DebugApp extends Application {
 			}
 			
 			/* finally */
+			HBox pluginLoadingBox = (HBox) stage.getScene().lookup("#pluginLoadingBox");
+			pluginLoadingBox.setVisible(false);
 			
 			new Thread(() -> {
-				Runnable checkUpdate = () -> {
-					Label warningLabel = (Label) stage.getScene().lookup("#warningLabel");
-					Label updateAlarmLabel = (Label) stage.getScene().lookup("#updateAlarmLabel");
-					
-					try {
-						URI pluginUpdateCheckURI = plugin.getPluginUpdateCheckURI();
-						if (pluginUpdateCheckURI != null) {
-							Map<String, Object> result = null;
-							
-							ArrayList<NameValuePair> param = new ArrayList<NameValuePair>();
-			    			param.add(new BasicNameValuePair("version", plugin.getPluginVersion()));
-			    			/* below values are unnecessary. version value is enough.
-			    			param.add(new BasicNameValuePair("os", SystemUtil.getOSName()));
-			    			param.add(new BasicNameValuePair("architecture", SystemUtil.getPlatformArchitecture()));
-			    			*/
-							
-							String uri = pluginUpdateCheckURI.toString();
-							if (uri.matches("(?i).*\\.js")) {
-								StringBuffer script = new StringBuffer();
-								script.append(String.format("var version = '%s';", plugin.getPluginVersion())).append("\r\n");
-								script.append(RESTfulAPI.doGet(pluginUpdateCheckURI.toString(), param, String.class, plugin.getBeforeRequest()));
-								
-								ScriptEngine scriptEngine = new ScriptEngineManager().getEngineByName("nashorn");
-								Object _result = scriptEngine.eval(script.toString());
-								if (_result instanceof Map) {
-									result = (Map) _result;
-								}
-							} else {
-				    			result = RESTfulAPI.doGet(pluginUpdateCheckURI.toString(), param, Map.class, plugin.getBeforeRequest());
-							}
-			    			
-			    			if (result == null) {
-			    				return;
-			    			}
-			    			
-			    			if (result.containsKey("available")) {
-			    				isAvailableNewPlugin = Boolean.parseBoolean(String.valueOf(result.get("available")));
-			    				if (isAvailableNewPlugin) {
-			    					URI pluginArchivesURI = plugin.getPluginArchivesURI();
-									if (pluginArchivesURI != null) {
-										newPluginURI = pluginArchivesURI;
-									}
-									
-									if (result.containsKey("url")) {
-			    						try {
-			    							newPluginURI = new URI(String.valueOf(result.get("url")));
-			    							plugin.setPluginArchivesURI(newPluginURI);
-			        					} catch (Exception e) {
-			        						e.printStackTrace();
-			        					}
-			    					}
-									
-									if (newPluginURI != null) {
-			    						updateAlarmLabel.setVisible(true);
-			    						playFadeTransition(updateAlarmLabel);
-			    					} else {
-			    						updateAlarmLabel.setVisible(false);
-			    					}
-									
-									if (result.containsKey("jar")) {
-										System.out.println(String.join("", "[skip automatic update] jar=", String.valueOf(result.get("jar"))));
-									}
-			    					
-			    					try {
-			    						plugin.pluginUpdateFound();
-			    					} catch (Exception e) {
-			    						e.printStackTrace();
-			    					}
-			    				}
-			    			}
-			    			
-			    			if (result.containsKey("killSwitch")) {
-			    				boolean hasTurnedOnKillSwitch = "on".equalsIgnoreCase(String.valueOf(result.get("killSwitch")).trim());
-			    				if (hasTurnedOnKillSwitch) {
-			    					String message = "The plugin's kill switch has turned on by the author.";
-			    					
-			    					makeDisable(new Exception(message), false);
-			    					
-			    					warningLabel.setOnMouseClicked(mouseEvent -> {
-										MessageBox.showInformation(stage, message);
-									});
-									warningLabel.setVisible(true);
-									playFadeTransition(warningLabel);
-			    				}
-			    			}
-			    			
-			    			if (result.containsKey("endOfService")) {
-			    				boolean hasEndOfService = Boolean.parseBoolean(String.valueOf(result.get("endOfService")));
-								if (hasEndOfService) {
-									warningLabel.setOnMouseClicked(mouseEvent -> {
-										MessageBox.showInformation(stage, "This plugin has reached end of service by the author.");
-									});
-									warningLabel.setVisible(true);
-									playFadeTransition(warningLabel);
-								}
-			    			}
-						}
-					} catch (Exception e) {
-						e.printStackTrace(); // print stack trace only ! do nothing ! b/c of its not kind of critical exception.
-					}
-				};
-				
 				boolean shouldCheck = true;
 				Date latestCheckDate= null;
 				while (true) {
 					if (shouldCheck) {
-						checkUpdate.run();
+						checkForUpdates.run();
 						latestCheckDate = Calendar.getInstance().getTime();
 					}
 					try {
@@ -783,12 +664,12 @@ public final class DebugApp extends Application {
 		HBox hBox = new HBox(node);
 		hBox.setAlignment(Pos.CENTER);
 		hBox.setPadding(new Insets(3, 3, 3, 3));
-		hBox.setStyle("-fx-background-color: white;");
+		hBox.setStyle("-fx-background-color: #fbfbfb;");
 		hBox.setOnMouseEntered(mouseEvent -> {
 			hBox.setStyle("-fx-background-color: lightgray;");
 		});
 		hBox.setOnMouseExited(mouseEvent -> {
-			hBox.setStyle("-fx-background-color: white;");
+			hBox.setStyle("-fx-background-color: #fbfbfb;");
 		});
 		hBox.addEventFilter(MouseEvent.MOUSE_CLICKED, mouseEvent -> {
 			try {
@@ -861,15 +742,20 @@ public final class DebugApp extends Application {
 				if (isInitialized()) {
 					((VBox) popOver.getContentNode()).getChildren().add(createAboutFunction());
 					
-					JFXToggleButton toggle = (JFXToggleButton) stage.getScene().lookup("#togActivator");
-					if (toggle.selectedProperty().get()) {
+					if (isActivated()) {
 						if (plugin.getFunctionMap().size() > 0) {
 							((VBox) popOver.getContentNode()).getChildren().add(createCustomSeparator());
 						}
 						
 						((VBox) popOver.getContentNode()).getChildren().addAll(functions);
 					}
+					
+					((VBox) popOver.getContentNode()).getChildren().add(createCustomSeparator());
+					
+					((VBox) popOver.getContentNode()).getChildren().add(createCheckForUpdatesFunction());
 				}
+				
+				((VBox) popOver.getContentNode()).getChildren().add(createDeleteFunction());
 				
 				popOver.show(stage, e.getScreenX()-40, e.getScreenY()-10); // -40, -10 : offset of PopOver control
 			}
@@ -882,6 +768,136 @@ public final class DebugApp extends Application {
 		Separator separator = new Separator(Orientation.HORIZONTAL);
 		separator.setStyle("-fx-padding: 0.083333em 0.0em 0.0em 0.0em;"); /* 1 0 0 0 */
 		return separator;
+	}
+	
+	private volatile Runnable checkForUpdates = () -> {
+		Label warningLabel = (Label) stage.getScene().lookup("#warningLabel");
+		Label updateAlarmLabel = (Label) stage.getScene().lookup("#updateAlarmLabel");
+		
+		try {
+			URI pluginUpdateCheckURI = plugin.getPluginUpdateCheckURI();
+			if (pluginUpdateCheckURI != null) {
+				Map<String, Object> result = null;
+				
+				ArrayList<NameValuePair> param = new ArrayList<NameValuePair>();
+    			param.add(new BasicNameValuePair("version", plugin.getPluginVersion()));
+    			/* below values are unnecessary. version value is enough.
+    			param.add(new BasicNameValuePair("os", SystemUtil.getOSName()));
+    			param.add(new BasicNameValuePair("architecture", SystemUtil.getPlatformArchitecture()));
+    			*/
+				
+				String uri = pluginUpdateCheckURI.toString();
+				if (uri.matches("(?i).*\\.js")) {
+					StringBuffer script = new StringBuffer();
+					script.append(String.format("var version = '%s';", plugin.getPluginVersion())).append("\r\n");
+					script.append(RESTfulAPI.doGet(pluginUpdateCheckURI.toString(), param, String.class, plugin.getBeforeRequest()));
+					
+					ScriptEngine scriptEngine = new ScriptEngineManager().getEngineByName("nashorn");
+					Object _result = scriptEngine.eval(script.toString());
+					if (_result instanceof Map) {
+						result = (Map) _result;
+					}
+				} else {
+	    			result = RESTfulAPI.doGet(pluginUpdateCheckURI.toString(), param, Map.class, plugin.getBeforeRequest());
+				}
+    			
+    			if (result == null) {
+    				return;
+    			}
+    			
+    			if (result.containsKey("available")) {
+    				isAvailableNewPlugin = Boolean.parseBoolean(String.valueOf(result.get("available")));
+    				if (isAvailableNewPlugin) {
+    					URI pluginArchivesURI = plugin.getPluginArchivesURI();
+						if (pluginArchivesURI != null) {
+							newPluginURI = pluginArchivesURI;
+						}
+						
+						if (result.containsKey("url")) {
+    						try {
+    							newPluginURI = new URI(String.valueOf(result.get("url")));
+    							plugin.setPluginArchivesURI(newPluginURI);
+        					} catch (Exception e) {
+        						e.printStackTrace();
+        					}
+    					}
+						
+						if (newPluginURI != null) {
+    						updateAlarmLabel.setVisible(true);
+    						playFadeTransition(updateAlarmLabel);
+    					} else {
+    						updateAlarmLabel.setVisible(false);
+    					}
+						
+						if (result.containsKey("jar")) {
+							System.out.println(String.join("", "[skip automatic update] jar=", String.valueOf(result.get("jar"))));
+						}
+    					
+    					try {
+    						plugin.pluginUpdateFound();
+    					} catch (Exception e) {
+    						e.printStackTrace();
+    					}
+    				}
+    			}
+    			
+    			if (result.containsKey("killSwitch")) {
+    				boolean hasTurnedOnKillSwitch = "on".equalsIgnoreCase(String.valueOf(result.get("killSwitch")).trim());
+    				if (hasTurnedOnKillSwitch) {
+    					String message = "The plugin's kill switch has turned on by the author.";
+    					
+    					makeDisable(new Exception(message), false);
+    					
+    					warningLabel.setOnMouseClicked(mouseEvent -> {
+							MessageBox.showInformation(stage, message);
+						});
+						warningLabel.setVisible(true);
+						playFadeTransition(warningLabel);
+    				}
+    			}
+    			
+    			if (result.containsKey("endOfService")) {
+    				boolean hasEndOfService = Boolean.parseBoolean(String.valueOf(result.get("endOfService")));
+					if (hasEndOfService) {
+						warningLabel.setOnMouseClicked(mouseEvent -> {
+							MessageBox.showInformation(stage, "This plugin has reached end of service by the author.");
+						});
+						warningLabel.setVisible(true);
+						playFadeTransition(warningLabel);
+					}
+    			}
+			}
+		} catch (Exception e) {
+			e.printStackTrace(); // print stack trace only ! do nothing ! b/c of its not kind of critical exception.
+		}
+	};
+	
+	private HBox createCheckForUpdatesFunction() {
+		return createFunctionBox(new Label("Check for updates"), mouseEvent -> {
+			HBox pluginLoadingBox = (HBox) stage.getScene().lookup("#pluginLoadingBox");
+			pluginLoadingBox.setVisible(true); // for head
+			displayLoadingBar(true);           // for body
+			
+			new Thread(() -> {
+				checkForUpdates.run();
+				
+				pluginLoadingBox.setVisible(false); // for head
+				displayLoadingBar(false);           // for body
+			}).start();
+		});
+	}
+	
+	private HBox createDeleteFunction() {
+		Label label = new Label("Delete");
+		label.setTextFill(Paint.valueOf("#db0018"));
+		
+		return createFunctionBox(label, mouseEvent -> {
+			showRestrictionMessageBox();
+		});
+	}
+	
+	private void showRestrictionMessageBox() {
+		MessageBox.showInformation(stage, "This feature isn't available in debug mode.");
 	}
 	
 	private HBox createToggleBox() {
@@ -1187,6 +1203,23 @@ public final class DebugApp extends Application {
 		return separator;
 	}
 	
+	private HBox createPluginLoadingBox() {
+		JFXSpinner spinner = new JFXSpinner();
+		spinner.setPrefSize(28.0, 28.0);
+		
+		HBox pluginLoadingBox = new HBox(spinner);
+		pluginLoadingBox.setId("pluginLoadingBox");
+		pluginLoadingBox.setAlignment(Pos.CENTER);
+		pluginLoadingBox.setLayoutX(0.0);
+		pluginLoadingBox.setLayoutY(45.0);
+		pluginLoadingBox.setPrefHeight(45.0);
+		AnchorPane.setTopAnchor(pluginLoadingBox, 0.0);
+		AnchorPane.setLeftAnchor(pluginLoadingBox, 35.0);
+		AnchorPane.setRightAnchor(pluginLoadingBox, 0.0);
+		
+		return pluginLoadingBox;
+	}
+	
 	private VBox createContentBox() {
 		VBox contentBox = new VBox();
 		contentBox.setId("contentBox");
@@ -1216,7 +1249,7 @@ public final class DebugApp extends Application {
 	}
 	
 	private void displayLoadingBar(boolean shouldShowLoadingBar) {
-		if (plugin.existsGraphic()) {
+		if (isActivated() && plugin.existsGraphic()) {
 			Runnable runnable = new Runnable() {
 				@Override
 				public void run() {
@@ -1226,7 +1259,9 @@ public final class DebugApp extends Application {
 					contentLoadingBox.getChildren().clear();
 					
 					if (shouldShowLoadingBar) {
-						contentLoadingBox.getChildren().add(new JFXSpinner());
+						JFXSpinner spinner = new JFXSpinner();
+						spinner.setPrefSize(28.0, 28.0);
+						contentLoadingBox.getChildren().add(spinner);
 					}
 					
 					contentBox.setVisible(!shouldShowLoadingBar);

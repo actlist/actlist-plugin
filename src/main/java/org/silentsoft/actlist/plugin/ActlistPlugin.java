@@ -42,7 +42,7 @@ public abstract class ActlistPlugin {
 	 * Actlist engine will reflects this variable to determine what the version of the ActlistPlugin is.
 	 */
 	@SuppressWarnings("unused")
-	private String version = "1.5.1";
+	private String version = "1.6.0";
 	
 	public enum SupportedPlatform {
 		WINDOWS, MACOSX
@@ -70,42 +70,38 @@ public abstract class ActlistPlugin {
 	}
 	
 	private String pluginName = null;
-	
-	private SupportedPlatform[] supportedPlatforms = null;
-	
-	private boolean oneTimePlugin = false;
+
+	private String pluginVersion = null;
 	
 	private String pluginDescription = null;
 	private URI pluginDescriptionURI = null;
+	
+	private String pluginAuthor = null;
+	private URI pluginAuthorURI = null;
 	
 	private String pluginChangeLog = null;
 	private URI pluginChangeLogURI = null;
 	
 	private String pluginLicense = null;
 	private URI pluginLicenseURI = null;
+
+	private String minimumCompatibleVersion = null;
 	
-	private String pluginVersion = null;
+	private String warningText = null;
 	
 	private URI pluginUpdateCheckURI = null;
 	private URI pluginArchivesURI = null;
 	private Consumer<HttpRequest> beforeRequest = null;
 	
-	private String pluginAuthor = null;
-	private URI pluginAuthorURI = null;
+	private boolean oneTimePlugin = false;
 	
-	private String minimumCompatibleVersion = null;
+	private SupportedPlatform[] supportedPlatforms = null;
 	
-	private String warningText = null;
+	private String pluginStatisticsUUID = null;
 	
 	private PluginConfig pluginConfig = null;
 	
 	private LinkedHashMap<String, Function> functionMap = new LinkedHashMap<>();
-	
-	private ObjectProperty<SupportedPlatform> currentPlatformObject = new SimpleObjectProperty(null);
-	
-	private ObjectProperty<ClassLoader> classLoaderObject = new SimpleObjectProperty(null);
-	
-	private ObjectProperty<HttpHost> proxyHostObject = new SimpleObjectProperty(null);
 	
 	private BooleanProperty shouldShowLoadingBar = new SimpleBooleanProperty(false);
 	
@@ -115,11 +111,19 @@ public abstract class ActlistPlugin {
 	private ObjectProperty<TrayNotification> dismissTrayNotificationObject = new SimpleObjectProperty(null);
 	private BooleanProperty shouldDismissTrayNotifications = new SimpleBooleanProperty(false);
 	
+	private ObjectProperty<ClassLoader> classLoaderObject = new SimpleObjectProperty(null);
+	
+	private ObjectProperty<HttpHost> proxyHostObject = new SimpleObjectProperty(null);
+	
 	private BooleanProperty shouldBrowseActlistArchives = new SimpleBooleanProperty(false);
 	
 	private ObjectProperty<Boolean> shouldRequestShowActlist = new SimpleObjectProperty(null);
 	
 	private BooleanProperty shouldRequestDeactivate = new SimpleBooleanProperty(false);
+	
+	private ObjectProperty<SupportedPlatform> currentPlatformObject = new SimpleObjectProperty(null);
+	
+	private BooleanProperty darkModeProperty = new SimpleBooleanProperty(false);
 	
 	public ActlistPlugin(String pluginName) {
 		this.pluginName = pluginName;
@@ -135,26 +139,40 @@ public abstract class ActlistPlugin {
 	/**
 	 * @param isDebugMode if this value set to <code>false</code>, then {@link ActlistPlugin#isDebugMode()} will returns <code>false</code>. otherwise, <code>true</code>.
 	 * @since 1.5.1
+	 * @see #debug(DebugParameter)
 	 */
+	@Deprecated
 	protected static void debug(boolean isDebugMode) {
-		DebugApp.debug(isDebugMode);
+		DebugApp.debug(DebugParameter.custom().setDebugMode(isDebugMode).build());
 	}
 	
 	/**
 	 * @param proxyHost e.g. "http://1.2.3.4:8080"
 	 * @since 1.5.1
+	 * @see #debug(DebugParameter)
 	 */
+	@Deprecated
 	protected static void debug(String proxyHost) {
-		DebugApp.debug(proxyHost);
+		DebugApp.debug(DebugParameter.custom().setProxyHost(proxyHost).build());
 	}
 	
 	/**
 	 * @param isDebugMode if this value set to <code>false</code>, then {@link ActlistPlugin#isDebugMode()} will returns <code>false</code>. otherwise, <code>true</code>.
 	 * @param proxyHost e.g. "http://1.2.3.4:8080"
 	 * @since 1.5.1
+	 * @see #debug(DebugParameter)
 	 */
+	@Deprecated
 	protected static void debug(boolean isDebugMode, String proxyHost) {
-		DebugApp.debug(isDebugMode, proxyHost);
+		DebugApp.debug(DebugParameter.custom().setDebugMode(isDebugMode).setProxyHost(proxyHost).build());
+	}
+	
+	/**
+	 * @param debugParameter e.g. <code>DebugParameter.custom().setProxyHost("http://1.2.3.4:8080").setDarkMode(true).build()</code>
+	 * @since 1.6.0
+	 */
+	protected static void debug(DebugParameter debugParameter) {
+		DebugApp.debug(debugParameter);
 	}
 	
 	/**
@@ -162,7 +180,12 @@ public abstract class ActlistPlugin {
 	 * @since 1.5.1 breaking changes as a static method
 	 */
 	public static boolean isDebugMode() {
-		return DebugApp.isDebugMode;
+		// release mode
+		if (DebugApp.debugParameter == null) {
+			return false;
+		}
+		
+		return DebugApp.debugParameter.isDebugMode();
 	}
 	
 	/**
@@ -266,6 +289,22 @@ public abstract class ActlistPlugin {
 	 * @since 1.2.2
 	 */
 	public void applicationCloseRequested() throws Exception {
+		
+	}
+	
+	/**
+	 * This method will be called when Actlist application's config has been changed.</p>
+	 * 
+	 * Supported config event
+	 * <ul>
+	 * <li>proxy host</li>
+	 * <li>dark mode</li>
+	 * </ul>
+	 * 
+	 * @throws Exception
+	 * @since 1.6.0
+	 */
+	public void applicationConfigChanged() throws Exception {
 		
 	}
 	
@@ -381,31 +420,17 @@ public abstract class ActlistPlugin {
 	}
 	
 	/**
-	 * @since 1.3.0
+	 * @since 1.2.0
 	 */
-	public SupportedPlatform[] getSupportedPlatforms() {
-		return supportedPlatforms;
+	public String getPluginVersion() {
+		return pluginVersion;
 	}
-	
+
 	/**
-	 * @since 1.3.0
+	 * @since 1.2.0
 	 */
-	public void setSupportedPlatforms(SupportedPlatform... supportedPlatforms) {
-		this.supportedPlatforms = supportedPlatforms;
-	}
-	
-	/**
-	 * @since 1.2.10
-	 */
-	public boolean isOneTimePlugin() {
-		return oneTimePlugin;
-	}
-	
-	/**
-	 * @since 1.2.10
-	 */
-	public void setOneTimePlugin(boolean oneTimePlugin) {
-		this.oneTimePlugin = oneTimePlugin;
+	protected void setPluginVersion(String pluginVersion) {
+		this.pluginVersion = pluginVersion;
 	}
 	
 	/**
@@ -434,6 +459,35 @@ public abstract class ActlistPlugin {
 	 */
 	public URI getPluginDescriptionURI() {
 		return pluginDescriptionURI;
+	}
+	
+	/**
+	 * @since 1.2.0
+	 */
+	public String getPluginAuthor() {
+		return pluginAuthor;
+	}
+
+	/**
+	 * @since 1.2.0
+	 */
+	protected void setPluginAuthor(String pluginAuthor) {
+		this.pluginAuthor = pluginAuthor;
+	}
+	
+	/**
+	 * @since 1.2.6
+	 */
+	protected void setPluginAuthor(String pluginAuthor, URI uri) {
+		this.pluginAuthor = pluginAuthor;
+		this.pluginAuthorURI = uri;
+	}
+	
+	/**
+	 * @since 1.2.6
+	 */
+	public URI getPluginAuthorURI() {
+		return pluginAuthorURI;
 	}
 	
 	/**
@@ -491,107 +545,6 @@ public abstract class ActlistPlugin {
 	public URI getPluginLicenseURI() {
 		return pluginLicenseURI;
 	}
-
-	/**
-	 * @since 1.2.0
-	 */
-	public String getPluginVersion() {
-		return pluginVersion;
-	}
-
-	/**
-	 * @since 1.2.0
-	 */
-	protected void setPluginVersion(String pluginVersion) {
-		this.pluginVersion = pluginVersion;
-	}
-
-	/**
-	 * @since 1.2.0
-	 */
-	public String getPluginAuthor() {
-		return pluginAuthor;
-	}
-
-	/**
-	 * @since 1.2.0
-	 */
-	protected void setPluginAuthor(String pluginAuthor) {
-		this.pluginAuthor = pluginAuthor;
-	}
-	
-	/**
-	 * @since 1.2.6
-	 */
-	protected void setPluginAuthor(String pluginAuthor, URI uri) {
-		this.pluginAuthor = pluginAuthor;
-		this.pluginAuthorURI = uri;
-	}
-	
-	/**
-	 * @since 1.2.6
-	 */
-	public URI getPluginAuthorURI() {
-		return pluginAuthorURI;
-	}
-
-	/**
-	 * @since 1.2.6
-	 */
-	public URI getPluginArchivesURI() {
-		return pluginArchivesURI;
-	}
-
-	/**
-	 * @since 1.2.6
-	 */
-	public void setPluginArchivesURI(URI pluginArchivesURI) {
-		this.pluginArchivesURI = pluginArchivesURI;
-	}
-	
-	/**
-	 * @since 1.5.0
-	 */
-	public Consumer<HttpRequest> getBeforeRequest() {
-		return beforeRequest;
-	}
-	
-	/**
-	 * @since 1.5.0
-	 */
-	public void setBeforeRequest(Consumer<HttpRequest> beforeRequest) {
-		this.beforeRequest = beforeRequest;
-	}
-	
-	/**
-	 * @since 1.2.6
-	 */
-	public URI getPluginUpdateCheckURI() {
-		return pluginUpdateCheckURI;
-	}
-	
-	/**
-	 * @since 1.2.6
-	 */
-	public void setPluginUpdateCheckURI(URI pluginUpdateCheckURI) {
-		this.pluginUpdateCheckURI = pluginUpdateCheckURI;
-	}
-	
-	/**
-	 * @since 1.2.6
-	 */
-	public void setPluginUpdateCheckURI(URI pluginUpdateCheckURI, URI pluginArchivesURI) {
-		this.pluginUpdateCheckURI = pluginUpdateCheckURI;
-		this.pluginArchivesURI = pluginArchivesURI;
-	}
-	
-	/**
-	 * @since 1.5.0
-	 */
-	public void setPluginUpdateCheckURI(URI pluginUpdateCheckURI, Consumer<HttpRequest> beforeRequest) {
-		this.pluginUpdateCheckURI = pluginUpdateCheckURI;
-		this.beforeRequest = beforeRequest;
-	}
 	
 	/**
 	 * @since 1.2.4
@@ -620,7 +573,114 @@ public abstract class ActlistPlugin {
 	protected void setWarningText(String warningText) {
 		this.warningText = warningText;
 	}
+	
+	/**
+	 * @since 1.2.6
+	 */
+	public URI getPluginUpdateCheckURI() {
+		return pluginUpdateCheckURI;
+	}
+	
+	/**
+	 * @since 1.2.6 created as a public method
+	 * @since 1.6.0 breaking changes as a protected method
+	 */
+	protected void setPluginUpdateCheckURI(URI pluginUpdateCheckURI) {
+		this.pluginUpdateCheckURI = pluginUpdateCheckURI;
+	}
+	
+	/**
+	 * @since 1.2.6 created as a public method
+	 * @since 1.6.0 breaking changes as a protected method
+	 */
+	protected void setPluginUpdateCheckURI(URI pluginUpdateCheckURI, URI pluginArchivesURI) {
+		this.pluginUpdateCheckURI = pluginUpdateCheckURI;
+		this.pluginArchivesURI = pluginArchivesURI;
+	}
+	
+	/**
+	 * @since 1.5.0 created as a public method
+	 * @since 1.6.0 breaking changes as a protected method
+	 */
+	protected void setPluginUpdateCheckURI(URI pluginUpdateCheckURI, Consumer<HttpRequest> beforeRequest) {
+		this.pluginUpdateCheckURI = pluginUpdateCheckURI;
+		this.beforeRequest = beforeRequest;
+	}
+	
+	/**
+	 * @since 1.2.6
+	 */
+	public URI getPluginArchivesURI() {
+		return pluginArchivesURI;
+	}
 
+	/**
+	 * @since 1.2.6 created as a public method
+	 * @since 1.6.0 breaking changes as a protected method
+	 */
+	protected void setPluginArchivesURI(URI pluginArchivesURI) {
+		this.pluginArchivesURI = pluginArchivesURI;
+	}
+	
+	/**
+	 * @since 1.5.0
+	 */
+	public Consumer<HttpRequest> getBeforeRequest() {
+		return beforeRequest;
+	}
+	
+	/**
+	 * @since 1.5.0 created as a public method
+	 * @since 1.6.0 breaking changes as a protected method
+	 */
+	protected void setBeforeRequest(Consumer<HttpRequest> beforeRequest) {
+		this.beforeRequest = beforeRequest;
+	}
+	
+	/**
+	 * @since 1.2.10
+	 */
+	public boolean isOneTimePlugin() {
+		return oneTimePlugin;
+	}
+	
+	/**
+	 * @since 1.2.10 created as a public method
+	 * @since 1.6.0 breaking changes as a protected method
+	 */
+	protected void setOneTimePlugin(boolean oneTimePlugin) {
+		this.oneTimePlugin = oneTimePlugin;
+	}
+	
+	/**
+	 * @since 1.3.0
+	 */
+	public SupportedPlatform[] getSupportedPlatforms() {
+		return supportedPlatforms;
+	}
+	
+	/**
+	 * @since 1.3.0 created as a public method
+	 * @since 1.6.0 breaking changes as a protected method
+	 */
+	protected void setSupportedPlatforms(SupportedPlatform... supportedPlatforms) {
+		this.supportedPlatforms = supportedPlatforms;
+	}
+	
+	/**
+	 * @since 1.6.0
+	 */
+	public String getPluginStatisticsUUID() {
+		return pluginStatisticsUUID;
+	}
+	
+	/**
+	 * @since 1.6.0
+	 */
+	protected void setPluginStatisticsUUID(String pluginStatisticsUUID) {
+		this.pluginStatisticsUUID = pluginStatisticsUUID;
+	}
+	
 	PluginConfig getPluginConfig() {
 		return pluginConfig;
 	}
@@ -700,18 +760,6 @@ public abstract class ActlistPlugin {
 		return functionMap;
 	}
 	
-	ObjectProperty<SupportedPlatform> currentPlatformObject() {
-		return currentPlatformObject;
-	}
-	
-	ObjectProperty<ClassLoader> classLoaderObject() {
-		return classLoaderObject;
-	}
-	
-	ObjectProperty<HttpHost> proxyHostObject() {
-		return proxyHostObject;
-	}
-	
 	BooleanProperty shouldShowLoadingBar() {
 		return shouldShowLoadingBar;
 	}
@@ -732,6 +780,14 @@ public abstract class ActlistPlugin {
 		return shouldDismissTrayNotifications;
 	}
 	
+	ObjectProperty<ClassLoader> classLoaderObject() {
+		return classLoaderObject;
+	}
+	
+	ObjectProperty<HttpHost> proxyHostObject() {
+		return proxyHostObject;
+	}
+	
 	BooleanProperty shouldBrowseActlistArchives() {
 		return shouldBrowseActlistArchives;
 	}
@@ -742,6 +798,14 @@ public abstract class ActlistPlugin {
 	
 	BooleanProperty shouldRequestDeactivate() {
 		return shouldRequestDeactivate;
+	}
+	
+	ObjectProperty<SupportedPlatform> currentPlatformObject() {
+		return currentPlatformObject;
+	}
+	
+	BooleanProperty darkModeProperty() {
+		return darkModeProperty;
 	}
 	
 	/**
@@ -811,27 +875,6 @@ public abstract class ActlistPlugin {
 	 */
 	public void removeConfig(String key) throws Exception {
 		getPluginConfig().remove(key);
-	}
-	
-	/**
-	 * @since 1.3.0
-	 */
-	public SupportedPlatform getCurrentPlatform() {
-		return currentPlatformObject().get();
-	}
-	
-	/**
-	 * @since 1.2.6
-	 */
-	public ClassLoader getClassLoader() {
-		return classLoaderObject().get();
-	}
-	
-	/**
-	 * @since 1.2.6
-	 */
-	public HttpHost getProxyHost() {
-		return proxyHostObject().get();
 	}
 	
 	/**
@@ -921,6 +964,20 @@ public abstract class ActlistPlugin {
 	}
 	
 	/**
+	 * @since 1.2.6
+	 */
+	public ClassLoader getClassLoader() {
+		return classLoaderObject().get();
+	}
+	
+	/**
+	 * @since 1.2.6
+	 */
+	public HttpHost getProxyHost() {
+		return proxyHostObject().get();
+	}
+	
+	/**
 	 * @since 1.2.10
 	 */
 	public void requestShowActlist() {
@@ -939,6 +996,20 @@ public abstract class ActlistPlugin {
 	 */
 	public void requestDeactivate() {
 		shouldRequestDeactivate().set(true);
+	}
+	
+	/**
+	 * @since 1.3.0
+	 */
+	public SupportedPlatform getCurrentPlatform() {
+		return currentPlatformObject().get();
+	}
+	
+	/**
+	 * @since 1.6.0
+	 */
+	public boolean isDarkMode() {
+		return darkModeProperty().get();
 	}
 	
 }

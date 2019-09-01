@@ -424,7 +424,7 @@ public final class DebugApp extends Application {
 			
 			stage.setTitle("Actlist Debug App");
 			stage.setOnCloseRequest(windowEvent -> {
-				Platform.exit();
+				System.exit(0);
 			});
 			stage.show();
 			

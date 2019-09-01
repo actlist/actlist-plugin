@@ -423,6 +423,9 @@ public final class DebugApp extends Application {
 			stage.setScene(new Scene(new BorderPane(root), Color.TRANSPARENT));
 			
 			stage.setTitle("Actlist Debug App");
+			stage.setOnCloseRequest(windowEvent -> {
+				Platform.exit();
+			});
 			stage.show();
 			
 			/**

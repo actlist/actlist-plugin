@@ -580,6 +580,10 @@ public final class DebugApp extends Application {
 	}
 	
 	private void makeDisable(Throwable throwable, boolean shouldTraceException) {
+		if (shouldTraceException) {
+			throwable.printStackTrace();
+		}
+		
 		new Thread(() -> {
 			JFXToggleButton togActivator = (JFXToggleButton) stage.getScene().lookup("#togActivator");
 			if (togActivator.selectedProperty().get()) {

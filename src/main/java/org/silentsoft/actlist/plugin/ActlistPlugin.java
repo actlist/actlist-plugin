@@ -868,6 +868,13 @@ public abstract class ActlistPlugin {
 	}
 	
 	/**
+	 * @since 1.7.0
+	 */
+	protected Function getFunction(String functionName) {
+		return getFunctionMap().get(functionName);
+	}
+	
+	/**
 	 * @since 1.0.0
 	 */
 	protected void removeFunction(String functionName) {

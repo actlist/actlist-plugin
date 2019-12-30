@@ -656,7 +656,7 @@ public final class DebugApp extends Application {
 	}
 	
 	private void addFunction(Function function) {
-		functions.add(createFunctionBox(new Label("", function.graphic), mouseEvent -> {
+		functions.add(createFunctionBox(function.graphic, mouseEvent -> {
 			try {
 				if (function.action != null) {
 					function.action.run();

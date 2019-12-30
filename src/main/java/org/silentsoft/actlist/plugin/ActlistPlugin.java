@@ -10,14 +10,23 @@ import org.apache.http.HttpHost;
 import org.apache.http.HttpRequest;
 import org.silentsoft.actlist.plugin.tray.TrayNotification;
 
+import com.jfoenix.controls.JFXToggleButton;
+
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.paint.Paint;
 
 /**
  * Please generate executable main class called <tt>your.pkg.Plugin.java</tt> that you assigned from <tt>mainClass</tt> property on <tt>pom.xml</tt>
@@ -55,6 +64,12 @@ public abstract class ActlistPlugin {
 			this.graphic = graphic;
 			this.action = action;
 		}
+		public Node getGraphic() {
+			return this.graphic;
+		}
+		protected void setGraphic(Node graphic) {
+			this.graphic = graphic;
+		}
 	}
 	
 	public class TextFunction extends Function {
@@ -66,6 +81,37 @@ public abstract class ActlistPlugin {
 	public class GraphicFunction extends Function {
 		public GraphicFunction(Node graphic, Runnable action) {
 			super(graphic, action);
+		}
+	}
+	
+	public class ToggleFunction extends GraphicFunction {
+		public ToggleFunction(String text, boolean selected, ChangeListener<? super Boolean> listener) {
+			super(null, null);
+			{
+				Label label = new Label(text);
+				label.setAlignment(Pos.CENTER_RIGHT);
+				label.setMaxWidth(Double.MAX_VALUE);
+				
+				JFXToggleButton toggleButton = new JFXToggleButton();
+				toggleButton.setText(" ");
+				toggleButton.setSelected(selected);
+				toggleButton.selectedProperty().addListener(listener);
+				toggleButton.setContentDisplay(ContentDisplay.RIGHT);
+				toggleButton.setMinHeight(23.0);
+				toggleButton.setPrefHeight(23.0);
+				toggleButton.setMaxHeight(23.0);
+				toggleButton.setToggleColor(Paint.valueOf("#fafafa"));
+				toggleButton.setToggleLineColor(Paint.valueOf("#59bf53"));
+				toggleButton.setUnToggleLineColor(Paint.valueOf("#e0e0e0"));
+				toggleButton.setDisableVisualFocus(true);
+				
+				BorderPane borderPane = new BorderPane();
+				borderPane.setCenter(label);
+				borderPane.setRight(toggleButton);
+				HBox.setHgrow(borderPane, Priority.ALWAYS);
+				
+				super.setGraphic(borderPane);
+			}
 		}
 	}
 	

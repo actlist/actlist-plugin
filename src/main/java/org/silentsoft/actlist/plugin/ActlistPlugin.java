@@ -5,6 +5,7 @@ import java.net.URL;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import org.apache.http.HttpHost;
 import org.apache.http.HttpRequest;
@@ -86,32 +87,34 @@ public abstract class ActlistPlugin {
 	
 	public class ToggleFunction extends GraphicFunction {
 		public ToggleFunction(String text, boolean selected, ChangeListener<? super Boolean> listener) {
-			super(null, null);
-			{
-				Label label = new Label(text);
-				label.setAlignment(Pos.CENTER_RIGHT);
-				label.setMaxWidth(Double.MAX_VALUE);
-				
-				JFXToggleButton toggleButton = new JFXToggleButton();
-				toggleButton.setText(" ");
-				toggleButton.setSelected(selected);
-				toggleButton.selectedProperty().addListener(listener);
-				toggleButton.setContentDisplay(ContentDisplay.RIGHT);
-				toggleButton.setMinHeight(23.0);
-				toggleButton.setPrefHeight(23.0);
-				toggleButton.setMaxHeight(23.0);
-				toggleButton.setToggleColor(Paint.valueOf("#fafafa"));
-				toggleButton.setToggleLineColor(Paint.valueOf("#59bf53"));
-				toggleButton.setUnToggleLineColor(Paint.valueOf("#e0e0e0"));
-				toggleButton.setDisableVisualFocus(true);
-				
-				BorderPane borderPane = new BorderPane();
-				borderPane.setCenter(label);
-				borderPane.setRight(toggleButton);
-				HBox.setHgrow(borderPane, Priority.ALWAYS);
-				
-				super.setGraphic(borderPane);
-			}
+			super(new Supplier<Node>() {
+				@Override
+				public Node get() {
+					Label label = new Label(text);
+					label.setAlignment(Pos.CENTER_RIGHT);
+					label.setMaxWidth(Double.MAX_VALUE);
+					
+					JFXToggleButton toggleButton = new JFXToggleButton();
+					toggleButton.setText("");
+					toggleButton.setSelected(selected);
+					toggleButton.selectedProperty().addListener(listener);
+					toggleButton.setContentDisplay(ContentDisplay.RIGHT);
+					toggleButton.setMinHeight(23.0);
+					toggleButton.setPrefHeight(23.0);
+					toggleButton.setMaxHeight(23.0);
+					toggleButton.setToggleColor(Paint.valueOf("#fafafa"));
+					toggleButton.setToggleLineColor(Paint.valueOf("#59bf53"));
+					toggleButton.setUnToggleLineColor(Paint.valueOf("#e0e0e0"));
+					toggleButton.setDisableVisualFocus(true);
+					
+					BorderPane borderPane = new BorderPane();
+					borderPane.setCenter(label);
+					borderPane.setRight(toggleButton);
+					HBox.setHgrow(borderPane, Priority.ALWAYS);
+					
+					return borderPane;
+				}
+			}.get(), null);
 		}
 	}
 	

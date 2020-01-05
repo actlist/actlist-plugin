@@ -8,8 +8,6 @@ import java.util.function.Supplier;
 
 import org.apache.http.HttpHost;
 import org.apache.http.HttpRequest;
-import org.silentsoft.actlist.plugin.annotation.CompatibleVersion;
-import org.silentsoft.actlist.plugin.comparator.VersionComparator;
 import org.silentsoft.actlist.plugin.tray.TrayNotification;
 
 import com.jfoenix.controls.JFXToggleButton;
@@ -891,9 +889,9 @@ public abstract class ActlistPlugin {
 	 * @since 1.0.0
 	 */
 	@CompatibleVersion("1.0.0")
-	protected void putFunction(String functionName, Function function) throws DuplicateNameException {
+	protected void putFunction(String functionName, Function function) throws Exception {
 		if (getFunctionMap().containsKey(functionName)) {
-			throw new DuplicateNameException("The function '{}' is already exists !", new Object[]{ functionName });
+			throw new Exception(String.format("The function '%s' is already exists !", functionName));
 		}
 		
 		getFunctionMap().put(functionName, function);

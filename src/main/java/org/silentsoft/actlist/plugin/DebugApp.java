@@ -52,8 +52,6 @@ import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.controlsfx.control.PopOver;
 import org.silentsoft.actlist.plugin.ActlistPlugin.Function;
 import org.silentsoft.actlist.plugin.ActlistPlugin.SupportedPlatform;
-import org.silentsoft.actlist.plugin.annotation.CompatibleVersion;
-import org.silentsoft.actlist.plugin.comparator.VersionComparator;
 import org.silentsoft.actlist.plugin.messagebox.MessageBox;
 import org.silentsoft.actlist.plugin.tray.TrayNotification;
 import org.silentsoft.core.util.DateUtil;
@@ -208,7 +206,9 @@ public final class DebugApp extends Application {
 							for (CtMethod ctMethod : ctMethods) {
 								for (CtMethod superMethod : ctActlistPlugin.getDeclaredMethods()) {
 									if (superMethod.equals(ctMethod)) {
-										comparator.accept(((CompatibleVersion) superMethod.getAnnotation(CompatibleVersion.class)).value());
+										if (superMethod.hasAnnotation(CompatibleVersion.class)) {
+											comparator.accept(((CompatibleVersion) superMethod.getAnnotation(CompatibleVersion.class)).value());
+										}
 									}
 								}
 							}

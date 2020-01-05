@@ -1,8 +1,8 @@
-package org.silentsoft.actlist.plugin.comparator;
+package org.silentsoft.actlist.plugin;
 
 import java.util.Comparator;
 
-public class VersionComparator implements Comparator<String> {
+class VersionComparator implements Comparator<String> {
 
 	private static VersionComparator instance;
 	

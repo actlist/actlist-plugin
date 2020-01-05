@@ -17,7 +17,12 @@ import java.net.Proxy;
 import java.net.SocketAddress;
 import java.net.URI;
 import java.nio.charset.Charset;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -26,6 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -46,6 +52,8 @@ import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.controlsfx.control.PopOver;
 import org.silentsoft.actlist.plugin.ActlistPlugin.Function;
 import org.silentsoft.actlist.plugin.ActlistPlugin.SupportedPlatform;
+import org.silentsoft.actlist.plugin.annotation.CompatibleVersion;
+import org.silentsoft.actlist.plugin.comparator.VersionComparator;
 import org.silentsoft.actlist.plugin.messagebox.MessageBox;
 import org.silentsoft.actlist.plugin.tray.TrayNotification;
 import org.silentsoft.core.util.DateUtil;
@@ -101,6 +109,12 @@ import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
+import javassist.CannotCompileException;
+import javassist.ClassPool;
+import javassist.CtClass;
+import javassist.CtMethod;
+import javassist.expr.ExprEditor;
+import javassist.expr.MethodCall;
 
 /**
  * <em><tt>WARNING : This Debug application's source code is independent with real Actlist application's source code. So this application might not be same with real Actlist application.</tt></em></p>
@@ -121,6 +135,7 @@ public final class DebugApp extends Application {
 	public static void debug(DebugParameter debugParameter) {
 		DebugApp.debugParameter = debugParameter;
 		
+		analyze();
 		updateProxyHost();
 		generateUserAgent();
 		
@@ -139,6 +154,74 @@ public final class DebugApp extends Application {
 	
 	boolean isAvailableNewPlugin = false;
 	URI newPluginURI;
+	
+	private static void analyze() {
+		if (DebugApp.debugParameter.shouldAnalyze()) {
+			try {
+				ArrayList<String> classes = new ArrayList<String>();
+				
+				Files.walkFileTree(DebugApp.debugParameter.getClassesDirectoryToAnalyze(), new SimpleFileVisitor<Path>() {
+					@Override
+					public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+						String fileName = file.getFileName().toString();
+						if (fileName.toLowerCase().endsWith(".class")) {
+							String classFileName = DebugApp.debugParameter.getClassesDirectoryToAnalyze().relativize(file).normalize().toString();
+							String className = classFileName.substring(0, classFileName.length() - ".class".length()).replaceAll("/", ".");
+							
+							classes.add(className);
+						}
+						return super.visitFile(file, attrs);
+					}
+				});
+				
+				if (classes.isEmpty()) {
+					return;
+				} else {
+					AtomicReference<String> minimumCompatibleVersion = new AtomicReference<String>("");
+					Consumer<String> comparator = (version) -> {
+						if (minimumCompatibleVersion.get() == null || "".equals(minimumCompatibleVersion.get()) || VersionComparator.getInstance().compare(minimumCompatibleVersion.get(), version) < 0) {
+							minimumCompatibleVersion.set(version);
+						}
+					};
+					
+					ClassPool classPool = ClassPool.getDefault();
+					CtClass ctActlistPlugin = classPool.get(ActlistPlugin.class.getName());
+					CtClass[] ctClasses = classPool.get(classes.toArray(new String[] {}));
+					for (CtClass ctClass : ctClasses) {
+						ctClass.instrument(new ExprEditor() {
+							public void edit(MethodCall methodCall) throws CannotCompileException {
+								try {
+									CtMethod method = methodCall.getMethod();
+									if (method.getLongName().startsWith(ActlistPlugin.class.getName())) {
+										if (method.hasAnnotation(CompatibleVersion.class)) {
+											comparator.accept(((CompatibleVersion) method.getAnnotation(CompatibleVersion.class)).value());
+										}
+									}
+								} catch (Exception e) {
+									
+								}
+							}
+						});
+						
+						CtMethod[] ctMethods = ctClass.getDeclaredMethods();
+						if (ctMethods != null) {
+							for (CtMethod ctMethod : ctMethods) {
+								for (CtMethod superMethod : ctActlistPlugin.getDeclaredMethods()) {
+									if (superMethod.equals(ctMethod)) {
+										comparator.accept(((CompatibleVersion) superMethod.getAnnotation(CompatibleVersion.class)).value());
+									}
+								}
+							}
+						}
+					}
+					
+					System.out.println(String.format(":: minimum compatible version = Actlist v%s ::", minimumCompatibleVersion.get()));
+				}
+			} catch (Exception | Error e) {
+				e.printStackTrace();
+			}
+		}
+	}
 	
 	private static void updateProxyHost() {
 		String proxyHost = "";

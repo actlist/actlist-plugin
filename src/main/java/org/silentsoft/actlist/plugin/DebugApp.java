@@ -131,10 +131,7 @@ public final class DebugApp extends Application {
 	static void debug(DebugParameter debugParameter) {
 		DebugApp.debugParameter = debugParameter;
 		
-		System.out.println("::..............< Start Analyzing >..............::");
-		System.out.println(">-------------------------------------------------<");
 		analyze(debugParameter);
-		System.out.println();
 		
 		updateProxyHost();
 		generateUserAgent();
@@ -160,6 +157,9 @@ public final class DebugApp extends Application {
 	
 	static AnalysisResult analyze(DebugParameter debugParameter) {
 		if (debugParameter.shouldAnalyze()) {
+			System.out.println("::..............< Start Analyzing >..............::");
+			System.out.println(">-------------------------------------------------<");
+			
 			try {
 				ArrayList<String> classes = new ArrayList<String>();
 				
@@ -265,6 +265,7 @@ public final class DebugApp extends Application {
 						System.out.println(wrapper.toString());
 					}
 					System.out.println(String.format(">: minimum compatible version = Actlist v%s", minimumCompatibleVersion.get()));
+					System.out.println();
 					
 					AnalysisResult analysisResult = new AnalysisResult();
 					analysisResult.setMinimumCompatibleVersion(minimumCompatibleVersion.get());

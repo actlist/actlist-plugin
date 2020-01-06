@@ -131,11 +131,17 @@ public final class DebugApp extends Application {
 	static void debug(DebugParameter debugParameter) {
 		DebugApp.debugParameter = debugParameter;
 		
+		System.out.println("::..............< Start Analyzing >..............::");
+		System.out.println(">-------------------------------------------------<");
 		analyze(debugParameter);
+		System.out.println();
 		
 		updateProxyHost();
 		generateUserAgent();
 		
+		System.out.println("::.................< Launching >.................::");
+		System.out.println(">-------------------------------------------------<");
+		System.out.println();
 		launch("");
 	}
 	
@@ -255,12 +261,10 @@ public final class DebugApp extends Application {
 						return VersionComparator.getInstance().compare(o1.version, o2.version);
 					});
 					
-					System.out.println(String.format(":: minimum compatible version = Actlist v%s ::", minimumCompatibleVersion.get()));
 					for (Wrapper wrapper : wrappers) {
 						System.out.println(wrapper.toString());
 					}
-					System.out.println("::");
-					System.out.println();
+					System.out.println(String.format(">: minimum compatible version = Actlist v%s", minimumCompatibleVersion.get()));
 					
 					AnalysisResult analysisResult = new AnalysisResult();
 					analysisResult.setMinimumCompatibleVersion(minimumCompatibleVersion.get());

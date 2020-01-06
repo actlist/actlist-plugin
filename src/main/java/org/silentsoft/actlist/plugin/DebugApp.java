@@ -204,6 +204,11 @@ public final class DebugApp extends Application {
 							public void edit(MethodCall methodCall) throws CannotCompileException {
 								try {
 									CtMethod method = methodCall.getMethod();
+									if (debugParameter.getAnalysisIgnoreMethodNames() != null) {
+										if (Arrays.asList(debugParameter.getAnalysisIgnoreMethodNames()).contains(method.getLongName())) {
+											return;
+										}
+									}
 									if (method.getLongName().startsWith(ActlistPlugin.class.getName())) {
 										if (method.hasAnnotation(CompatibleVersion.class)) {
 											String value = ((CompatibleVersion) method.getAnnotation(CompatibleVersion.class)).value();
@@ -226,6 +231,11 @@ public final class DebugApp extends Application {
 							if (ctMethods != null) {
 								for (CtMethod ctMethod : ctMethods) {
 									for (CtMethod superMethod : ctActlistPlugin.getDeclaredMethods()) {
+										if (debugParameter.getAnalysisIgnoreMethodNames() != null) {
+											if (Arrays.asList(debugParameter.getAnalysisIgnoreMethodNames()).contains(superMethod.getLongName())) {
+												continue;
+											}
+										}
 										if (superMethod.equals(ctMethod)) {
 											if (superMethod.hasAnnotation(CompatibleVersion.class)) {
 												String value = ((CompatibleVersion) superMethod.getAnnotation(CompatibleVersion.class)).value();

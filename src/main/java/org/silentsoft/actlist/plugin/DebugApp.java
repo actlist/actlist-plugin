@@ -35,6 +35,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.script.ScriptEngine;
@@ -115,6 +116,7 @@ import javassist.expr.ExprEditor;
 import javassist.expr.MethodCall;
 
 /**
+ * <em><tt>Do not make any references to this class within your code. This class is designed for internal-use only.</tt></em></p>
  * <em><tt>WARNING : This Debug application's source code is independent with real Actlist application's source code. So this application might not be same with real Actlist application.</tt></em></p>
  * 
  * This class is designed for debugging the Actlist plugin.</p>
@@ -123,17 +125,14 @@ import javassist.expr.MethodCall;
  * @author silentsoft
  */
 public final class DebugApp extends Application {
-
-	static DebugParameter debugParameter;
-		
-	public static void debug() {
-		debug(DebugParameter.custom().build());
-	}
 	
-	public static void debug(DebugParameter debugParameter) {
+	static DebugParameter debugParameter;
+	
+	static void debug(DebugParameter debugParameter) {
 		DebugApp.debugParameter = debugParameter;
 		
-		analyze();
+		analyze(debugParameter);
+		
 		updateProxyHost();
 		generateUserAgent();
 		
@@ -153,18 +152,18 @@ public final class DebugApp extends Application {
 	boolean isAvailableNewPlugin = false;
 	URI newPluginURI;
 	
-	private static void analyze() {
-		if (DebugApp.debugParameter.shouldAnalyze()) {
+	static void analyze(DebugParameter debugParameter) {
+		if (debugParameter.shouldAnalyze()) {
 			try {
 				ArrayList<String> classes = new ArrayList<String>();
 				
-				Files.walkFileTree(DebugApp.debugParameter.getClassesDirectoryToAnalyze(), new SimpleFileVisitor<Path>() {
+				Files.walkFileTree(debugParameter.getClassesDirectoryToAnalyze(), new SimpleFileVisitor<Path>() {
 					@Override
 					public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
 						String fileName = file.getFileName().toString();
 						if (fileName.toLowerCase().endsWith(".class")) {
-							String classFileName = DebugApp.debugParameter.getClassesDirectoryToAnalyze().relativize(file).normalize().toString();
-							String className = classFileName.substring(0, classFileName.length() - ".class".length()).replaceAll("/", ".");
+							String classFileName = debugParameter.getClassesDirectoryToAnalyze().relativize(file).normalize().toString();
+							String className = classFileName.substring(0, classFileName.length() - ".class".length()).replaceAll(Pattern.quote(File.separator), ".");
 							
 							classes.add(className);
 						}
@@ -175,6 +174,21 @@ public final class DebugApp extends Application {
 				if (classes.isEmpty()) {
 					return;
 				} else {
+					class Wrapper {
+						String version;
+						String content;
+						Wrapper(String version, String content) {
+							this.version = version;
+							this.content = content;
+						}
+						@Override
+						public String toString() {
+							return String.format(" : @CompatibleVersion(%s) %s", version, content);
+						}
+					}
+					
+					ArrayList<Wrapper> wrappers = new ArrayList<Wrapper>();
+					
 					AtomicReference<String> minimumCompatibleVersion = new AtomicReference<String>("");
 					Consumer<String> comparator = (version) -> {
 						if (minimumCompatibleVersion.get() == null || "".equals(minimumCompatibleVersion.get()) || VersionComparator.getInstance().compare(minimumCompatibleVersion.get(), version) < 0) {
@@ -192,7 +206,13 @@ public final class DebugApp extends Application {
 									CtMethod method = methodCall.getMethod();
 									if (method.getLongName().startsWith(ActlistPlugin.class.getName())) {
 										if (method.hasAnnotation(CompatibleVersion.class)) {
-											comparator.accept(((CompatibleVersion) method.getAnnotation(CompatibleVersion.class)).value());
+											String value = ((CompatibleVersion) method.getAnnotation(CompatibleVersion.class)).value();
+											{
+												String packageName = methodCall.where().getDeclaringClass().getPackageName();
+												String source = (packageName == null) ? methodCall.getFileName() : String.join(".", packageName, methodCall.getFileName());
+												wrappers.add(new Wrapper(value, String.format("%s[L:%d] call <%s>", source, methodCall.getLineNumber(), method.getLongName())));
+											}
+											comparator.accept(value);
 										}
 									}
 								} catch (Exception e) {
@@ -201,13 +221,19 @@ public final class DebugApp extends Application {
 							}
 						});
 						
-						CtMethod[] ctMethods = ctClass.getDeclaredMethods();
-						if (ctMethods != null) {
-							for (CtMethod ctMethod : ctMethods) {
-								for (CtMethod superMethod : ctActlistPlugin.getDeclaredMethods()) {
-									if (superMethod.equals(ctMethod)) {
-										if (superMethod.hasAnnotation(CompatibleVersion.class)) {
-											comparator.accept(((CompatibleVersion) superMethod.getAnnotation(CompatibleVersion.class)).value());
+						if (ActlistPlugin.class.isAssignableFrom(Class.forName(ctClass.getName()))) {
+							CtMethod[] ctMethods = ctClass.getDeclaredMethods();
+							if (ctMethods != null) {
+								for (CtMethod ctMethod : ctMethods) {
+									for (CtMethod superMethod : ctActlistPlugin.getDeclaredMethods()) {
+										if (superMethod.equals(ctMethod)) {
+											if (superMethod.hasAnnotation(CompatibleVersion.class)) {
+												String value = ((CompatibleVersion) superMethod.getAnnotation(CompatibleVersion.class)).value();
+												{
+													wrappers.add(new Wrapper(value, String.format("%s override <%s>", ctClass.getName(), superMethod.getLongName())));
+												}
+												comparator.accept(value);
+											}
 										}
 									}
 								}
@@ -215,7 +241,16 @@ public final class DebugApp extends Application {
 						}
 					}
 					
+					wrappers.sort((o1, o2) -> {
+						return VersionComparator.getInstance().compare(o1.version, o2.version);
+					});
+					
 					System.out.println(String.format(":: minimum compatible version = Actlist v%s ::", minimumCompatibleVersion.get()));
+					for (Wrapper wrapper : wrappers) {
+						System.out.println(wrapper.toString());
+					}
+					System.out.println("::");
+					System.out.println();
 				}
 			} catch (Exception | Error e) {
 				e.printStackTrace();

@@ -152,7 +152,7 @@ public final class DebugApp extends Application {
 	boolean isAvailableNewPlugin = false;
 	URI newPluginURI;
 	
-	static void analyze(DebugParameter debugParameter) {
+	static AnalysisResult analyze(DebugParameter debugParameter) {
 		if (debugParameter.shouldAnalyze()) {
 			try {
 				ArrayList<String> classes = new ArrayList<String>();
@@ -172,7 +172,7 @@ public final class DebugApp extends Application {
 				});
 				
 				if (classes.isEmpty()) {
-					return;
+					return null;
 				} else {
 					class Wrapper {
 						String version;
@@ -251,11 +251,17 @@ public final class DebugApp extends Application {
 					}
 					System.out.println("::");
 					System.out.println();
+					
+					AnalysisResult analysisResult = new AnalysisResult();
+					analysisResult.setMinimumCompatibleVersion(minimumCompatibleVersion.get());
+					return analysisResult;
 				}
 			} catch (Exception | Error e) {
 				e.printStackTrace();
 			}
 		}
+		
+		return null;
 	}
 	
 	private static void updateProxyHost() {

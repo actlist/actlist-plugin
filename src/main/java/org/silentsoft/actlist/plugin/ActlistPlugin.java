@@ -246,16 +246,16 @@ public abstract class ActlistPlugin {
 	 * @since 1.7.0
 	 */
 	@CompatibleVersion("1.7.0")
-	public static void analyze() {
-		DebugApp.analyze(DebugParameter.custom().build());
+	public static AnalysisResult analyze() {
+		return DebugApp.analyze(DebugParameter.custom().build());
 	}
 	
 	/**
 	 * @since 1.7.0
 	 */
 	@CompatibleVersion("1.7.0")
-	public static void analyze(DebugParameter debugParameter) {
-		DebugApp.analyze(debugParameter);
+	public static AnalysisResult analyze(DebugParameter debugParameter) {
+		return DebugApp.analyze(debugParameter);
 	}
 	
 	/**

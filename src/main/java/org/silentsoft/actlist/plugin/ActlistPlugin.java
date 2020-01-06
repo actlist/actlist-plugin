@@ -182,7 +182,7 @@ public abstract class ActlistPlugin {
 	 */
 	@CompatibleVersion("1.2.6")
 	protected static void debug() {
-		DebugApp.debug();
+		DebugApp.debug(DebugParameter.custom().build());
 	}
 	
 	/**
@@ -240,6 +240,22 @@ public abstract class ActlistPlugin {
 		}
 		
 		return DebugApp.debugParameter.isDebugMode();
+	}
+	
+	/**
+	 * @since 1.7.0
+	 */
+	@CompatibleVersion("1.7.0")
+	public static void analyze() {
+		DebugApp.analyze(DebugParameter.custom().build());
+	}
+	
+	/**
+	 * @since 1.7.0
+	 */
+	@CompatibleVersion("1.7.0")
+	public static void analyze(DebugParameter debugParameter) {
+		DebugApp.analyze(debugParameter);
 	}
 	
 	/**
@@ -643,7 +659,7 @@ public abstract class ActlistPlugin {
 	 * @since 1.2.6 created as a public method
 	 * @since 1.6.0 breaking changes as a protected method
 	 */
-	@CompatibleVersion("1.6.0")
+	@CompatibleVersion("1.2.6")
 	protected void setPluginUpdateCheckURI(URI pluginUpdateCheckURI) {
 		this.pluginUpdateCheckURI = pluginUpdateCheckURI;
 	}
@@ -652,7 +668,7 @@ public abstract class ActlistPlugin {
 	 * @since 1.2.6 created as a public method
 	 * @since 1.6.0 breaking changes as a protected method
 	 */
-	@CompatibleVersion("1.6.0")
+	@CompatibleVersion("1.2.6")
 	protected void setPluginUpdateCheckURI(URI pluginUpdateCheckURI, URI pluginArchivesURI) {
 		this.pluginUpdateCheckURI = pluginUpdateCheckURI;
 		this.pluginArchivesURI = pluginArchivesURI;
@@ -662,7 +678,7 @@ public abstract class ActlistPlugin {
 	 * @since 1.5.0 created as a public method
 	 * @since 1.6.0 breaking changes as a protected method
 	 */
-	@CompatibleVersion("1.6.0")
+	@CompatibleVersion("1.5.0")
 	protected void setPluginUpdateCheckURI(URI pluginUpdateCheckURI, Consumer<HttpRequest> beforeRequest) {
 		this.pluginUpdateCheckURI = pluginUpdateCheckURI;
 		this.beforeRequest = beforeRequest;
@@ -680,7 +696,7 @@ public abstract class ActlistPlugin {
 	 * @since 1.2.6 created as a public method
 	 * @since 1.6.0 breaking changes as a protected method
 	 */
-	@CompatibleVersion("1.6.0")
+	@CompatibleVersion("1.2.6")
 	protected void setPluginArchivesURI(URI pluginArchivesURI) {
 		this.pluginArchivesURI = pluginArchivesURI;
 	}
@@ -697,7 +713,7 @@ public abstract class ActlistPlugin {
 	 * @since 1.5.0 created as a public method
 	 * @since 1.6.0 breaking changes as a protected method
 	 */
-	@CompatibleVersion("1.6.0")
+	@CompatibleVersion("1.5.0")
 	protected void setBeforeRequest(Consumer<HttpRequest> beforeRequest) {
 		this.beforeRequest = beforeRequest;
 	}
@@ -714,7 +730,7 @@ public abstract class ActlistPlugin {
 	 * @since 1.2.10 created as a public method
 	 * @since 1.6.0 breaking changes as a protected method
 	 */
-	@CompatibleVersion("1.6.0")
+	@CompatibleVersion("1.2.10")
 	protected void setOneTimePlugin(boolean oneTimePlugin) {
 		this.oneTimePlugin = oneTimePlugin;
 	}
@@ -731,7 +747,7 @@ public abstract class ActlistPlugin {
 	 * @since 1.3.0 created as a public method
 	 * @since 1.6.0 breaking changes as a protected method
 	 */
-	@CompatibleVersion("1.6.0")
+	@CompatibleVersion("1.3.0")
 	protected void setSupportedPlatforms(SupportedPlatform... supportedPlatforms) {
 		this.supportedPlatforms = supportedPlatforms;
 	}

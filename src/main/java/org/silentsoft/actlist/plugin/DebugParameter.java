@@ -10,6 +10,7 @@ public class DebugParameter {
 	private boolean isDarkMode;
 	private boolean shouldAnalyze;
 	private Path classesDirectoryToAnalyze;
+	private String[] analysisIgnoreMethodNames;
 	
 	private DebugParameter() {
 		
@@ -21,6 +22,7 @@ public class DebugParameter {
 		this.isDarkMode = builder.isDarkMode;
 		this.shouldAnalyze = builder.shouldAnalyze;
 		this.classesDirectoryToAnalyze = builder.classesDirectoryToAnalyze;
+		this.analysisIgnoreMethodNames = builder.analysisIgnoreMethodNames;
 	}
 	
 	public boolean isDebugMode() {
@@ -42,6 +44,10 @@ public class DebugParameter {
 	public Path getClassesDirectoryToAnalyze() {
 		return classesDirectoryToAnalyze;
 	}
+	
+	public String[] getAnalysisIgnoreMethodNames() {
+		return analysisIgnoreMethodNames;
+	}
 
 	public static DebugParameterBuilder custom() {
 		return new DebugParameterBuilder();
@@ -53,6 +59,7 @@ public class DebugParameter {
 		private boolean isDarkMode;
 		private boolean shouldAnalyze;
 		private Path classesDirectoryToAnalyze;
+		private String[] analysisIgnoreMethodNames;
 		
 		private DebugParameterBuilder() {
 			this.isDebugMode = true;
@@ -60,6 +67,7 @@ public class DebugParameter {
 			this.isDarkMode = false;
 			this.shouldAnalyze = true;
 			this.classesDirectoryToAnalyze = Paths.get("target", "classes");
+			this.analysisIgnoreMethodNames = null;
 		}
 
 		/**
@@ -108,6 +116,16 @@ public class DebugParameter {
 		 */
 		public DebugParameterBuilder setClassesDirectoryToAnalyze(Path classesDirectoryToAnalyze) {
 			this.classesDirectoryToAnalyze = classesDirectoryToAnalyze;
+			
+			return this;
+		}
+		
+		/**
+		 * @param analysisIgnoreMethodNames e.g. <code>new String[] {"org.silentsoft.actlist.plugin.ActlistPlugin.debug(org.silentsoft.actlist.plugin.DebugParameter)"}</code>
+		 * @return
+		 */
+		public DebugParameterBuilder setAnalysisIgnoreMethodNames(String[] analysisIgnoreMethodNames) {
+			this.analysisIgnoreMethodNames = analysisIgnoreMethodNames;
 			
 			return this;
 		}

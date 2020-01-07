@@ -182,9 +182,11 @@ public final class DebugApp extends Application {
 				} else {
 					class Wrapper {
 						String version;
+						String methodName;
 						String content;
-						Wrapper(String version, String content) {
+						Wrapper(String version, String methodName, String content) {
 							this.version = version;
+							this.methodName = methodName;
 							this.content = content;
 						}
 						@Override
@@ -221,7 +223,7 @@ public final class DebugApp extends Application {
 											{
 												String packageName = methodCall.where().getDeclaringClass().getPackageName();
 												String source = (packageName == null) ? methodCall.getFileName() : String.join(".", packageName, methodCall.getFileName());
-												wrappers.add(new Wrapper(value, String.format("%s[L:%d] call <%s>", source, methodCall.getLineNumber(), method.getLongName())));
+												wrappers.add(new Wrapper(value, method.getLongName(), String.format("%s[L:%d] call <%s>", source, methodCall.getLineNumber(), method.getLongName())));
 											}
 											comparator.accept(value);
 										}
@@ -246,7 +248,7 @@ public final class DebugApp extends Application {
 											if (superMethod.hasAnnotation(CompatibleVersion.class)) {
 												String value = ((CompatibleVersion) superMethod.getAnnotation(CompatibleVersion.class)).value();
 												{
-													wrappers.add(new Wrapper(value, String.format("%s override <%s>", ctClass.getName(), superMethod.getLongName())));
+													wrappers.add(new Wrapper(value, superMethod.getLongName(), String.format("%s override <%s>", ctClass.getName(), superMethod.getLongName())));
 												}
 												comparator.accept(value);
 											}
@@ -269,6 +271,7 @@ public final class DebugApp extends Application {
 					
 					AnalysisResult analysisResult = new AnalysisResult();
 					analysisResult.setMinimumCompatibleVersion(minimumCompatibleVersion.get());
+					analysisResult.setReferencedMethodNames(wrappers.stream().map(wrapper -> wrapper.methodName).collect(Collectors.toList()));
 					return analysisResult;
 				}
 			} catch (Exception | Error e) {

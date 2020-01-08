@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
+import org.silentsoft.actlist.plugin.CompatibleVersion;
+
 import com.sun.javafx.stage.StageHelper;
 
 import javafx.application.Platform;
@@ -23,6 +25,7 @@ import javafx.stage.Stage;
 import javafx.stage.Window;
 
 @SuppressWarnings("restriction")
+@CompatibleVersion("1.0.0")
 public final class MessageBox {
 	
 	private static List<Image> getActlistIcons() {
@@ -38,66 +41,82 @@ public final class MessageBox {
 		}.apply(new int[]{24, 32, 48, 64, 128, 256});
 	}
 	
+	@CompatibleVersion("1.0.0")
 	public static void showAbout(String message) {
 		showAbout(null, null, message);
 	}
 	
+	@CompatibleVersion("1.0.0")
 	public static void showAbout(Object owner, String message) {
 		showAbout(owner, null, message);
 	}
 	
+	@CompatibleVersion("1.0.0")
 	public static void showAbout(String masthead, String message) {
 		showAbout(null, masthead, message);
 	}
 	
+	@CompatibleVersion("1.0.0")
 	public static void showAbout(Object owner, String masthead, String message) {
 		showMessage(AlertType.INFORMATION, "About", owner, masthead, message);
 	}
 	
+	@CompatibleVersion("1.2.6")
 	public static void showInformation(String message) {
 		showInformation(null, null, message);
 	}
 	
+	@CompatibleVersion("1.2.6")
 	public static void showInformation(Object owner, String message) {
 		showInformation(owner, null, message);
 	}
 	
+	@CompatibleVersion("1.2.6")
 	public static void showInformation(String masthead, String message) {
 		showInformation(null, masthead, message);
 	}
 	
+	@CompatibleVersion("1.0.0")
 	public static void showInformation(Object owner, String masthead, String message) {
 		showMessage(AlertType.INFORMATION, "Information", owner, masthead, message);
 	}
 	
+	@CompatibleVersion("1.2.6")
 	public static void showWarning(String message) {
 		showWarning(null, null, message);
 	}
 	
+	@CompatibleVersion("1.2.6")
 	public static void showWarning(Object owner, String message) {
 		showWarning(owner, null, message);
 	}
 	
+	@CompatibleVersion("1.2.6")
 	public static void showWarning(String masthead, String message) {
 		showWarning(null, masthead, message);
 	}
 	
+	@CompatibleVersion("1.2.6")
 	public static void showWarning(Object owner, String masthead, String message) {
 		showMessage(AlertType.WARNING, "Warning", owner, masthead, message);
 	}
 	
+	@CompatibleVersion("1.0.0")
 	public static void showError(String message) {
 		showError(null, null, message);
 	}
 	
+	@CompatibleVersion("1.0.0")
 	public static void showError(Object owner, String message) {
 		showError(owner, null, message);
 	}
 	
+	@CompatibleVersion("1.0.0")
 	public static void showError(String masthead, String message) {
 		showError(null, masthead, message);
 	}
 	
+	@CompatibleVersion("1.0.0")
 	public static void showError(Object owner, String masthead, String message) {
 		showMessage(AlertType.ERROR, "Error", owner, masthead, message);
 	}
@@ -121,18 +140,22 @@ public final class MessageBox {
 		alert.showAndWait();
 	}
 	
+	@CompatibleVersion("1.0.0")
 	public static Optional<ButtonType> showConfirm(String message) {
 		return showConfirm(null, null, message);
 	}
 	
+	@CompatibleVersion("1.0.0")
 	public static Optional<ButtonType> showConfirm(Object owner, String message) {
 		return showConfirm(owner, null, message);
 	}
 	
+	@CompatibleVersion("1.0.0")
 	public static Optional<ButtonType> showConfirm(String masthead, String message) {
 		return showConfirm(null, masthead, message);
 	}
 	
+	@CompatibleVersion("1.0.0")
 	public static Optional<ButtonType> showConfirm(Object owner, String masthead, String message) {
 		String title = "Confirm";
 		
@@ -154,26 +177,32 @@ public final class MessageBox {
 		return alert.showAndWait();
 	}
 	
+	@CompatibleVersion("1.0.0")
 	public static void showException(Throwable exception) {
 		showException(null, null, null, exception);
 	}
 	
+	@CompatibleVersion("1.0.0")
 	public static void showException(Object owner, Throwable exception) {
 		showException(owner, null, null, exception);
 	}
 	
+	@CompatibleVersion("1.0.0")
 	public static void showException(String message, Throwable exception) {
 		showException(null, null, message, exception);
 	}
 	
+	@CompatibleVersion("1.0.0")
 	public static void showException(Object owner, String message, Throwable exception) {
 		showException(owner, null, message, exception);
 	}
 	
+	@CompatibleVersion("1.0.0")
 	public static void showException(String masthead, String message, Throwable exception) {
 		showException(null, masthead, message, exception);
 	}
 	
+	@CompatibleVersion("1.0.0")
 	public static void showException(Object owner, String masthead, String message, Throwable exception) {
 		Platform.runLater(() -> {
 			String title = "Exception";

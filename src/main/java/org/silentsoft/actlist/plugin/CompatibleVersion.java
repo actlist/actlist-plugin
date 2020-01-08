@@ -8,7 +8,8 @@ import java.lang.annotation.Target;
 
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
-@interface CompatibleVersion {
+@Target({ElementType.TYPE, ElementType.CONSTRUCTOR, ElementType.METHOD})
+@CompatibleVersion("1.7.0")
+public @interface CompatibleVersion {
 	String value();
 }

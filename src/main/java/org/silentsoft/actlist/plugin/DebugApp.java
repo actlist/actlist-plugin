@@ -26,8 +26,10 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -124,6 +126,8 @@ import javassist.expr.MethodCall;
  * 
  * @author silentsoft
  */
+@Deprecated
+@CompatibleVersion("1.2.6")
 public final class DebugApp extends Application {
 	
 	static DebugParameter debugParameter;
@@ -180,98 +184,137 @@ public final class DebugApp extends Application {
 				if (classes.isEmpty()) {
 					return null;
 				} else {
-					class Wrapper {
-						String version;
-						String methodName;
-						String content;
-						Wrapper(String version, String methodName, String content) {
-							this.version = version;
-							this.methodName = methodName;
-							this.content = content;
-						}
-						@Override
-						public String toString() {
-							return String.format(" : @CompatibleVersion(%s) %s", version, content);
-						}
-					}
-					
-					ArrayList<Wrapper> wrappers = new ArrayList<Wrapper>();
-					
 					AtomicReference<String> minimumCompatibleVersion = new AtomicReference<String>("");
-					Consumer<String> comparator = (version) -> {
-						if (minimumCompatibleVersion.get() == null || "".equals(minimumCompatibleVersion.get()) || VersionComparator.getInstance().compare(minimumCompatibleVersion.get(), version) < 0) {
-							minimumCompatibleVersion.set(version);
-						}
-					};
+					HashSet<String> referencedActlistClassNames = new HashSet<String>();
+					HashSet<String> referencedActlistMethodNames = new HashSet<String>();
+					HashSet<String> referencedClassNames = new HashSet<String>();
+					HashSet<String> referencedMethodNames = new HashSet<String>();
 					
-					ClassPool classPool = ClassPool.getDefault();
-					CtClass ctActlistPlugin = classPool.get(ActlistPlugin.class.getName());
-					CtClass[] ctClasses = classPool.get(classes.toArray(new String[] {}));
-					for (CtClass ctClass : ctClasses) {
-						ctClass.instrument(new ExprEditor() {
-							public void edit(MethodCall methodCall) throws CannotCompileException {
-								try {
-									CtMethod method = methodCall.getMethod();
-									if (debugParameter.getAnalysisIgnoreMethodNames() != null) {
-										if (Arrays.asList(debugParameter.getAnalysisIgnoreMethodNames()).contains(method.getLongName())) {
-											return;
+					{
+						Consumer<String> comparator = (version) -> {
+							if (minimumCompatibleVersion.get() == null || "".equals(minimumCompatibleVersion.get()) || VersionComparator.getInstance().compare(minimumCompatibleVersion.get(), version) < 0) {
+								minimumCompatibleVersion.set(version);
+							}
+						};
+						
+						class Wrapper {
+							String version;
+							String content;
+							Wrapper(String version, String content) {
+								this.version = version;
+								this.content = content;
+							}
+							@Override
+							public String toString() {
+								return String.format(" : @CompatibleVersion(%s) %s", version, content);
+							}
+						}
+						
+						ArrayList<Wrapper> wrappers = new ArrayList<Wrapper>();
+						
+						ClassPool classPool = ClassPool.getDefault();
+						CtClass ctActlistPlugin = classPool.get(ActlistPlugin.class.getName());
+						CtClass[] ctClasses = classPool.get(classes.toArray(new String[] {}));
+						for (CtClass ctClass : ctClasses) {
+							Collection<String> refClasses = ctClass.getRefClasses();
+							if (refClasses != null) {
+								referencedClassNames.addAll(refClasses);
+								
+								for (String refClass : refClasses) {
+									if (debugParameter.getAnalysisIgnoreActlistClassNames() != null) {
+										if (Arrays.asList(debugParameter.getAnalysisIgnoreActlistClassNames()).contains(refClass)) {
+											continue;
 										}
 									}
-									if (method.getLongName().startsWith(ActlistPlugin.class.getName())) {
+									if (refClass.startsWith(ActlistPlugin.class.getPackage().getName())) {
+										referencedActlistClassNames.add(refClass);
+									}
+									CtClass ctRefClass = classPool.get(refClass);
+									if (ctRefClass.hasAnnotation(CompatibleVersion.class)) {
+										String value = ((CompatibleVersion) ctRefClass.getAnnotation(CompatibleVersion.class)).value();
+										{
+											wrappers.add(new Wrapper(value, String.format("%s refer <%s>", ctClass.getName(), ctRefClass.getName())));
+										}
+										comparator.accept(value);
+									}
+								}
+							}
+							
+							ctClass.instrument(new ExprEditor() {
+								public void edit(MethodCall methodCall) throws CannotCompileException {
+									try {
+										CtMethod method = methodCall.getMethod();
+										
+										referencedMethodNames.add(method.getLongName());
+										
+										if (debugParameter.getAnalysisIgnoreActlistMethodNames() != null) {
+											if (Arrays.asList(debugParameter.getAnalysisIgnoreActlistMethodNames()).contains(method.getLongName())) {
+												return;
+											}
+										}
+										if (method.getLongName().startsWith(ActlistPlugin.class.getPackage().getName())) {
+											referencedActlistMethodNames.add(method.getLongName());
+										}
 										if (method.hasAnnotation(CompatibleVersion.class)) {
 											String value = ((CompatibleVersion) method.getAnnotation(CompatibleVersion.class)).value();
 											{
 												String packageName = methodCall.where().getDeclaringClass().getPackageName();
 												String source = (packageName == null) ? methodCall.getFileName() : String.join(".", packageName, methodCall.getFileName());
-												wrappers.add(new Wrapper(value, method.getLongName(), String.format("%s[L:%d] call <%s>", source, methodCall.getLineNumber(), method.getLongName())));
+												wrappers.add(new Wrapper(value, String.format("%s[L:%d] call <%s>", source, methodCall.getLineNumber(), method.getLongName())));
 											}
 											comparator.accept(value);
 										}
+									} catch (Exception e) {
+										
 									}
-								} catch (Exception e) {
-									
 								}
-							}
-						});
-						
-						if (ActlistPlugin.class.isAssignableFrom(Class.forName(ctClass.getName()))) {
-							CtMethod[] ctMethods = ctClass.getDeclaredMethods();
-							if (ctMethods != null) {
-								for (CtMethod ctMethod : ctMethods) {
-									for (CtMethod superMethod : ctActlistPlugin.getDeclaredMethods()) {
-										if (debugParameter.getAnalysisIgnoreMethodNames() != null) {
-											if (Arrays.asList(debugParameter.getAnalysisIgnoreMethodNames()).contains(superMethod.getLongName())) {
-												continue;
-											}
-										}
-										if (superMethod.equals(ctMethod)) {
-											if (superMethod.hasAnnotation(CompatibleVersion.class)) {
-												String value = ((CompatibleVersion) superMethod.getAnnotation(CompatibleVersion.class)).value();
-												{
-													wrappers.add(new Wrapper(value, superMethod.getLongName(), String.format("%s override <%s>", ctClass.getName(), superMethod.getLongName())));
+							});
+							
+							if (ActlistPlugin.class.isAssignableFrom(Class.forName(ctClass.getName()))) {
+								CtMethod[] ctMethods = ctClass.getDeclaredMethods();
+								if (ctMethods != null) {
+									for (CtMethod ctMethod : ctMethods) {
+										for (CtMethod superMethod : ctActlistPlugin.getDeclaredMethods()) {
+											if (debugParameter.getAnalysisIgnoreActlistMethodNames() != null) {
+												if (Arrays.asList(debugParameter.getAnalysisIgnoreActlistMethodNames()).contains(superMethod.getLongName())) {
+													continue;
 												}
-												comparator.accept(value);
+											}
+											if (superMethod.equals(ctMethod)) {
+												referencedActlistMethodNames.add(superMethod.getLongName());
+												
+												if (superMethod.hasAnnotation(CompatibleVersion.class)) {
+													String value = ((CompatibleVersion) superMethod.getAnnotation(CompatibleVersion.class)).value();
+													{
+														wrappers.add(new Wrapper(value, String.format("%s override <%s>", ctClass.getName(), superMethod.getLongName())));
+													}
+													comparator.accept(value);
+												}
 											}
 										}
 									}
 								}
 							}
 						}
+						
+						wrappers.sort((o1, o2) -> {
+							return VersionComparator.getInstance().compare(o1.version, o2.version);
+						});
+						
+						for (Wrapper wrapper : wrappers) {
+							System.out.println(wrapper.toString());
+						}
+						System.out.println(String.format(">: minimum compatible version = Actlist v%s", minimumCompatibleVersion.get()));
+						System.out.println();
 					}
-					
-					wrappers.sort((o1, o2) -> {
-						return VersionComparator.getInstance().compare(o1.version, o2.version);
-					});
-					
-					for (Wrapper wrapper : wrappers) {
-						System.out.println(wrapper.toString());
-					}
-					System.out.println(String.format(">: minimum compatible version = Actlist v%s", minimumCompatibleVersion.get()));
-					System.out.println();
 					
 					AnalysisResult analysisResult = new AnalysisResult();
 					analysisResult.setMinimumCompatibleVersion(minimumCompatibleVersion.get());
-					analysisResult.setReferencedMethodNames(wrappers.stream().map(wrapper -> wrapper.methodName).collect(Collectors.toList()));
+					analysisResult.setReferencedActlistClassNames(referencedActlistClassNames.stream().sorted().collect(Collectors.toList()));
+					analysisResult.setReferencedActlistMethodNames(referencedActlistMethodNames.stream().sorted().collect(Collectors.toList()));
+					analysisResult.setReferencedClassNames(referencedClassNames.stream().sorted().collect(Collectors.toList()));
+					analysisResult.setReferencedMethodNames(referencedMethodNames.stream().sorted().collect(Collectors.toList()));
+					
 					return analysisResult;
 				}
 			} catch (Exception | Error e) {

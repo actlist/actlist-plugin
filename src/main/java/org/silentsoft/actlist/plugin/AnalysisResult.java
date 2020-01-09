@@ -3,13 +3,9 @@ package org.silentsoft.actlist.plugin;
 import java.util.List;
 
 @CompatibleVersion("1.7.0")
-public class AnalysisResult {
+public final class AnalysisResult {
 	
 	private String minimumCompatibleVersion;
-	
-	private List<String> referencedActlistClassNames;
-	
-	private List<String> referencedActlistMethodNames;
 	
 	private List<String> referencedClassNames;
 	
@@ -23,26 +19,6 @@ public class AnalysisResult {
 	@CompatibleVersion("1.7.0")
 	public void setMinimumCompatibleVersion(String minimumCompatibleVersion) {
 		this.minimumCompatibleVersion = minimumCompatibleVersion;
-	}
-	
-	@CompatibleVersion("1.7.0")
-	public List<String> getReferencedActlistClassNames() {
-		return referencedActlistClassNames;
-	}
-
-	@CompatibleVersion("1.7.0")
-	public void setReferencedActlistClassNames(List<String> referencedActlistClassNames) {
-		this.referencedActlistClassNames = referencedActlistClassNames;
-	}
-
-	@CompatibleVersion("1.7.0")
-	public List<String> getReferencedActlistMethodNames() {
-		return referencedActlistMethodNames;
-	}
-
-	@CompatibleVersion("1.7.0")
-	public void setReferencedActlistMethodNames(List<String> referencedActlistMethodNames) {
-		this.referencedActlistMethodNames = referencedActlistMethodNames;
 	}
 	
 	@CompatibleVersion("1.7.0")

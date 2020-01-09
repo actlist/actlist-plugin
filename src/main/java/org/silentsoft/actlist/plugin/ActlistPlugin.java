@@ -57,6 +57,7 @@ public abstract class ActlistPlugin {
 		WINDOWS, MACOSX
 	}
 	
+	@CompatibleVersion("1.0.0")
 	public class Function {
 		Node graphic;
 		Runnable action;
@@ -64,27 +65,35 @@ public abstract class ActlistPlugin {
 			this.graphic = graphic;
 			this.action = action;
 		}
+		@CompatibleVersion("1.7.0")
 		public Node getGraphic() {
 			return this.graphic;
 		}
+		@CompatibleVersion("1.7.0")
 		protected void setGraphic(Node graphic) {
 			this.graphic = graphic;
 		}
 	}
 	
+	@CompatibleVersion("1.0.0")
 	public class TextFunction extends Function {
+		@CompatibleVersion("1.0.0")
 		public TextFunction(String text, Runnable action) {
 			super(new Label(text), action);
 		}
 	}
 	
+	@CompatibleVersion("1.0.0")
 	public class GraphicFunction extends Function {
+		@CompatibleVersion("1.0.0")
 		public GraphicFunction(Node graphic, Runnable action) {
 			super(graphic, action);
 		}
 	}
 	
+	@CompatibleVersion("1.7.0")
 	public class ToggleFunction extends GraphicFunction {
+		@CompatibleVersion("1.7.0")
 		public ToggleFunction(String text, boolean selected, ChangeListener<? super Boolean> listener) {
 			super(new Supplier<Node>() {
 				@Override
@@ -173,6 +182,7 @@ public abstract class ActlistPlugin {
 	
 	private BooleanProperty darkModeProperty = new SimpleBooleanProperty(false);
 	
+	@CompatibleVersion("1.0.0")
 	public ActlistPlugin(String pluginName) {
 		this.pluginName = pluginName;
 	}

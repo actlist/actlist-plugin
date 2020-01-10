@@ -7,10 +7,8 @@ public final class AnalysisResult {
 	
 	private String minimumCompatibleVersion;
 	
-	private List<String> referencedClassNames;
+	private List<String> references;
 	
-	private List<String> referencedMethodNames;
-
 	@CompatibleVersion("1.7.0")
 	public String getMinimumCompatibleVersion() {
 		return minimumCompatibleVersion;
@@ -22,23 +20,13 @@ public final class AnalysisResult {
 	}
 	
 	@CompatibleVersion("1.7.0")
-	public List<String> getReferencedClassNames() {
-		return referencedClassNames;
+	public List<String> getReferences() {
+		return references;
 	}
-
+	
 	@CompatibleVersion("1.7.0")
-	public void setReferencedClassNames(List<String> referencedClassNames) {
-		this.referencedClassNames = referencedClassNames;
-	}
-
-	@CompatibleVersion("1.7.0")
-	public List<String> getReferencedMethodNames() {
-		return referencedMethodNames;
-	}
-
-	@CompatibleVersion("1.7.0")
-	public void setReferencedMethodNames(List<String> referencedMethodNames) {
-		this.referencedMethodNames = referencedMethodNames;
+	public void setReferences(List<String> references) {
+		this.references = references;
 	}
 	
 }

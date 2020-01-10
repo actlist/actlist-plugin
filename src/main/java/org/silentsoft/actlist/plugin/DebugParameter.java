@@ -11,8 +11,7 @@ public class DebugParameter {
 	private boolean isDarkMode;
 	private boolean shouldAnalyze;
 	private Path classesDirectoryToAnalyze;
-	private String[] analysisIgnoreClassNames;
-	private String[] analysisIgnoreMethodNames;
+	private String[] analysisIgnoreReferences;
 	
 	private DebugParameter() {
 		
@@ -24,8 +23,7 @@ public class DebugParameter {
 		this.isDarkMode = builder.isDarkMode;
 		this.shouldAnalyze = builder.shouldAnalyze;
 		this.classesDirectoryToAnalyze = builder.classesDirectoryToAnalyze;
-		this.analysisIgnoreClassNames = builder.analysisIgnoreClassNames;
-		this.analysisIgnoreMethodNames = builder.analysisIgnoreMethodNames;
+		this.analysisIgnoreReferences = builder.analysisIgnoreReferences;
 	}
 	
 	@CompatibleVersion("1.6.0")
@@ -54,15 +52,10 @@ public class DebugParameter {
 	}
 	
 	@CompatibleVersion("1.7.0")
-	public String[] getAnalysisIgnoreClassNames() {
-		return analysisIgnoreClassNames;
+	public String[] getAnalysisIgnoreReferences() {
+		return analysisIgnoreReferences;
 	}
 	
-	@CompatibleVersion("1.7.0")
-	public String[] getAnalysisIgnoreMethodNames() {
-		return analysisIgnoreMethodNames;
-	}
-
 	@CompatibleVersion("1.6.0")
 	public static DebugParameterBuilder custom() {
 		return new DebugParameterBuilder();
@@ -75,8 +68,7 @@ public class DebugParameter {
 		private boolean isDarkMode;
 		private boolean shouldAnalyze;
 		private Path classesDirectoryToAnalyze;
-		private String[] analysisIgnoreClassNames;
-		private String[] analysisIgnoreMethodNames;
+		private String[] analysisIgnoreReferences;
 		
 		private DebugParameterBuilder() {
 			this.isDebugMode = true;
@@ -84,8 +76,7 @@ public class DebugParameter {
 			this.isDarkMode = false;
 			this.shouldAnalyze = true;
 			this.classesDirectoryToAnalyze = Paths.get("target", "classes");
-			this.analysisIgnoreClassNames = null;
-			this.analysisIgnoreMethodNames = null;
+			this.analysisIgnoreReferences = null;
 		}
 
 		/**
@@ -144,27 +135,16 @@ public class DebugParameter {
 		}
 		
 		/**
-		 * @param analysisIgnoreClassNames e.g. <code>new String[] {"org.silentsoft.actlist.plugin.DebugParameter", "org.silentsoft.actlist.plugin.DebugParameter$DebugParameterBuilder"}</code>
+		 * @param analysisIgnoreReferences e.g. <code>new String[] {"org.silentsoft.actlist.plugin.DebugParameter", "org.silentsoft.actlist.plugin.DebugParameter$DebugParameterBuilder", "org.silentsoft.actlist.plugin.ActlistPlugin.debug(org.silentsoft.actlist.plugin.DebugParameter)", "org.silentsoft.actlist.plugin.DebugParameter.custom()", "org.silentsoft.actlist.plugin.DebugParameter$DebugParameterBuilder.build()"}</code>
 		 * @return
 		 */
 		@CompatibleVersion("1.7.0")
-		public DebugParameterBuilder setAnalysisIgnoreClassNames(String[] analysisIgnoreClassNames) {
-			this.analysisIgnoreClassNames = analysisIgnoreClassNames;
+		public DebugParameterBuilder setAnalysisIgnoreReferences(String[] analysisIgnoreReferences) {
+			this.analysisIgnoreReferences = analysisIgnoreReferences;
 			
 			return this;
 		}
 		
-		/**
-		 * @param analysisIgnoreMethodNames e.g. <code>new String[] {"org.silentsoft.actlist.plugin.ActlistPlugin.debug(org.silentsoft.actlist.plugin.DebugParameter)", "org.silentsoft.actlist.plugin.DebugParameter.custom()", "org.silentsoft.actlist.plugin.DebugParameter$DebugParameterBuilder.build()"}</code>
-		 * @return
-		 */
-		@CompatibleVersion("1.7.0")
-		public DebugParameterBuilder setAnalysisIgnoreMethodNames(String[] analysisIgnoreMethodNames) {
-			this.analysisIgnoreMethodNames = analysisIgnoreMethodNames;
-			
-			return this;
-		}
-
 		@CompatibleVersion("1.6.0")
 		public DebugParameter build() {
 			return new DebugParameter(this);

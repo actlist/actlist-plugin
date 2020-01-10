@@ -115,10 +115,12 @@ import javassist.CannotCompileException;
 import javassist.ClassPool;
 import javassist.CtBehavior;
 import javassist.CtClass;
+import javassist.CtMember;
 import javassist.CtMethod;
 import javassist.expr.ConstructorCall;
 import javassist.expr.Expr;
 import javassist.expr.ExprEditor;
+import javassist.expr.FieldAccess;
 import javassist.expr.MethodCall;
 import javassist.expr.NewExpr;
 
@@ -190,8 +192,7 @@ public final class DebugApp extends Application {
 					return null;
 				} else {
 					AtomicReference<String> minimumCompatibleVersion = new AtomicReference<String>("");
-					HashSet<String> referencedClassNames = new HashSet<String>();
-					HashSet<String> referencedMethodNames = new HashSet<String>();
+					HashSet<String> references = new HashSet<String>();
 					{
 						class Wrapper {
 							String version;
@@ -213,21 +214,24 @@ public final class DebugApp extends Application {
 								minimumCompatibleVersion.set(version);
 							}
 						};
-						BiConsumer<Expr, CtBehavior> reference = (expr, ctBehavior) -> {
+						BiConsumer<Expr, CtMember> reference = (expr, ctMember) -> {
 							try {
-								referencedMethodNames.add(ctBehavior.getLongName());
+								String longName = (ctMember instanceof CtBehavior) ? ((CtBehavior) ctMember).getLongName() : String.join(".", ctMember.getDeclaringClass().getName(), ctMember.getName());
 								
-								if (debugParameter.getAnalysisIgnoreMethodNames() != null) {
-									if (Arrays.asList(debugParameter.getAnalysisIgnoreMethodNames()).contains(ctBehavior.getLongName())) {
+								references.add(longName);
+								
+								if (debugParameter.getAnalysisIgnoreReferences() != null) {
+									if (Arrays.asList(debugParameter.getAnalysisIgnoreReferences()).contains(longName)) {
 										return;
 									}
 								}
-								if (ctBehavior.hasAnnotation(CompatibleVersion.class)) {
-									String value = ((CompatibleVersion) ctBehavior.getAnnotation(CompatibleVersion.class)).value();
+								if (ctMember.hasAnnotation(CompatibleVersion.class)) {
+									String value = ((CompatibleVersion) ctMember.getAnnotation(CompatibleVersion.class)).value();
 									{
 										String packageName = expr.where().getDeclaringClass().getPackageName();
 										String source = (packageName == null) ? expr.getFileName() : String.join(".", packageName, expr.getFileName());
-										wrappers.add(new Wrapper(value, String.format("%s[L:%d] call <%s>", source, expr.getLineNumber(), ctBehavior.getLongName())));
+										String action = (ctMember instanceof CtBehavior) ? "call" : "access";
+										wrappers.add(new Wrapper(value, String.format("%s[L:%d] %s <%s>", source, expr.getLineNumber(), action, longName)));
 									}
 									comparator.accept(value);
 								}
@@ -244,7 +248,14 @@ public final class DebugApp extends Application {
 									
 								}
 							}
-							
+							@Override
+							public void edit(NewExpr newExpr) throws CannotCompileException {
+								try {
+									reference.accept(newExpr, newExpr.getConstructor());
+								} catch (Exception e) {
+									
+								}
+							}
 							@Override
 							public void edit(MethodCall methodCall) throws CannotCompileException {
 								try {
@@ -254,9 +265,9 @@ public final class DebugApp extends Application {
 								}
 							}
 							@Override
-							public void edit(NewExpr newExpr) throws CannotCompileException {
+							public void edit(FieldAccess fieldAccess) throws CannotCompileException {
 								try {
-									reference.accept(newExpr, newExpr.getConstructor());
+									reference.accept(fieldAccess, fieldAccess.getField());
 								} catch (Exception e) {
 									
 								}
@@ -269,11 +280,11 @@ public final class DebugApp extends Application {
 						for (CtClass ctClass : ctClasses) {
 							Collection<String> refClasses = ctClass.getRefClasses();
 							if (refClasses != null) {
-								referencedClassNames.addAll(refClasses);
+								references.addAll(refClasses);
 								
 								for (String refClass : refClasses) {
-									if (debugParameter.getAnalysisIgnoreClassNames() != null) {
-										if (Arrays.asList(debugParameter.getAnalysisIgnoreClassNames()).contains(refClass)) {
+									if (debugParameter.getAnalysisIgnoreReferences() != null) {
+										if (Arrays.asList(debugParameter.getAnalysisIgnoreReferences()).contains(refClass)) {
 											continue;
 										}
 									}
@@ -294,10 +305,10 @@ public final class DebugApp extends Application {
 									for (CtMethod ctMethod : ctMethods) {
 										for (CtMethod superMethod : ctActlistPlugin.getDeclaredMethods()) {
 											if (superMethod.equals(ctMethod)) {
-												referencedMethodNames.add(superMethod.getLongName());
+												references.add(superMethod.getLongName());
 												
-												if (debugParameter.getAnalysisIgnoreMethodNames() != null) {
-													if (Arrays.asList(debugParameter.getAnalysisIgnoreMethodNames()).contains(superMethod.getLongName())) {
+												if (debugParameter.getAnalysisIgnoreReferences() != null) {
+													if (Arrays.asList(debugParameter.getAnalysisIgnoreReferences()).contains(superMethod.getLongName())) {
 														continue;
 													}
 												}
@@ -330,8 +341,7 @@ public final class DebugApp extends Application {
 					
 					AnalysisResult analysisResult = new AnalysisResult();
 					analysisResult.setMinimumCompatibleVersion(minimumCompatibleVersion.get());
-					analysisResult.setReferencedClassNames(referencedClassNames.stream().sorted().collect(Collectors.toList()));
-					analysisResult.setReferencedMethodNames(referencedMethodNames.stream().sorted().collect(Collectors.toList()));
+					analysisResult.setReferences(references.stream().sorted().collect(Collectors.toList()));
 					
 					return analysisResult;
 				}

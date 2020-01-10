@@ -45,6 +45,7 @@ import javafx.scene.paint.Paint;
  * @see <a href="https://actlist.silentsoft.org/docs/quick-start/">Plugin Development Guide</a>
  */
 @SuppressWarnings({ "unchecked", "rawtypes" })
+@CompatibleVersion("1.0.0")
 public abstract class ActlistPlugin {
 	
 	/**
@@ -53,8 +54,10 @@ public abstract class ActlistPlugin {
 	@SuppressWarnings("unused")
 	private String version = "1.7.0.alpha";
 	
+	@CompatibleVersion("1.3.0")
 	public enum SupportedPlatform {
-		WINDOWS, MACOSX
+		@CompatibleVersion("1.3.0") WINDOWS,
+		@CompatibleVersion("1.3.0") MACOSX
 	}
 	
 	@CompatibleVersion("1.0.0")

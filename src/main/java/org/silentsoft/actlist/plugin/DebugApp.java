@@ -53,6 +53,8 @@ import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
+import org.commonmark.parser.Parser;
+import org.commonmark.renderer.html.HtmlRenderer;
 import org.controlsfx.control.PopOver;
 import org.silentsoft.actlist.plugin.ActlistPlugin.Function;
 import org.silentsoft.actlist.plugin.ActlistPlugin.SupportedPlatform;
@@ -1317,12 +1319,14 @@ public final class DebugApp extends Application {
 												for (String value=null; (value=reader.readLine()) != null; ) {
 													buffer.append(value.concat("\r\n"));
 												}
-												webView.getEngine().loadContent(buffer.toString(), "text/plain");
+												String content = HtmlRenderer.builder().build().render(Parser.builder().build().parse(buffer.toString()));
+												webView.getEngine().loadContent(content);
 											} else {
 												webView.getEngine().load(uri.toString());
 											}
 										} else if (ObjectUtil.isNotEmpty(text)) {
-											webView.getEngine().loadContent(text, "text/plain");
+											String content = HtmlRenderer.builder().build().render(Parser.builder().build().parse(text));
+											webView.getEngine().loadContent(content);
 										}
 									} catch (Exception e) {
 										e.printStackTrace();

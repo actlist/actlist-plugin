@@ -216,6 +216,25 @@ public final class DebugApp extends Application {
 								minimumCompatibleVersion.set(version);
 							}
 						};
+						
+						try {
+							MavenXpp3Reader reader = new MavenXpp3Reader();
+							Model model = reader.read(new FileReader("pom.xml"));
+							
+							String mainClass = (String) model.getProperties().get("mainClass");
+							if (ObjectUtil.isEmpty(mainClass)) {
+								mainClass = "Plugin";
+							}
+							
+							if ("Plugin".equals(mainClass) == false) {
+								String value = "1.4.2";
+								wrappers.add(new Wrapper(value, "pom.xml override <mainClass> property"));
+								comparator.accept(value);
+							}
+						} catch (Exception | Error e) {
+							
+						}
+						
 						BiConsumer<Expr, CtMember> reference = (expr, ctMember) -> {
 							try {
 								String longName = (ctMember instanceof CtBehavior) ? ((CtBehavior) ctMember).getLongName() : String.join(".", ctMember.getDeclaringClass().getName(), ctMember.getName());

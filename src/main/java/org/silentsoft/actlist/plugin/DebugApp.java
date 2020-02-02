@@ -17,18 +17,28 @@ import java.net.Proxy;
 import java.net.SocketAddress;
 import java.net.URI;
 import java.nio.charset.Charset;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BiConsumer;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.script.ScriptEngine;
@@ -43,6 +53,8 @@ import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
+import org.commonmark.parser.Parser;
+import org.commonmark.renderer.html.HtmlRenderer;
 import org.controlsfx.control.PopOver;
 import org.silentsoft.actlist.plugin.ActlistPlugin.Function;
 import org.silentsoft.actlist.plugin.ActlistPlugin.SupportedPlatform;
@@ -101,8 +113,21 @@ import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
+import javassist.CannotCompileException;
+import javassist.ClassPool;
+import javassist.CtBehavior;
+import javassist.CtClass;
+import javassist.CtMember;
+import javassist.CtMethod;
+import javassist.expr.ConstructorCall;
+import javassist.expr.Expr;
+import javassist.expr.ExprEditor;
+import javassist.expr.FieldAccess;
+import javassist.expr.MethodCall;
+import javassist.expr.NewExpr;
 
 /**
+ * <em><tt>Do not make any references to this class within your code. This class is designed for internal-use only.</tt></em></p>
  * <em><tt>WARNING : This Debug application's source code is independent with real Actlist application's source code. So this application might not be same with real Actlist application.</tt></em></p>
  * 
  * This class is designed for debugging the Actlist plugin.</p>
@@ -110,20 +135,23 @@ import javafx.util.Duration;
  * 
  * @author silentsoft
  */
+@Deprecated
+@CompatibleVersion("1.2.6")
 public final class DebugApp extends Application {
-
-	static DebugParameter debugParameter;
-		
-	public static void debug() {
-		debug(DebugParameter.custom().build());
-	}
 	
-	public static void debug(DebugParameter debugParameter) {
+	static DebugParameter debugParameter;
+	
+	static void debug(DebugParameter debugParameter) {
 		DebugApp.debugParameter = debugParameter;
+		
+		analyze(debugParameter);
 		
 		updateProxyHost();
 		generateUserAgent();
 		
+		System.out.println("::.................< Launching >.................::");
+		System.out.println(">-------------------------------------------------<");
+		System.out.println();
 		launch("");
 	}
 	
@@ -139,6 +167,212 @@ public final class DebugApp extends Application {
 	
 	boolean isAvailableNewPlugin = false;
 	URI newPluginURI;
+	
+	static AnalysisResult analyze(DebugParameter debugParameter) {
+		if (debugParameter.shouldAnalyze()) {
+			System.out.println("::..............< Start Analyzing >..............::");
+			System.out.println(">-------------------------------------------------<");
+			
+			try {
+				ArrayList<String> classes = new ArrayList<String>();
+				
+				Files.walkFileTree(debugParameter.getClassesDirectoryToAnalyze(), new SimpleFileVisitor<Path>() {
+					@Override
+					public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+						String fileName = file.getFileName().toString();
+						if (fileName.toLowerCase().endsWith(".class")) {
+							String classFileName = debugParameter.getClassesDirectoryToAnalyze().relativize(file).normalize().toString();
+							String className = classFileName.substring(0, classFileName.length() - ".class".length()).replaceAll(Pattern.quote(File.separator), ".");
+							
+							classes.add(className);
+						}
+						return super.visitFile(file, attrs);
+					}
+				});
+				
+				if (classes.isEmpty()) {
+					return null;
+				} else {
+					AtomicReference<String> minimumCompatibleVersion = new AtomicReference<String>("");
+					HashSet<String> references = new HashSet<String>();
+					{
+						class Wrapper {
+							String version;
+							String content;
+							Wrapper(String version, String content) {
+								this.version = version;
+								this.content = content;
+							}
+							@Override
+							public String toString() {
+								return String.format(" : @CompatibleVersion(%s) %s", version, content);
+							}
+						}
+						
+						ArrayList<Wrapper> wrappers = new ArrayList<Wrapper>();
+						
+						Consumer<String> comparator = (version) -> {
+							if (minimumCompatibleVersion.get() == null || "".equals(minimumCompatibleVersion.get()) || VersionComparator.getInstance().compare(minimumCompatibleVersion.get(), version) < 0) {
+								minimumCompatibleVersion.set(version);
+							}
+						};
+						
+						try {
+							MavenXpp3Reader reader = new MavenXpp3Reader();
+							Model model = reader.read(new FileReader("pom.xml"));
+							
+							String mainClass = (String) model.getProperties().get("mainClass");
+							if (ObjectUtil.isEmpty(mainClass)) {
+								mainClass = "Plugin";
+							}
+							
+							if ("Plugin".equals(mainClass) == false) {
+								String value = "1.4.2";
+								wrappers.add(new Wrapper(value, "pom.xml override <mainClass> property"));
+								comparator.accept(value);
+							}
+						} catch (Exception | Error e) {
+							
+						}
+						
+						BiConsumer<Expr, CtMember> reference = (expr, ctMember) -> {
+							try {
+								String longName = (ctMember instanceof CtBehavior) ? ((CtBehavior) ctMember).getLongName() : String.join(".", ctMember.getDeclaringClass().getName(), ctMember.getName());
+								
+								references.add(longName);
+								
+								if (debugParameter.getAnalysisIgnoreReferences() != null) {
+									if (Arrays.asList(debugParameter.getAnalysisIgnoreReferences()).contains(longName)) {
+										return;
+									}
+								}
+								if (ctMember.hasAnnotation(CompatibleVersion.class)) {
+									String value = ((CompatibleVersion) ctMember.getAnnotation(CompatibleVersion.class)).value();
+									{
+										String packageName = expr.where().getDeclaringClass().getPackageName();
+										String source = (packageName == null) ? expr.getFileName() : String.join(".", packageName, expr.getFileName());
+										String action = (ctMember instanceof CtBehavior) ? "call" : "access";
+										wrappers.add(new Wrapper(value, String.format("%s[L:%d] %s <%s>", source, expr.getLineNumber(), action, longName)));
+									}
+									comparator.accept(value);
+								}
+							} catch (Exception e) {
+								
+							}
+						};
+						ExprEditor exprEditor = new ExprEditor() {
+							@Override
+							public void edit(ConstructorCall constructorCall) throws CannotCompileException {
+								try {
+									reference.accept(constructorCall, constructorCall.getConstructor());
+								} catch (Exception e) {
+									
+								}
+							}
+							@Override
+							public void edit(NewExpr newExpr) throws CannotCompileException {
+								try {
+									reference.accept(newExpr, newExpr.getConstructor());
+								} catch (Exception e) {
+									
+								}
+							}
+							@Override
+							public void edit(MethodCall methodCall) throws CannotCompileException {
+								try {
+									reference.accept(methodCall, methodCall.getMethod());
+								} catch (Exception e) {
+									
+								}
+							}
+							@Override
+							public void edit(FieldAccess fieldAccess) throws CannotCompileException {
+								try {
+									reference.accept(fieldAccess, fieldAccess.getField());
+								} catch (Exception e) {
+									
+								}
+							}
+						};
+						
+						ClassPool classPool = ClassPool.getDefault();
+						CtClass ctActlistPlugin = classPool.get(ActlistPlugin.class.getName());
+						CtClass[] ctClasses = classPool.get(classes.toArray(new String[] {}));
+						for (CtClass ctClass : ctClasses) {
+							Collection<String> refClasses = ctClass.getRefClasses();
+							if (refClasses != null) {
+								references.addAll(refClasses);
+								
+								for (String refClass : refClasses) {
+									if (debugParameter.getAnalysisIgnoreReferences() != null) {
+										if (Arrays.asList(debugParameter.getAnalysisIgnoreReferences()).contains(refClass)) {
+											continue;
+										}
+									}
+									CtClass ctRefClass = classPool.get(refClass);
+									if (ctRefClass.hasAnnotation(CompatibleVersion.class)) {
+										String value = ((CompatibleVersion) ctRefClass.getAnnotation(CompatibleVersion.class)).value();
+										{
+											wrappers.add(new Wrapper(value, String.format("%s refer <%s>", ctClass.getName(), ctRefClass.getName())));
+										}
+										comparator.accept(value);
+									}
+								}
+							}
+							
+							if (ActlistPlugin.class.isAssignableFrom(Class.forName(ctClass.getName()))) {
+								CtMethod[] ctMethods = ctClass.getDeclaredMethods();
+								if (ctMethods != null) {
+									for (CtMethod ctMethod : ctMethods) {
+										for (CtMethod superMethod : ctActlistPlugin.getDeclaredMethods()) {
+											if (superMethod.equals(ctMethod)) {
+												references.add(superMethod.getLongName());
+												
+												if (debugParameter.getAnalysisIgnoreReferences() != null) {
+													if (Arrays.asList(debugParameter.getAnalysisIgnoreReferences()).contains(superMethod.getLongName())) {
+														continue;
+													}
+												}
+												if (superMethod.hasAnnotation(CompatibleVersion.class)) {
+													String value = ((CompatibleVersion) superMethod.getAnnotation(CompatibleVersion.class)).value();
+													{
+														wrappers.add(new Wrapper(value, String.format("%s override <%s>", ctClass.getName(), superMethod.getLongName())));
+													}
+													comparator.accept(value);
+												}
+											}
+										}
+									}
+								}
+							}
+							
+							ctClass.instrument(exprEditor);
+						}
+						
+						wrappers.sort((o1, o2) -> {
+							return VersionComparator.getInstance().compare(o1.version, o2.version);
+						});
+						
+						for (Wrapper wrapper : wrappers) {
+							System.out.println(wrapper.toString());
+						}
+						System.out.println(String.format(">: minimum compatible version = Actlist v%s", minimumCompatibleVersion.get()));
+						System.out.println();
+					}
+					
+					AnalysisResult analysisResult = new AnalysisResult();
+					analysisResult.setMinimumCompatibleVersion(minimumCompatibleVersion.get());
+					analysisResult.setReferences(references.stream().sorted().collect(Collectors.toList()));
+					
+					return analysisResult;
+				}
+			} catch (Exception | Error e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return null;
+	}
 	
 	private static void updateProxyHost() {
 		String proxyHost = "";
@@ -580,6 +814,10 @@ public final class DebugApp extends Application {
 	}
 	
 	private void makeDisable(Throwable throwable, boolean shouldTraceException) {
+		if (shouldTraceException) {
+			throwable.printStackTrace();
+		}
+		
 		new Thread(() -> {
 			JFXToggleButton togActivator = (JFXToggleButton) stage.getScene().lookup("#togActivator");
 			if (togActivator.selectedProperty().get()) {
@@ -652,7 +890,7 @@ public final class DebugApp extends Application {
 	}
 	
 	private void addFunction(Function function) {
-		functions.add(createFunctionBox(new Label("", function.graphic), mouseEvent -> {
+		functions.add(createFunctionBox(function.graphic, mouseEvent -> {
 			try {
 				if (function.action != null) {
 					function.action.run();
@@ -1100,12 +1338,14 @@ public final class DebugApp extends Application {
 												for (String value=null; (value=reader.readLine()) != null; ) {
 													buffer.append(value.concat("\r\n"));
 												}
-												webView.getEngine().loadContent(buffer.toString(), "text/plain");
+												String content = HtmlRenderer.builder().build().render(Parser.builder().build().parse(buffer.toString()));
+												webView.getEngine().loadContent(content);
 											} else {
 												webView.getEngine().load(uri.toString());
 											}
 										} else if (ObjectUtil.isNotEmpty(text)) {
-											webView.getEngine().loadContent(text, "text/plain");
+											String content = HtmlRenderer.builder().build().render(Parser.builder().build().parse(text));
+											webView.getEngine().loadContent(content);
 										}
 									} catch (Exception e) {
 										e.printStackTrace();

@@ -2,22 +2,31 @@ package org.silentsoft.actlist.plugin;
 
 import java.net.URI;
 import java.net.URL;
-import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import org.apache.http.HttpHost;
 import org.apache.http.HttpRequest;
 import org.silentsoft.actlist.plugin.tray.TrayNotification;
 
+import com.jfoenix.controls.JFXToggleButton;
+
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.paint.Paint;
 
 /**
  * Please generate executable main class called <tt>your.pkg.Plugin.java</tt> that you assigned from <tt>mainClass</tt> property on <tt>pom.xml</tt>
@@ -36,18 +45,22 @@ import javafx.scene.image.ImageView;
  * @see <a href="https://actlist.silentsoft.org/docs/quick-start/">Plugin Development Guide</a>
  */
 @SuppressWarnings({ "unchecked", "rawtypes" })
+@CompatibleVersion("1.0.0")
 public abstract class ActlistPlugin {
 	
 	/**
 	 * Actlist engine will reflects this variable to determine what the version of the ActlistPlugin is.
 	 */
 	@SuppressWarnings("unused")
-	private String version = "1.6.0";
+	private String version = "1.7.0.alpha";
 	
+	@CompatibleVersion("1.3.0")
 	public enum SupportedPlatform {
-		WINDOWS, MACOSX
+		@CompatibleVersion("1.3.0") WINDOWS,
+		@CompatibleVersion("1.3.0") MACOSX
 	}
 	
+	@CompatibleVersion("1.0.0")
 	public class Function {
 		Node graphic;
 		Runnable action;
@@ -55,17 +68,64 @@ public abstract class ActlistPlugin {
 			this.graphic = graphic;
 			this.action = action;
 		}
+		@CompatibleVersion("1.7.0")
+		public Node getGraphic() {
+			return this.graphic;
+		}
+		@CompatibleVersion("1.7.0")
+		protected void setGraphic(Node graphic) {
+			this.graphic = graphic;
+		}
 	}
 	
+	@CompatibleVersion("1.0.0")
 	public class TextFunction extends Function {
+		@CompatibleVersion("1.0.0")
 		public TextFunction(String text, Runnable action) {
 			super(new Label(text), action);
 		}
 	}
 	
+	@CompatibleVersion("1.0.0")
 	public class GraphicFunction extends Function {
+		@CompatibleVersion("1.0.0")
 		public GraphicFunction(Node graphic, Runnable action) {
 			super(graphic, action);
+		}
+	}
+	
+	@CompatibleVersion("1.7.0")
+	public class ToggleFunction extends GraphicFunction {
+		@CompatibleVersion("1.7.0")
+		public ToggleFunction(String text, boolean selected, ChangeListener<? super Boolean> listener) {
+			super(new Supplier<Node>() {
+				@Override
+				public Node get() {
+					Label label = new Label(text);
+					label.setAlignment(Pos.CENTER_RIGHT);
+					label.setMaxWidth(Double.MAX_VALUE);
+					
+					JFXToggleButton toggleButton = new JFXToggleButton();
+					toggleButton.setText("");
+					toggleButton.setSelected(selected);
+					toggleButton.selectedProperty().addListener(listener);
+					toggleButton.setContentDisplay(ContentDisplay.RIGHT);
+					toggleButton.setMinHeight(23.0);
+					toggleButton.setPrefHeight(23.0);
+					toggleButton.setMaxHeight(23.0);
+					toggleButton.setToggleColor(Paint.valueOf("#fafafa"));
+					toggleButton.setToggleLineColor(Paint.valueOf("#59bf53"));
+					toggleButton.setUnToggleLineColor(Paint.valueOf("#e0e0e0"));
+					toggleButton.setDisableVisualFocus(true);
+					
+					BorderPane borderPane = new BorderPane();
+					borderPane.setCenter(label);
+					borderPane.setRight(toggleButton);
+					HBox.setHgrow(borderPane, Priority.ALWAYS);
+					
+					return borderPane;
+				}
+			}.get(), null);
 		}
 	}
 	
@@ -125,6 +185,7 @@ public abstract class ActlistPlugin {
 	
 	private BooleanProperty darkModeProperty = new SimpleBooleanProperty(false);
 	
+	@CompatibleVersion("1.0.0")
 	public ActlistPlugin(String pluginName) {
 		this.pluginName = pluginName;
 	}
@@ -132,8 +193,9 @@ public abstract class ActlistPlugin {
 	/**
 	 * @since 1.2.6
 	 */
+	@CompatibleVersion("1.2.6")
 	protected static void debug() {
-		DebugApp.debug();
+		DebugApp.debug(DebugParameter.custom().build());
 	}
 	
 	/**
@@ -142,6 +204,7 @@ public abstract class ActlistPlugin {
 	 * @see #debug(DebugParameter)
 	 */
 	@Deprecated
+	@CompatibleVersion("1.5.1")
 	protected static void debug(boolean isDebugMode) {
 		DebugApp.debug(DebugParameter.custom().setDebugMode(isDebugMode).build());
 	}
@@ -152,6 +215,7 @@ public abstract class ActlistPlugin {
 	 * @see #debug(DebugParameter)
 	 */
 	@Deprecated
+	@CompatibleVersion("1.5.1")
 	protected static void debug(String proxyHost) {
 		DebugApp.debug(DebugParameter.custom().setProxyHost(proxyHost).build());
 	}
@@ -163,6 +227,7 @@ public abstract class ActlistPlugin {
 	 * @see #debug(DebugParameter)
 	 */
 	@Deprecated
+	@CompatibleVersion("1.5.1")
 	protected static void debug(boolean isDebugMode, String proxyHost) {
 		DebugApp.debug(DebugParameter.custom().setDebugMode(isDebugMode).setProxyHost(proxyHost).build());
 	}
@@ -171,6 +236,7 @@ public abstract class ActlistPlugin {
 	 * @param debugParameter e.g. <code>DebugParameter.custom().setProxyHost("http://1.2.3.4:8080").setDarkMode(true).build()</code>
 	 * @since 1.6.0
 	 */
+	@CompatibleVersion("1.6.0")
 	protected static void debug(DebugParameter debugParameter) {
 		DebugApp.debug(debugParameter);
 	}
@@ -179,6 +245,7 @@ public abstract class ActlistPlugin {
 	 * @since 1.2.6 created as a non-static method
 	 * @since 1.5.1 breaking changes as a static method
 	 */
+	@CompatibleVersion("1.5.1")
 	public static boolean isDebugMode() {
 		// release mode
 		if (DebugApp.debugParameter == null) {
@@ -186,6 +253,22 @@ public abstract class ActlistPlugin {
 		}
 		
 		return DebugApp.debugParameter.isDebugMode();
+	}
+	
+	/**
+	 * @since 1.7.0
+	 */
+	@CompatibleVersion("1.7.0")
+	public static AnalysisResult analyze() {
+		return DebugApp.analyze(DebugParameter.custom().build());
+	}
+	
+	/**
+	 * @since 1.7.0
+	 */
+	@CompatibleVersion("1.7.0")
+	public static AnalysisResult analyze(DebugParameter debugParameter) {
+		return DebugApp.analyze(debugParameter);
 	}
 	
 	/**
@@ -199,6 +282,7 @@ public abstract class ActlistPlugin {
 	 * 
 	 * @since 1.0.0
 	 */
+	@CompatibleVersion("1.0.0")
 	protected abstract void initialize() throws Exception;
 	
 	/**
@@ -217,6 +301,7 @@ public abstract class ActlistPlugin {
 	 * @throws Exception
 	 * @since 1.0.0
 	 */
+	@CompatibleVersion("1.0.0")
 	public abstract void pluginActivated() throws Exception;
 	
 	/**
@@ -234,6 +319,7 @@ public abstract class ActlistPlugin {
 	 * @throws Exception
 	 * @since 1.0.0
 	 */
+	@CompatibleVersion("1.0.0")
 	public abstract void pluginDeactivated() throws Exception;
 	
 	/**
@@ -252,6 +338,7 @@ public abstract class ActlistPlugin {
 	 * @throws Exception
 	 * @since 1.2.6
 	 */
+	@CompatibleVersion("1.2.6")
 	public void pluginUpdateFound() throws Exception {
 		
 	}
@@ -264,6 +351,7 @@ public abstract class ActlistPlugin {
 	 * @throws Exception
 	 * @since 1.0.0
 	 */
+	@CompatibleVersion("1.0.0")
 	public void applicationActivated() throws Exception {
 		
 	}
@@ -276,6 +364,7 @@ public abstract class ActlistPlugin {
 	 * @throws Exception
 	 * @since 1.0.0
 	 */
+	@CompatibleVersion("1.0.0")
 	public void applicationDeactivated() throws Exception {
 		
 	}
@@ -288,6 +377,7 @@ public abstract class ActlistPlugin {
 	 * @throws Exception
 	 * @since 1.2.2
 	 */
+	@CompatibleVersion("1.2.2")
 	public void applicationCloseRequested() throws Exception {
 		
 	}
@@ -304,6 +394,7 @@ public abstract class ActlistPlugin {
 	 * @throws Exception
 	 * @since 1.6.0
 	 */
+	@CompatibleVersion("1.6.0")
 	public void applicationConfigChanged() throws Exception {
 		
 	}
@@ -311,6 +402,7 @@ public abstract class ActlistPlugin {
 	/**
 	 * @since 1.2.6
 	 */
+	@CompatibleVersion("1.2.6")
 	protected String getActlistVersion() {
 		String actlistVersion = null;
 		
@@ -329,6 +421,7 @@ public abstract class ActlistPlugin {
 	/**
 	 * @since 1.2.6
 	 */
+	@CompatibleVersion("1.2.6")
 	protected String getActlistBuildTime() {
 		String actlistBuildTime = null;
 		
@@ -361,60 +454,31 @@ public abstract class ActlistPlugin {
 	/**
 	 * @since 1.2.6
 	 */
+	@CompatibleVersion("1.2.6")
 	protected boolean isActlistVersionLowerThan(int major, int minor, int patch) {
-		return versionComparator.compare(getActlistVersion(), String.format("%d.%d.%d", major, minor, patch)) < 0;
+		return VersionComparator.getInstance().compare(getActlistVersion(), String.format("%d.%d.%d", major, minor, patch)) < 0;
 	}
 	
 	/**
 	 * @since 1.2.6
 	 */
+	@CompatibleVersion("1.2.6")
 	protected boolean isActlistVersionSameWith(int major, int minor, int patch) {
-		return versionComparator.compare(getActlistVersion(), String.format("%d.%d.%d", major, minor, patch)) == 0;
+		return VersionComparator.getInstance().compare(getActlistVersion(), String.format("%d.%d.%d", major, minor, patch)) == 0;
 	}
 	
 	/**
 	 * @since 1.2.6
 	 */
+	@CompatibleVersion("1.2.6")
 	protected boolean isActlistVersionHigherThan(int major, int minor, int patch) {
-		return versionComparator.compare(getActlistVersion(), String.format("%d.%d.%d", major, minor, patch)) > 0;
+		return VersionComparator.getInstance().compare(getActlistVersion(), String.format("%d.%d.%d", major, minor, patch)) > 0;
 	}
-	
-	private Comparator<String> versionComparator = new Comparator<String>() {
-		@Override
-		public int compare(String o1, String o2) {
-			if (o1.equals(o2)) {
-				return 0;
-			}
-			
-			String[] _o1 = o1.split("\\.");
-			String[] _o2 = o2.split("\\.");
-			
-			Integer o1Major = Integer.valueOf(_o1[0]);
-			Integer o2Major = Integer.valueOf(_o2[0]);
-			
-			int majorCompare = o1Major.compareTo(o2Major);
-			if (majorCompare == 0) {
-				Integer o1Minor = Integer.valueOf(_o1[1]);
-				Integer o2Minor = Integer.valueOf(_o2[1]);
-				
-				int minorCompare = o1Minor.compareTo(o2Minor);
-				if (minorCompare == 0) {
-					Integer o1Patch = Integer.valueOf(_o1[2]);
-					Integer o2Patch = Integer.valueOf(_o2[2]);
-					
-					return o1Patch.compareTo(o2Patch);
-				} else {
-					return minorCompare;
-				}
-			}
-			
-			return majorCompare;
-		}
-	};
 	
 	/**
 	 * @since 1.0.0
 	 */
+	@CompatibleVersion("1.0.0")
 	public String getPluginName() {
 		return pluginName;
 	}
@@ -422,6 +486,7 @@ public abstract class ActlistPlugin {
 	/**
 	 * @since 1.2.0
 	 */
+	@CompatibleVersion("1.2.0")
 	public String getPluginVersion() {
 		return pluginVersion;
 	}
@@ -429,6 +494,7 @@ public abstract class ActlistPlugin {
 	/**
 	 * @since 1.2.0
 	 */
+	@CompatibleVersion("1.2.0")
 	protected void setPluginVersion(String pluginVersion) {
 		this.pluginVersion = pluginVersion;
 	}
@@ -436,6 +502,7 @@ public abstract class ActlistPlugin {
 	/**
 	 * @since 1.0.0
 	 */
+	@CompatibleVersion("1.0.0")
 	public String getPluginDescription() {
 		return pluginDescription;
 	}
@@ -443,6 +510,7 @@ public abstract class ActlistPlugin {
 	/**
 	 * @since 1.2.0
 	 */
+	@CompatibleVersion("1.2.0")
 	protected void setPluginDescription(String pluginDescription) {
 		this.pluginDescription = pluginDescription;
 	}
@@ -450,6 +518,7 @@ public abstract class ActlistPlugin {
 	/**
 	 * @since 1.2.6
 	 */
+	@CompatibleVersion("1.2.6")
 	protected void setPluginDescription(URI uri) {
 		this.pluginDescriptionURI = uri;
 	}
@@ -457,6 +526,7 @@ public abstract class ActlistPlugin {
 	/**
 	 * @since 1.2.6
 	 */
+	@CompatibleVersion("1.2.6")
 	public URI getPluginDescriptionURI() {
 		return pluginDescriptionURI;
 	}
@@ -464,6 +534,7 @@ public abstract class ActlistPlugin {
 	/**
 	 * @since 1.2.0
 	 */
+	@CompatibleVersion("1.2.0")
 	public String getPluginAuthor() {
 		return pluginAuthor;
 	}
@@ -471,6 +542,7 @@ public abstract class ActlistPlugin {
 	/**
 	 * @since 1.2.0
 	 */
+	@CompatibleVersion("1.2.0")
 	protected void setPluginAuthor(String pluginAuthor) {
 		this.pluginAuthor = pluginAuthor;
 	}
@@ -478,6 +550,7 @@ public abstract class ActlistPlugin {
 	/**
 	 * @since 1.2.6
 	 */
+	@CompatibleVersion("1.2.6")
 	protected void setPluginAuthor(String pluginAuthor, URI uri) {
 		this.pluginAuthor = pluginAuthor;
 		this.pluginAuthorURI = uri;
@@ -486,6 +559,7 @@ public abstract class ActlistPlugin {
 	/**
 	 * @since 1.2.6
 	 */
+	@CompatibleVersion("1.2.6")
 	public URI getPluginAuthorURI() {
 		return pluginAuthorURI;
 	}
@@ -493,6 +567,7 @@ public abstract class ActlistPlugin {
 	/**
 	 * @since 1.2.6
 	 */
+	@CompatibleVersion("1.2.6")
 	public String getPluginChangeLog() {
 		return pluginChangeLog;
 	}
@@ -500,6 +575,7 @@ public abstract class ActlistPlugin {
 	/**
 	 * @since 1.2.6
 	 */
+	@CompatibleVersion("1.2.6")
 	protected void setPluginChangeLog(String pluginChangeLog) {
 		this.pluginChangeLog = pluginChangeLog;
 	}
@@ -507,6 +583,7 @@ public abstract class ActlistPlugin {
 	/**
 	 * @since 1.2.6
 	 */
+	@CompatibleVersion("1.2.6")
 	protected void setPluginChangeLog(URI uri) {
 		this.pluginChangeLogURI = uri;
 	}
@@ -514,6 +591,7 @@ public abstract class ActlistPlugin {
 	/**
 	 * @since 1.2.6
 	 */
+	@CompatibleVersion("1.2.6")
 	public URI getPluginChangeLogURI() {
 		return pluginChangeLogURI;
 	}
@@ -521,6 +599,7 @@ public abstract class ActlistPlugin {
 	/**
 	 * @since 1.2.6
 	 */
+	@CompatibleVersion("1.2.6")
 	public String getPluginLicense() {
 		return pluginLicense;
 	}
@@ -528,6 +607,7 @@ public abstract class ActlistPlugin {
 	/**
 	 * @since 1.2.6
 	 */
+	@CompatibleVersion("1.2.6")
 	protected void setPluginLicense(String pluginLicense) {
 		this.pluginLicense = pluginLicense;
 	}
@@ -535,6 +615,7 @@ public abstract class ActlistPlugin {
 	/**
 	 * @since 1.2.6
 	 */
+	@CompatibleVersion("1.2.6")
 	protected void setPluginLicense(URI uri) {
 		this.pluginLicenseURI = uri;
 	}
@@ -542,6 +623,7 @@ public abstract class ActlistPlugin {
 	/**
 	 * @since 1.2.6
 	 */
+	@CompatibleVersion("1.2.6")
 	public URI getPluginLicenseURI() {
 		return pluginLicenseURI;
 	}
@@ -549,6 +631,7 @@ public abstract class ActlistPlugin {
 	/**
 	 * @since 1.2.4
 	 */
+	@CompatibleVersion("1.2.4")
 	public String getMinimumCompatibleVersion() {
 		return minimumCompatibleVersion;
 	}
@@ -556,6 +639,7 @@ public abstract class ActlistPlugin {
 	/**
 	 * @since 1.2.4
 	 */
+	@CompatibleVersion("1.2.4")
 	protected void setMinimumCompatibleVersion(int major, int minor, int patch) {
 		this.minimumCompatibleVersion = String.format("%d.%d.%d", major, minor, patch);
 	}
@@ -563,6 +647,7 @@ public abstract class ActlistPlugin {
 	/**
 	 * @since 1.2.6
 	 */
+	@CompatibleVersion("1.2.6")
 	public String getWarningText() {
 		return warningText;
 	}
@@ -570,6 +655,7 @@ public abstract class ActlistPlugin {
 	/**
 	 * @since 1.2.6
 	 */
+	@CompatibleVersion("1.2.6")
 	protected void setWarningText(String warningText) {
 		this.warningText = warningText;
 	}
@@ -577,6 +663,7 @@ public abstract class ActlistPlugin {
 	/**
 	 * @since 1.2.6
 	 */
+	@CompatibleVersion("1.2.6")
 	public URI getPluginUpdateCheckURI() {
 		return pluginUpdateCheckURI;
 	}
@@ -585,6 +672,7 @@ public abstract class ActlistPlugin {
 	 * @since 1.2.6 created as a public method
 	 * @since 1.6.0 breaking changes as a protected method
 	 */
+	@CompatibleVersion("1.2.6")
 	protected void setPluginUpdateCheckURI(URI pluginUpdateCheckURI) {
 		this.pluginUpdateCheckURI = pluginUpdateCheckURI;
 	}
@@ -593,6 +681,7 @@ public abstract class ActlistPlugin {
 	 * @since 1.2.6 created as a public method
 	 * @since 1.6.0 breaking changes as a protected method
 	 */
+	@CompatibleVersion("1.2.6")
 	protected void setPluginUpdateCheckURI(URI pluginUpdateCheckURI, URI pluginArchivesURI) {
 		this.pluginUpdateCheckURI = pluginUpdateCheckURI;
 		this.pluginArchivesURI = pluginArchivesURI;
@@ -602,6 +691,7 @@ public abstract class ActlistPlugin {
 	 * @since 1.5.0 created as a public method
 	 * @since 1.6.0 breaking changes as a protected method
 	 */
+	@CompatibleVersion("1.5.0")
 	protected void setPluginUpdateCheckURI(URI pluginUpdateCheckURI, Consumer<HttpRequest> beforeRequest) {
 		this.pluginUpdateCheckURI = pluginUpdateCheckURI;
 		this.beforeRequest = beforeRequest;
@@ -610,6 +700,7 @@ public abstract class ActlistPlugin {
 	/**
 	 * @since 1.2.6
 	 */
+	@CompatibleVersion("1.2.6")
 	public URI getPluginArchivesURI() {
 		return pluginArchivesURI;
 	}
@@ -618,6 +709,7 @@ public abstract class ActlistPlugin {
 	 * @since 1.2.6 created as a public method
 	 * @since 1.6.0 breaking changes as a protected method
 	 */
+	@CompatibleVersion("1.2.6")
 	protected void setPluginArchivesURI(URI pluginArchivesURI) {
 		this.pluginArchivesURI = pluginArchivesURI;
 	}
@@ -625,6 +717,7 @@ public abstract class ActlistPlugin {
 	/**
 	 * @since 1.5.0
 	 */
+	@CompatibleVersion("1.5.0")
 	public Consumer<HttpRequest> getBeforeRequest() {
 		return beforeRequest;
 	}
@@ -633,6 +726,7 @@ public abstract class ActlistPlugin {
 	 * @since 1.5.0 created as a public method
 	 * @since 1.6.0 breaking changes as a protected method
 	 */
+	@CompatibleVersion("1.5.0")
 	protected void setBeforeRequest(Consumer<HttpRequest> beforeRequest) {
 		this.beforeRequest = beforeRequest;
 	}
@@ -640,6 +734,7 @@ public abstract class ActlistPlugin {
 	/**
 	 * @since 1.2.10
 	 */
+	@CompatibleVersion("1.2.10")
 	public boolean isOneTimePlugin() {
 		return oneTimePlugin;
 	}
@@ -648,6 +743,7 @@ public abstract class ActlistPlugin {
 	 * @since 1.2.10 created as a public method
 	 * @since 1.6.0 breaking changes as a protected method
 	 */
+	@CompatibleVersion("1.2.10")
 	protected void setOneTimePlugin(boolean oneTimePlugin) {
 		this.oneTimePlugin = oneTimePlugin;
 	}
@@ -655,6 +751,7 @@ public abstract class ActlistPlugin {
 	/**
 	 * @since 1.3.0
 	 */
+	@CompatibleVersion("1.3.0")
 	public SupportedPlatform[] getSupportedPlatforms() {
 		return supportedPlatforms;
 	}
@@ -663,6 +760,7 @@ public abstract class ActlistPlugin {
 	 * @since 1.3.0 created as a public method
 	 * @since 1.6.0 breaking changes as a protected method
 	 */
+	@CompatibleVersion("1.3.0")
 	protected void setSupportedPlatforms(SupportedPlatform... supportedPlatforms) {
 		this.supportedPlatforms = supportedPlatforms;
 	}
@@ -670,6 +768,7 @@ public abstract class ActlistPlugin {
 	/**
 	 * @since 1.6.0
 	 */
+	@CompatibleVersion("1.6.0")
 	public String getPluginStatisticsUUID() {
 		return pluginStatisticsUUID;
 	}
@@ -677,6 +776,7 @@ public abstract class ActlistPlugin {
 	/**
 	 * @since 1.6.0
 	 */
+	@CompatibleVersion("1.6.0")
 	protected void setPluginStatisticsUUID(String pluginStatisticsUUID) {
 		this.pluginStatisticsUUID = pluginStatisticsUUID;
 	}
@@ -701,6 +801,7 @@ public abstract class ActlistPlugin {
 	/**
 	 * @since 1.2.0
 	 */
+	@CompatibleVersion("1.2.0")
 	public boolean existsIcon() {
 		if (existsIcon == null) {
 			existsIcon = true;
@@ -718,6 +819,7 @@ public abstract class ActlistPlugin {
 	/**
 	 * @since 1.2.0
 	 */
+	@CompatibleVersion("1.2.0")
 	public ImageView getIcon() throws Exception {
 		if (icon == null) {
 			icon = new ImageView(getPNG().toExternalForm());
@@ -729,6 +831,7 @@ public abstract class ActlistPlugin {
 	/**
 	 * @since 1.1.0
 	 */
+	@CompatibleVersion("1.1.0")
 	public boolean existsGraphic() {
 		if (existsGraphic == null) {
 			existsGraphic = true;
@@ -746,6 +849,7 @@ public abstract class ActlistPlugin {
 	/**
 	 * @since 1.0.0
 	 */
+	@CompatibleVersion("1.0.0")
 	public Node getGraphic() throws Exception {
 		if (graphic == null) {
 			FXMLLoader fxmlLoader = new FXMLLoader(getFXML());
@@ -813,17 +917,27 @@ public abstract class ActlistPlugin {
 	 * @param function executes when user choosed.
 	 * @since 1.0.0
 	 */
-	protected void putFunction(String functionName, Function function) throws DuplicateNameException {
+	@CompatibleVersion("1.0.0")
+	protected void putFunction(String functionName, Function function) throws Exception {
 		if (getFunctionMap().containsKey(functionName)) {
-			throw new DuplicateNameException("The function '{}' is already exists !", new Object[]{ functionName });
+			throw new Exception(String.format("The function '%s' is already exists !", functionName));
 		}
 		
 		getFunctionMap().put(functionName, function);
 	}
 	
 	/**
+	 * @since 1.7.0
+	 */
+	@CompatibleVersion("1.7.0")
+	protected Function getFunction(String functionName) {
+		return getFunctionMap().get(functionName);
+	}
+	
+	/**
 	 * @since 1.0.0
 	 */
+	@CompatibleVersion("1.0.0")
 	protected void removeFunction(String functionName) {
 		getFunctionMap().remove(functionName);
 	}
@@ -831,6 +945,7 @@ public abstract class ActlistPlugin {
 	/**
 	 * @since 1.0.0
 	 */
+	@CompatibleVersion("1.0.0")
 	protected void replaceFunction(String functionName, Function function) {
 		getFunctionMap().replace(functionName, function);
 	}
@@ -845,6 +960,7 @@ public abstract class ActlistPlugin {
 	 * 
 	 * @since 1.1.0
 	 */
+	@CompatibleVersion("1.1.0")
 	public <T> T getConfig(String key) throws Exception {
 		return getPluginConfig().get(key);
 	}
@@ -859,6 +975,7 @@ public abstract class ActlistPlugin {
 	 * 
 	 * @since 1.1.0
 	 */
+	@CompatibleVersion("1.1.0")
 	public void putConfig(String key, Object value) throws Exception {
 		getPluginConfig().put(key, value);
 	}
@@ -873,6 +990,7 @@ public abstract class ActlistPlugin {
 	 * 
 	 * @since 1.1.0
 	 */
+	@CompatibleVersion("1.1.0")
 	public void removeConfig(String key) throws Exception {
 		getPluginConfig().remove(key);
 	}
@@ -880,6 +998,7 @@ public abstract class ActlistPlugin {
 	/**
 	 * @since 1.2.0
 	 */
+	@CompatibleVersion("1.2.0")
 	public void showLoadingBar() {
 		shouldShowLoadingBar().set(true);
 	}
@@ -887,6 +1006,7 @@ public abstract class ActlistPlugin {
 	/**
 	 * @since 1.2.0
 	 */
+	@CompatibleVersion("1.2.0")
 	public void hideLoadingBar() {
 		shouldShowLoadingBar().set(false);
 	}
@@ -931,6 +1051,7 @@ public abstract class ActlistPlugin {
 	 * @param exception that you can't handle
 	 * @since 1.2.1
 	 */
+	@CompatibleVersion("1.2.1")
 	public void throwException(Throwable exception) {
 		exceptionObject().set(exception);
 	}
@@ -938,6 +1059,7 @@ public abstract class ActlistPlugin {
 	/**
 	 * @since 1.2.4
 	 */
+	@CompatibleVersion("1.2.4")
 	public void showTrayNotification(TrayNotification trayNotification) {
 		showTrayNotificationObject().set(trayNotification);
 	}
@@ -945,6 +1067,7 @@ public abstract class ActlistPlugin {
 	/**
 	 * @since 1.2.4
 	 */
+	@CompatibleVersion("1.2.4")
 	public void dismissTrayNotification(TrayNotification trayNotification) {
 		dismissTrayNotificationObject().set(trayNotification);
 	}
@@ -952,6 +1075,7 @@ public abstract class ActlistPlugin {
 	/**
 	 * @since 1.2.4
 	 */
+	@CompatibleVersion("1.2.4")
 	public void dismissTrayNotifications() {
 		shouldDismissTrayNotifications().set(true);
 	}
@@ -959,6 +1083,7 @@ public abstract class ActlistPlugin {
 	/**
 	 * @since 1.2.6
 	 */
+	@CompatibleVersion("1.2.6")
 	public void browseActlistArchives() {
 		shouldBrowseActlistArchives().set(true);
 	}
@@ -966,6 +1091,7 @@ public abstract class ActlistPlugin {
 	/**
 	 * @since 1.2.6
 	 */
+	@CompatibleVersion("1.2.6")
 	public ClassLoader getClassLoader() {
 		return classLoaderObject().get();
 	}
@@ -973,6 +1099,7 @@ public abstract class ActlistPlugin {
 	/**
 	 * @since 1.2.6
 	 */
+	@CompatibleVersion("1.2.6")
 	public HttpHost getProxyHost() {
 		return proxyHostObject().get();
 	}
@@ -980,6 +1107,7 @@ public abstract class ActlistPlugin {
 	/**
 	 * @since 1.2.10
 	 */
+	@CompatibleVersion("1.2.10")
 	public void requestShowActlist() {
 		shouldRequestShowActlist().set(true);
 	}
@@ -987,6 +1115,7 @@ public abstract class ActlistPlugin {
 	/**
 	 * @since 1.2.10
 	 */
+	@CompatibleVersion("1.2.10")
 	public void requestHideActlist() {
 		shouldRequestShowActlist().set(false);
 	}
@@ -994,6 +1123,7 @@ public abstract class ActlistPlugin {
 	/**
 	 * @since 1.2.10
 	 */
+	@CompatibleVersion("1.2.10")
 	public void requestDeactivate() {
 		shouldRequestDeactivate().set(true);
 	}
@@ -1001,6 +1131,7 @@ public abstract class ActlistPlugin {
 	/**
 	 * @since 1.3.0
 	 */
+	@CompatibleVersion("1.3.0")
 	public SupportedPlatform getCurrentPlatform() {
 		return currentPlatformObject().get();
 	}
@@ -1008,6 +1139,7 @@ public abstract class ActlistPlugin {
 	/**
 	 * @since 1.6.0
 	 */
+	@CompatibleVersion("1.6.0")
 	public boolean isDarkMode() {
 		return darkModeProperty().get();
 	}

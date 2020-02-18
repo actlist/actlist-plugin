@@ -7,7 +7,7 @@ import java.util.HashMap;
 import org.silentsoft.core.util.FileUtil;
 import org.silentsoft.core.util.JSONUtil;
 
-class PluginConfig {
+public class PluginConfig {
 
 	private String plugin;
 	

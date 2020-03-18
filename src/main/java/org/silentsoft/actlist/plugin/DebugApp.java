@@ -51,6 +51,8 @@ import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.log4j.Level;
+import org.apache.log4j.LogManager;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.commonmark.parser.Parser;
@@ -146,6 +148,7 @@ public final class DebugApp extends Application {
 		
 		analyze(debugParameter);
 		
+		updateLoggingLevel(debugParameter);
 		updateProxyHost();
 		generateUserAgent();
 		
@@ -372,6 +375,10 @@ public final class DebugApp extends Application {
 		}
 		
 		return null;
+	}
+	
+	private static void updateLoggingLevel(DebugParameter debugParameter) {
+		LogManager.getRootLogger().setLevel((Level.toLevel(debugParameter.getLoggingLevel())));
 	}
 	
 	private static void updateProxyHost() {

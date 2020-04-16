@@ -5,7 +5,15 @@ This product includes software developed by silentsoft.org.
 
 This product includes software developed by The Apache Software Foundation (http://www.apache.org/).
 
-__commons-codec 1.6__
+__centerdevice-nsmenufx 2.1.5__
+ * https://github.com/codecentric/NSMenuFX
+ * BSD-3-Clause
+
+__commonmark 0.13.1__
+ * https://github.com/atlassian/commonmark-java
+ * BSD-2-Clause
+
+__commons-codec 1.11__
  * https://github.com/apache/commons-codec
  * Apache License 2.0
 
@@ -21,7 +29,7 @@ __commons-lang 2.6__
  * https://github.com/apache/commons-lang
  * Apache License 2.0
 
-__commons-logging 1.1.3__
+__commons-logging 1.2__
  * https://github.com/apache/commons-logging
  * Apache License 2.0
 
@@ -29,51 +37,39 @@ __commons-net 3.3__
  * https://github.com/apache/commons-net
  * Apache License 2.0
 
-__httpclient 4.3.6__
+__controlsfx 8.40.15__
+ * https://github.com/controlsfx/controlsfx
+ * BSD-3-Clause
+
+__httpclient 4.5.12__
  * https://github.com/apache/httpcomponents-client
  * Apache License 2.0
 
-__httpcore 4.3.3__
+__httpcore 4.4.13__
  * https://github.com/apache/httpcomponents-core
  * Apache License 2.0
 
-__httpmime 4.3.6__
+__httpmime 4.5.12__
  * Apache License 2.0
 
-__log4j 1.2.17__
- * https://github.com/apache/log4j
+__ini4j 0.5.4__
+ * https://github.com/michaelPf85/ini4j
  * Apache License 2.0
 
-__maven-model 3.6.0__
- * https://github.com/apache/maven
- * Apache License 2.0
-
-__plexus-utils 3.1.0__
- * https://github.com/codehaus-plexus/plexus-utils
- * Apache License 2.0
-
-__centerdevice-nsmenufx 2.1.5__
- * https://github.com/codecentric/NSMenuFX
- * BSD-3-Clause
-
-__controlsfx 8.40.15__
- * https://bitbucket.org/controlsfx/controlsfx
- * BSD-3-Clause
-
-__json 20141113__
- * https://github.com/douglascrockford/JSON-java
- * JSON License
-
-__jackson-annotations 2.4.2__
+__jackson-annotations 2.10.3__
  * https://github.com/FasterXML/jackson-annotations
  * Apache License 2.0
 
-__jackson-core 2.4.2__
+__jackson-core 2.10.3__
  * https://github.com/FasterXML/jackson-core
  * Apache License 2.0
 
-__jackson-databind 2.4.2__
+__jackson-databind 2.10.3__
  * https://github.com/FasterXML/jackson-databind
+ * Apache License 2.0
+
+__javassist 3.26.0-GA__
+ * https://github.com/jboss-javassist/javassist
  * Apache License 2.0
 
 __jfoenix 8.0.8__
@@ -88,17 +84,41 @@ __jna-platform 4.5.1__
  * https://github.com/java-native-access/jna
  * Apache License 2.0
 
+__json 20141113__
+ * https://github.com/douglascrockford/JSON-java
+ * JSON License
+
+__log4j 1.2.17__
+ * https://github.com/apache/log4j
+ * Apache License 2.0
+
+__maven-model 3.6.0__
+ * https://github.com/apache/maven
+ * Apache License 2.0
+
+__plexus-utils 3.1.0__
+ * https://github.com/codehaus-plexus/plexus-utils
+ * Apache License 2.0
+
 __proxy-vole 1.0.3__
  * https://github.com/MarkusBernhardt/proxy-vole
  * Apache License 2.0
 
-__ini4j 0.5.4__
- * https://github.com/michaelPf85/ini4j
+__silentsoft-core 1.3.0__
+ * https://github.com/silentsoft/silentsoft-core
  * Apache License 2.0
 
-__PlusHaze-TrayNotification 5393c3a54f__
- * https://github.com/PlusHaze/TrayNotification
- * MIT License
+__silentsoft-io 1.2.0__
+ * https://github.com/silentsoft/silentsoft-io
+ * Apache License 2.0
+
+__silentsoft-net 1.4.0__
+ * https://github.com/silentsoft/silentsoft-net
+ * Apache License 2.0
+
+__silentsoft-ui 1.2.0__
+ * https://github.com/silentsoft/silentsoft-ui
+ * Apache License 2.0
 
 __slf4j-api 1.7.5__
  * https://github.com/qos-ch/slf4j
@@ -108,14 +128,42 @@ __slf4j-log4j12 1.7.5__
  * https://github.com/qos-ch/slf4j
  * MIT License
 
-__javassist 3.26.0-GA__
- * https://github.com/jboss-javassist/javassist
- * Apache License 2.0
+__PlusHaze-TrayNotification 5393c3a54f__
+ * https://github.com/PlusHaze/TrayNotification
+ * MIT License
 
-__commonmark 0.13.1__
- * https://github.com/atlassian/commonmark-java
- * BSD-2-Clause
+______
 
+__BSD-3-Clause__
+
+```
+Copyright <YEAR> <COPYRIGHT HOLDER>
+
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+
+3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+```
+______
+
+__BSD-2-Clause__
+
+```
+Copyright <YEAR> <COPYRIGHT HOLDER>
+
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+```
 ______
 
 __Apache License 2.0__
@@ -325,23 +373,6 @@ __Apache License 2.0__
 ```
 ______
 
-__BSD-3-Clause__
-
-```
-Copyright <YEAR> <COPYRIGHT HOLDER>
-
-Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
-
-1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
-
-2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
-
-3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-```
-______
-
 __JSON License__
 
 ```
@@ -367,19 +398,4 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-```
-______
-
-__BSD-2-Clause__
-
-```
-Copyright <YEAR> <COPYRIGHT HOLDER>
-
-Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
-
-1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
-
-2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ```

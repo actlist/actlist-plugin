@@ -51,6 +51,8 @@ import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.log4j.Level;
+import org.apache.log4j.LogManager;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.commonmark.parser.Parser;
@@ -127,11 +129,10 @@ import javassist.expr.MethodCall;
 import javassist.expr.NewExpr;
 
 /**
- * <em><tt>Do not make any references to this class within your code. This class is designed for internal-use only.</tt></em></p>
- * <em><tt>WARNING : This Debug application's source code is independent with real Actlist application's source code. So this application might not be same with real Actlist application.</tt></em></p>
+ * <em><tt>Do not make any references to this class within your code. This class is designed for internal-use only.</tt></em><p>
+ * <em><tt>WARNING : This Debug application's source code is independent with real Actlist application's source code. So this application might not be same with real Actlist application.</tt></em><p>
  * 
- * This class is designed for debugging the Actlist plugin.</p>
- * </p>
+ * This class is designed for debugging the Actlist plugin.<p>
  * 
  * @author silentsoft
  */
@@ -146,6 +147,7 @@ public final class DebugApp extends Application {
 		
 		analyze(debugParameter);
 		
+		updateLoggingLevel(debugParameter);
 		updateProxyHost();
 		generateUserAgent();
 		
@@ -372,6 +374,10 @@ public final class DebugApp extends Application {
 		}
 		
 		return null;
+	}
+	
+	private static void updateLoggingLevel(DebugParameter debugParameter) {
+		LogManager.getRootLogger().setLevel((Level.toLevel(debugParameter.getLoggingLevel())));
 	}
 	
 	private static void updateProxyHost() {

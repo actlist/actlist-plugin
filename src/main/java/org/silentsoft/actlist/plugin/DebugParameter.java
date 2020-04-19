@@ -12,6 +12,7 @@ public class DebugParameter {
 	private boolean shouldAnalyze;
 	private Path classesDirectoryToAnalyze;
 	private String[] analysisIgnoreReferences;
+	private String loggingLevel;
 	
 	private DebugParameter() {
 		
@@ -24,6 +25,7 @@ public class DebugParameter {
 		this.shouldAnalyze = builder.shouldAnalyze;
 		this.classesDirectoryToAnalyze = builder.classesDirectoryToAnalyze;
 		this.analysisIgnoreReferences = builder.analysisIgnoreReferences;
+		this.loggingLevel = builder.loggingLevel;
 	}
 	
 	@CompatibleVersion("1.6.0")
@@ -56,6 +58,11 @@ public class DebugParameter {
 		return analysisIgnoreReferences;
 	}
 	
+	@CompatibleVersion("2.0.0")
+	public String getLoggingLevel() {
+		return loggingLevel;
+	}
+	
 	@CompatibleVersion("1.6.0")
 	public static DebugParameterBuilder custom() {
 		return new DebugParameterBuilder();
@@ -69,6 +76,7 @@ public class DebugParameter {
 		private boolean shouldAnalyze;
 		private Path classesDirectoryToAnalyze;
 		private String[] analysisIgnoreReferences;
+		private String loggingLevel;
 		
 		private DebugParameterBuilder() {
 			this.isDebugMode = true;
@@ -77,6 +85,7 @@ public class DebugParameter {
 			this.shouldAnalyze = true;
 			this.classesDirectoryToAnalyze = Paths.get("target", "classes");
 			this.analysisIgnoreReferences = null;
+			this.loggingLevel = "TRACE";
 		}
 
 		/**
@@ -102,7 +111,7 @@ public class DebugParameter {
 		}
 
 		/**
-		 * @param isDarkMode if this value set to <code>true</code>, then Plugin's L&F will be applied to dark mode. otherwise, default L&F will be applied.
+		 * @param isDarkMode if this value set to <code>true</code>, then Plugin's L&amp;F will be applied to dark mode. otherwise, default L&amp;F will be applied.
 		 * @return
 		 */
 		@CompatibleVersion("1.6.0")
@@ -141,6 +150,17 @@ public class DebugParameter {
 		@CompatibleVersion("1.7.0")
 		public DebugParameterBuilder setAnalysisIgnoreReferences(String[] analysisIgnoreReferences) {
 			this.analysisIgnoreReferences = analysisIgnoreReferences;
+			
+			return this;
+		}
+		
+		/**
+		 * @param loggingLevel e.g. <code>TRACE, DEBUG, INFO, WARN, ERROR</code>
+		 * @return
+		 */
+		@CompatibleVersion("2.0.0")
+		public DebugParameterBuilder setLoggingLevel(String loggingLevel) {
+			this.loggingLevel = loggingLevel;
 			
 			return this;
 		}

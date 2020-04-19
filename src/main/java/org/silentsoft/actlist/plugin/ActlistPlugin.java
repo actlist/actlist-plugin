@@ -30,16 +30,16 @@ import javafx.scene.paint.Paint;
 
 /**
  * Please generate executable main class called <tt>your.pkg.Plugin.java</tt> that you assigned from <tt>mainClass</tt> property on <tt>pom.xml</tt>
- * and inherit this <tt>ActlistPlugin</tt> class in your <tt>Plugin</tt> class.</br>
- * <em><tt>NOTE : You should not write any code other than calling the <code>debug();</code> method for debugging in the main method.</tt></em></p>
+ * and inherit this <tt>ActlistPlugin</tt> class in your <tt>Plugin</tt> class.<br>
+ * <em><tt>NOTE : You should not write any code other than calling the <code>debug();</code> method for debugging in the main method.</tt></em><p>
  * 
  * To make a plugin that contains graphic things, you can write the 'Plugin.fxml' file where in the same location of your <tt>Plguin</tt> class.
- * Also you can set the plugin's icon image that display where in about section (Right click -> About) through 'Plugin.png'</br>
- * <em><tt>NOTE : the recommended size of image is 48x48.</tt></em></p>
+ * Also you can set the plugin's icon image that display where in about section (Right click -&gt; About) through 'Plugin.png'<br>
+ * <em><tt>NOTE : the recommended size of image is 48x48.</tt></em><p>
  * 
- * Finally, run maven command via CLI or GUI with <tt>clean package</tt> goals.</p>
+ * Finally, run maven command via CLI or GUI with <tt>clean package</tt> goals.<p>
  * 
- * All done. Happy enjoy it !</p>
+ * All done. Happy enjoy it !<p>
  * 
  * @author silentsoft
  * @see <a href="https://actlist.silentsoft.org/docs/quick-start/">Plugin Development Guide</a>
@@ -47,12 +47,6 @@ import javafx.scene.paint.Paint;
 @SuppressWarnings({ "unchecked", "rawtypes" })
 @CompatibleVersion("1.0.0")
 public abstract class ActlistPlugin {
-	
-	/**
-	 * Actlist engine will reflects this variable to determine what the version of the ActlistPlugin is.
-	 */
-	@SuppressWarnings("unused")
-	private String version = "1.7.0.alpha";
 	
 	@CompatibleVersion("1.3.0")
 	public enum SupportedPlatform {
@@ -272,12 +266,11 @@ public abstract class ActlistPlugin {
 	}
 	
 	/**
-	 * Please write code inside of this method to initialize the plugin when first time.</p>
+	 * Please write code inside of this method to initialize the plugin at first time.<p>
+	 * 
 	 * <em>
-	 * <b>CRITICAL</b> :</br>
-	 * Please do not change this method's access modifier to public.</br>
-	 * b/c name that '<tt>initialize</tt>' is method that called by FXMLLoader automatically.</br>
-	 * so you should know that may occur change plugin's life cycle what if you change this method's access modifier to public from protected.
+	 * <b>CRITICAL</b> :<br>
+	 * Please do not change this method's access modifier to public.<br>
 	 * </em>
 	 * 
 	 * @since 1.0.0
@@ -286,17 +279,17 @@ public abstract class ActlistPlugin {
 	protected abstract void initialize() throws Exception;
 	
 	/**
-	 * This method will be called when plugin is activated.</p>
+	 * This method will be called when plugin is activated.<p>
 	 * 
-	 * Plugin will be activated when the user clicks to toggle button.</br>
-	 * also this method will be called if this plugin was activate when Actlist is started up.</p>
+	 * Plugin will be activated when the user clicks to toggle button.<br>
+	 * also this method will be called if this plugin was activate when Actlist is started up.<p>
 	 * 
 	 * <em>
-	 * <b>CRITICAL</b> :</br>
+	 * <b>CRITICAL</b> :<br>
 	 * This method will be called via FxApplicationThread.
 	 * If your work needs a few seconds for finish, you <b>must</b> write your code into a new Thread. (I'm <b>hirely recomend</b> this option)
      * If not, The Actlist's UI will be hang for few seconds.
-	 * </em></p>
+	 * </em><p>
 	 * 
 	 * @throws Exception
 	 * @since 1.0.0
@@ -305,16 +298,16 @@ public abstract class ActlistPlugin {
 	public abstract void pluginActivated() throws Exception;
 	
 	/**
-	 * This method will be called when plugin is deactivated.</p>
+	 * This method will be called when plugin is deactivated.<p>
 	 * 
-	 * Plugin will be deactivated when the user clicks the toggle button again after plugin is activated.</p>
+	 * Plugin will be deactivated when the user clicks the toggle button again after plugin is activated.<p>
 	 * 
 	 * <em>
-	 * <b>CRITICAL</b> :</br>
+	 * <b>CRITICAL</b> :<br>
 	 * This method will be called via FxApplicationThread.
 	 * If your work needs a few seconds for finish, you <b>must</b> write your code into a new Thread. (I'm <b>hirely recomend</b> this option)
      * If not, The Actlist's UI will be hang for few seconds.
-	 * </em></p>
+	 * </em><p>
 	 * 
 	 * @throws Exception
 	 * @since 1.0.0
@@ -323,17 +316,17 @@ public abstract class ActlistPlugin {
 	public abstract void pluginDeactivated() throws Exception;
 	
 	/**
-	 * This method will be called when the update check response's <code>available</code> value is <code>true</code>.</p>
+	 * This method will be called when the update check response's <code>available</code> value is <code>true</code>.<p>
 	 * 
 	 * <em>
 	 * You can't set pluginArchivesURI here. there will be no change and no effect. the pluginArchivesURI must be declared in the consturctor or update check response.
-	 * </em></p>
+	 * </em><p>
 	 * 
 	 * <em>
-	 * <b>CRITICAL</b> :</br>
+	 * <b>CRITICAL</b> :<br>
 	 * This method will be called via non-FxApplicationThread.
 	 * so if you wanna do control some of the your graphic Node, you should writes code within FxApplicationThread.
-	 * </em></p>
+	 * </em><p>
 	 * 
 	 * @throws Exception
 	 * @since 1.2.6
@@ -344,7 +337,7 @@ public abstract class ActlistPlugin {
 	}
 	
 	/**
-	 * This method will be called when Actlist application is activated.</p>
+	 * This method will be called when Actlist application is activated.<p>
 	 * 
 	 * It could be time that user clicks system tray icon, or press the global short cut to showing up.
 	 * 
@@ -357,7 +350,7 @@ public abstract class ActlistPlugin {
 	}
 	
 	/**
-	 * This method will be called when Actlist application is deactivated.</p>
+	 * This method will be called when Actlist application is deactivated.<p>
 	 * 
 	 * It could be time that user clicks minimize button or system tray icon again, or press the global short cut again when after shown.
 	 *  
@@ -370,7 +363,7 @@ public abstract class ActlistPlugin {
 	}
 	
 	/**
-	 * This method will be called when Actlist application got close request.</p>
+	 * This method will be called when Actlist application got close request.<p>
 	 * 
 	 * It could be time that user clicks close button at task-manager, or press ALT+F4.
 	 * 
@@ -383,7 +376,7 @@ public abstract class ActlistPlugin {
 	}
 	
 	/**
-	 * This method will be called when Actlist application's config has been changed.</p>
+	 * This method will be called when Actlist application's config has been changed.<p>
 	 * 
 	 * Supported config event
 	 * <ul>
@@ -951,12 +944,12 @@ public abstract class ActlistPlugin {
 	}
 	
 	/**
-	 * Returns specific value that depends on <code>key</code> from own config file.</p>
+	 * Returns specific value that depends on <code>key</code> from own config file.<p>
 	 * 
 	 * <em>
-	 * <b>IMPORTANT</b> :</br>
+	 * <b>IMPORTANT</b> :<br>
 	 * Do not call this method on plugin's constructor.
-	 * </em></p>
+	 * </em><p>
 	 * 
 	 * @since 1.1.0
 	 */
@@ -966,12 +959,12 @@ public abstract class ActlistPlugin {
 	}
 	
 	/**
-	 * Each <code>key</code> and </code>value</code> will be put into own config file.</p>
+	 * Each <code>key</code> and <code>value</code> will be put into own config file.<p>
 	 * 
 	 * <em>
-	 * <b>IMPORTANT</b> :</br>
+	 * <b>IMPORTANT</b> :<br>
 	 * Do not call this method on plugin's constructor.
-	 * </em></p>
+	 * </em><p>
 	 * 
 	 * @since 1.1.0
 	 */
@@ -981,12 +974,12 @@ public abstract class ActlistPlugin {
 	}
 	
 	/**
-	 * Removes entire key-value from own config file.</p>
+	 * Removes entire key-value from own config file.<p>
 	 * 
 	 * <em>
-	 * <b>IMPORTANT</b> :</br>
+	 * <b>IMPORTANT</b> :<br>
 	 * Do not call this method on plugin's constructor.
-	 * </em></p>
+	 * </em><p>
 	 * 
 	 * @since 1.1.0
 	 */
@@ -1012,20 +1005,20 @@ public abstract class ActlistPlugin {
 	}
 	
 	/**
-	 * The plugin's toggle button will be toggle-off and displayed as RED color when you call to this method.</p>
+	 * The plugin's toggle button will be toggle-off and displayed as RED color when you call to this method.<p>
 	 * <em>
-	 * <b>CRITICAL</b> :</br>
-	 * if you created a thread and the thread is do something within infinite-while-loop,</br>
-	 * you must to do that finalize all kind of thread that you are created.</p>
-	 * 
+	 * <b>CRITICAL</b> :<br>
+	 * if you created a thread and the thread is do something within infinite-while-loop,<br>
+	 * you must to do that finalize all kind of thread that you are created.<br>
 	 * the recommended infinite-while-loop code of thread is below.
-	 * <code><pre>
+	 * </em>
+	 * <pre>
 	 * private Thread thread;
 	 * 
 	 * <code>@Override</code>
 	 * public void pluginActivated() throws Exception {
 	 *     thread = null;
-	 *     thread = new Thread(() -> {
+	 *     thread = new Thread(() -&gt; {
 	 *         try {
 	 *             while (true) {
 	 *                 // do something here.
@@ -1045,8 +1038,7 @@ public abstract class ActlistPlugin {
 	 * public void pluginDeactivated() throws Exception {
 	 *     thread.interrupt();
 	 * }
-	 * </pre></code>
-	 * </em>
+	 * </pre>
 	 * 
 	 * @param exception that you can't handle
 	 * @since 1.2.1

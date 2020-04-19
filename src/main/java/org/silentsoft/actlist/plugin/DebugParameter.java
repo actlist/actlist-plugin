@@ -111,7 +111,7 @@ public class DebugParameter {
 		}
 
 		/**
-		 * @param isDarkMode if this value set to <code>true</code>, then Plugin's L&F will be applied to dark mode. otherwise, default L&F will be applied.
+		 * @param isDarkMode if this value set to <code>true</code>, then Plugin's L&amp;F will be applied to dark mode. otherwise, default L&amp;F will be applied.
 		 * @return
 		 */
 		@CompatibleVersion("1.6.0")

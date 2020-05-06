@@ -51,8 +51,6 @@ import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicNameValuePair;
-import org.apache.log4j.Level;
-import org.apache.log4j.LogManager;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.commonmark.parser.Parser;
@@ -67,6 +65,7 @@ import org.silentsoft.core.util.FileUtil;
 import org.silentsoft.core.util.JSONUtil;
 import org.silentsoft.core.util.ObjectUtil;
 import org.silentsoft.core.util.SystemUtil;
+import org.slf4j.LoggerFactory;
 
 import com.github.markusbernhardt.proxy.ProxySearch;
 import com.github.plushaze.traynotification.animations.Animations;
@@ -74,6 +73,7 @@ import com.jfoenix.controls.JFXHamburger;
 import com.jfoenix.controls.JFXSpinner;
 import com.jfoenix.controls.JFXToggleButton;
 
+import ch.qos.logback.classic.Level;
 import de.codecentric.centerdevice.glass.AdapterContext;
 import javafx.animation.FadeTransition;
 import javafx.application.Application;
@@ -377,7 +377,7 @@ public final class DebugApp extends Application {
 	}
 	
 	private static void updateLoggingLevel(DebugParameter debugParameter) {
-		LogManager.getRootLogger().setLevel((Level.toLevel(debugParameter.getLoggingLevel())));
+		((ch.qos.logback.classic.Logger) LoggerFactory.getLogger(ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME)).setLevel(Level.toLevel(debugParameter.getLoggingLevel()));
 	}
 	
 	private static void updateProxyHost() {

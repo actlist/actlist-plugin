@@ -85,7 +85,7 @@ public class DebugParameter {
 			this.shouldAnalyze = true;
 			this.classesDirectoryToAnalyze = Paths.get("target", "classes");
 			this.analysisIgnoreReferences = null;
-			this.loggingLevel = "TRACE";
+			this.loggingLevel = "DEBUG";
 		}
 
 		/**

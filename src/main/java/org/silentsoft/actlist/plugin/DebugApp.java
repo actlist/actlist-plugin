@@ -65,6 +65,7 @@ import org.silentsoft.core.util.FileUtil;
 import org.silentsoft.core.util.JSONUtil;
 import org.silentsoft.core.util.ObjectUtil;
 import org.silentsoft.core.util.SystemUtil;
+import org.silentsoft.ui.model.Delta;
 import org.slf4j.LoggerFactory;
 
 import com.github.markusbernhardt.proxy.ProxySearch;
@@ -1566,10 +1567,49 @@ public final class DebugApp extends Application {
 				if (pluginContent != null) {
 					VBox contentBox = (VBox) stage.getScene().lookup("#contentBox");
 					
-					contentBox.getChildren().add(new BorderPane(pluginContent));
+					BorderPane pluginPane = new BorderPane(pluginContent);
+					BorderPane.setAlignment(pluginContent, Pos.TOP_CENTER);
+					contentBox.getChildren().add(pluginPane);
+					
 					Separator contentLine = new Separator();
 					contentLine.setPrefWidth(215.0);
 					contentLine.setPadding(new Insets(5.0, 0.0, 0.0, 0.0));
+					contentLine.setCursor(Cursor.V_RESIZE);
+					{
+						AtomicReference<Double> initialHeight = new AtomicReference<>(null);
+						Delta dragDelta = new Delta();
+						
+						contentLine.setOnMousePressed(mouseEvent -> {
+							if (mouseEvent.getButton() == MouseButton.PRIMARY) {
+								if (initialHeight.get() == null) {
+									initialHeight.set(pluginPane.getHeight());
+								}
+								
+								dragDelta.setHeight(pluginPane.getHeight());
+								dragDelta.setY(mouseEvent.getScreenY());
+								
+								if (mouseEvent.getClickCount() >= 2) {
+									pluginPane.setMinHeight(initialHeight.get());
+									pluginPane.setMaxHeight(initialHeight.get());
+									
+									contentLine.setCursor(Cursor.V_RESIZE);
+								}
+							}
+						});
+						contentLine.setOnMouseDragged(mouseEvent -> {
+							if (mouseEvent.getButton() == MouseButton.PRIMARY) {
+								double height = dragDelta.getHeight() + (mouseEvent.getScreenY() - dragDelta.getY());
+								if (height >= initialHeight.get()) {
+									pluginPane.setMinHeight(height);
+									pluginPane.setMaxHeight(height);
+									
+									contentLine.setCursor(Cursor.V_RESIZE);
+								} else {
+									contentLine.setCursor(Cursor.CLOSED_HAND);
+								}
+							}
+						});
+					}
 					contentBox.getChildren().add(contentLine);
 				}
 			}

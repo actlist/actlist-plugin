@@ -322,25 +322,34 @@ public final class DebugApp extends Application {
 								}
 							}
 							
-							if (ActlistPlugin.class.isAssignableFrom(Class.forName(ctClass.getName()))) {
-								CtMethod[] ctMethods = ctClass.getDeclaredMethods();
-								if (ctMethods != null) {
-									for (CtMethod ctMethod : ctMethods) {
-										for (CtMethod superMethod : ctActlistPlugin.getDeclaredMethods()) {
-											if (superMethod.equals(ctMethod)) {
-												references.add(superMethod.getLongName());
-												
-												if (debugParameter.getAnalysisIgnoreReferences() != null) {
-													if (Arrays.asList(debugParameter.getAnalysisIgnoreReferences()).contains(superMethod.getLongName())) {
-														continue;
+							Class<?> clazz = null;
+							try {
+								clazz = Class.forName(ctClass.getName());
+							} catch (Throwable e) {
+								
+							} finally {
+								if (clazz != null) {
+									if (ActlistPlugin.class.isAssignableFrom(clazz)) {
+										CtMethod[] ctMethods = ctClass.getDeclaredMethods();
+										if (ctMethods != null) {
+											for (CtMethod ctMethod : ctMethods) {
+												for (CtMethod superMethod : ctActlistPlugin.getDeclaredMethods()) {
+													if (superMethod.equals(ctMethod)) {
+														references.add(superMethod.getLongName());
+														
+														if (debugParameter.getAnalysisIgnoreReferences() != null) {
+															if (Arrays.asList(debugParameter.getAnalysisIgnoreReferences()).contains(superMethod.getLongName())) {
+																continue;
+															}
+														}
+														if (superMethod.hasAnnotation(CompatibleVersion.class)) {
+															String value = ((CompatibleVersion) superMethod.getAnnotation(CompatibleVersion.class)).value();
+															{
+																wrappers.add(new Wrapper(value, String.format("%s override <%s>", ctClass.getName(), superMethod.getLongName())));
+															}
+															comparator.accept(value);
+														}
 													}
-												}
-												if (superMethod.hasAnnotation(CompatibleVersion.class)) {
-													String value = ((CompatibleVersion) superMethod.getAnnotation(CompatibleVersion.class)).value();
-													{
-														wrappers.add(new Wrapper(value, String.format("%s override <%s>", ctClass.getName(), superMethod.getLongName())));
-													}
-													comparator.accept(value);
 												}
 											}
 										}

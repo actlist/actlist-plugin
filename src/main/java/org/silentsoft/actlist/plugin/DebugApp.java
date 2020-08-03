@@ -1345,6 +1345,13 @@ public final class DebugApp extends Application {
 							if (existsContent) {
 								WebView webView = new WebView();
 								{
+									Consumer<String> loadContent = (raw) -> {
+										String content = HtmlRenderer.builder().build().render(Parser.builder().build().parse(raw));
+										
+										webView.getEngine().setUserStyleSheetLocation(getClass().getResource("/github-markdown.css").toExternalForm());
+										webView.getEngine().loadContent(String.format("<article class='markdown-body'>%s</article>", content));
+									};
+									
 									BufferedReader reader = null;
 									try {
 										if (ObjectUtil.isNotEmpty(uri)) {
@@ -1354,14 +1361,13 @@ public final class DebugApp extends Application {
 												for (String value=null; (value=reader.readLine()) != null; ) {
 													buffer.append(value.concat("\r\n"));
 												}
-												String content = HtmlRenderer.builder().build().render(Parser.builder().build().parse(buffer.toString()));
-												webView.getEngine().loadContent(content);
+												
+												loadContent.accept(buffer.toString());
 											} else {
 												webView.getEngine().load(uri.toString());
 											}
 										} else if (ObjectUtil.isNotEmpty(text)) {
-											String content = HtmlRenderer.builder().build().render(Parser.builder().build().parse(text));
-											webView.getEngine().loadContent(content);
+											loadContent.accept(text);
 										}
 									} catch (Exception e) {
 										e.printStackTrace();

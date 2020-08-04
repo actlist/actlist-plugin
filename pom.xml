@@ -51,6 +51,7 @@
 		<plushaze-traynotification.tag>5393c3a54f</plushaze-traynotification.tag>
 		<javassist.version>3.26.0-GA</javassist.version>
 		<commonmark.version>0.13.1</commonmark.version>
+		<notice-file-generator.version>2.2.2</notice-file-generator.version>
 	</properties>
 
 	<repositories>
@@ -224,6 +225,12 @@
 			<groupId>com.atlassian.commonmark</groupId>
 			<artifactId>commonmark</artifactId>
 			<version>${commonmark.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.silentsoft.oss</groupId>
+			<artifactId>notice-file-generator</artifactId>
+			<version>${notice-file-generator.version}</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 

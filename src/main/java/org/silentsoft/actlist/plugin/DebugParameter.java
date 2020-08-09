@@ -58,7 +58,7 @@ public class DebugParameter {
 		return analysisIgnoreReferences;
 	}
 	
-	@CompatibleVersion("2.0.0")
+	@CompatibleVersion("2.0.1")
 	public String getLoggingLevel() {
 		return loggingLevel;
 	}
@@ -85,7 +85,7 @@ public class DebugParameter {
 			this.shouldAnalyze = true;
 			this.classesDirectoryToAnalyze = Paths.get("target", "classes");
 			this.analysisIgnoreReferences = null;
-			this.loggingLevel = "TRACE";
+			this.loggingLevel = "DEBUG";
 		}
 
 		/**
@@ -158,7 +158,7 @@ public class DebugParameter {
 		 * @param loggingLevel e.g. <code>TRACE, DEBUG, INFO, WARN, ERROR</code>
 		 * @return
 		 */
-		@CompatibleVersion("2.0.0")
+		@CompatibleVersion("2.0.1")
 		public DebugParameterBuilder setLoggingLevel(String loggingLevel) {
 			this.loggingLevel = loggingLevel;
 			

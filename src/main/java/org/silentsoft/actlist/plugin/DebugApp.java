@@ -51,8 +51,6 @@ import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicNameValuePair;
-import org.apache.log4j.Level;
-import org.apache.log4j.LogManager;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.commonmark.parser.Parser;
@@ -67,6 +65,8 @@ import org.silentsoft.core.util.FileUtil;
 import org.silentsoft.core.util.JSONUtil;
 import org.silentsoft.core.util.ObjectUtil;
 import org.silentsoft.core.util.SystemUtil;
+import org.silentsoft.ui.model.Delta;
+import org.slf4j.LoggerFactory;
 
 import com.github.markusbernhardt.proxy.ProxySearch;
 import com.github.plushaze.traynotification.animations.Animations;
@@ -74,6 +74,7 @@ import com.jfoenix.controls.JFXHamburger;
 import com.jfoenix.controls.JFXSpinner;
 import com.jfoenix.controls.JFXToggleButton;
 
+import ch.qos.logback.classic.Level;
 import de.codecentric.centerdevice.glass.AdapterContext;
 import javafx.animation.FadeTransition;
 import javafx.application.Application;
@@ -322,25 +323,34 @@ public final class DebugApp extends Application {
 								}
 							}
 							
-							if (ActlistPlugin.class.isAssignableFrom(Class.forName(ctClass.getName()))) {
-								CtMethod[] ctMethods = ctClass.getDeclaredMethods();
-								if (ctMethods != null) {
-									for (CtMethod ctMethod : ctMethods) {
-										for (CtMethod superMethod : ctActlistPlugin.getDeclaredMethods()) {
-											if (superMethod.equals(ctMethod)) {
-												references.add(superMethod.getLongName());
-												
-												if (debugParameter.getAnalysisIgnoreReferences() != null) {
-													if (Arrays.asList(debugParameter.getAnalysisIgnoreReferences()).contains(superMethod.getLongName())) {
-														continue;
+							Class<?> clazz = null;
+							try {
+								clazz = Class.forName(ctClass.getName());
+							} catch (Throwable e) {
+								
+							} finally {
+								if (clazz != null) {
+									if (ActlistPlugin.class.isAssignableFrom(clazz)) {
+										CtMethod[] ctMethods = ctClass.getDeclaredMethods();
+										if (ctMethods != null) {
+											for (CtMethod ctMethod : ctMethods) {
+												for (CtMethod superMethod : ctActlistPlugin.getDeclaredMethods()) {
+													if (superMethod.equals(ctMethod)) {
+														references.add(superMethod.getLongName());
+														
+														if (debugParameter.getAnalysisIgnoreReferences() != null) {
+															if (Arrays.asList(debugParameter.getAnalysisIgnoreReferences()).contains(superMethod.getLongName())) {
+																continue;
+															}
+														}
+														if (superMethod.hasAnnotation(CompatibleVersion.class)) {
+															String value = ((CompatibleVersion) superMethod.getAnnotation(CompatibleVersion.class)).value();
+															{
+																wrappers.add(new Wrapper(value, String.format("%s override <%s>", ctClass.getName(), superMethod.getLongName())));
+															}
+															comparator.accept(value);
+														}
 													}
-												}
-												if (superMethod.hasAnnotation(CompatibleVersion.class)) {
-													String value = ((CompatibleVersion) superMethod.getAnnotation(CompatibleVersion.class)).value();
-													{
-														wrappers.add(new Wrapper(value, String.format("%s override <%s>", ctClass.getName(), superMethod.getLongName())));
-													}
-													comparator.accept(value);
 												}
 											}
 										}
@@ -377,7 +387,7 @@ public final class DebugApp extends Application {
 	}
 	
 	private static void updateLoggingLevel(DebugParameter debugParameter) {
-		LogManager.getRootLogger().setLevel((Level.toLevel(debugParameter.getLoggingLevel())));
+		((ch.qos.logback.classic.Logger) LoggerFactory.getLogger(ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME)).setLevel(Level.toLevel(debugParameter.getLoggingLevel()));
 	}
 	
 	private static void updateProxyHost() {
@@ -1335,6 +1345,13 @@ public final class DebugApp extends Application {
 							if (existsContent) {
 								WebView webView = new WebView();
 								{
+									Consumer<String> loadContent = (raw) -> {
+										String content = HtmlRenderer.builder().build().render(Parser.builder().build().parse(raw));
+										
+										webView.getEngine().setUserStyleSheetLocation(getClass().getResource("/github-markdown.css").toExternalForm());
+										webView.getEngine().loadContent(String.format("<article class='markdown-body'>%s</article>", content));
+									};
+									
 									BufferedReader reader = null;
 									try {
 										if (ObjectUtil.isNotEmpty(uri)) {
@@ -1344,14 +1361,13 @@ public final class DebugApp extends Application {
 												for (String value=null; (value=reader.readLine()) != null; ) {
 													buffer.append(value.concat("\r\n"));
 												}
-												String content = HtmlRenderer.builder().build().render(Parser.builder().build().parse(buffer.toString()));
-												webView.getEngine().loadContent(content);
+												
+												loadContent.accept(buffer.toString());
 											} else {
 												webView.getEngine().load(uri.toString());
 											}
 										} else if (ObjectUtil.isNotEmpty(text)) {
-											String content = HtmlRenderer.builder().build().render(Parser.builder().build().parse(text));
-											webView.getEngine().loadContent(content);
+											loadContent.accept(text);
 										}
 									} catch (Exception e) {
 										e.printStackTrace();
@@ -1557,10 +1573,49 @@ public final class DebugApp extends Application {
 				if (pluginContent != null) {
 					VBox contentBox = (VBox) stage.getScene().lookup("#contentBox");
 					
-					contentBox.getChildren().add(new BorderPane(pluginContent));
+					BorderPane pluginPane = new BorderPane(pluginContent);
+					BorderPane.setAlignment(pluginContent, Pos.TOP_CENTER);
+					contentBox.getChildren().add(pluginPane);
+					
 					Separator contentLine = new Separator();
 					contentLine.setPrefWidth(215.0);
 					contentLine.setPadding(new Insets(5.0, 0.0, 0.0, 0.0));
+					contentLine.setCursor(Cursor.V_RESIZE);
+					{
+						AtomicReference<Double> initialHeight = new AtomicReference<>(null);
+						Delta dragDelta = new Delta();
+						
+						contentLine.setOnMousePressed(mouseEvent -> {
+							if (mouseEvent.getButton() == MouseButton.PRIMARY) {
+								if (initialHeight.get() == null) {
+									initialHeight.set(pluginPane.getHeight());
+								}
+								
+								dragDelta.setHeight(pluginPane.getHeight());
+								dragDelta.setY(mouseEvent.getScreenY());
+								
+								if (mouseEvent.getClickCount() >= 2) {
+									pluginPane.setMinHeight(initialHeight.get());
+									pluginPane.setMaxHeight(initialHeight.get());
+									
+									contentLine.setCursor(Cursor.V_RESIZE);
+								}
+							}
+						});
+						contentLine.setOnMouseDragged(mouseEvent -> {
+							if (mouseEvent.getButton() == MouseButton.PRIMARY) {
+								double height = dragDelta.getHeight() + (mouseEvent.getScreenY() - dragDelta.getY());
+								if (height >= initialHeight.get()) {
+									pluginPane.setMinHeight(height);
+									pluginPane.setMaxHeight(height);
+									
+									contentLine.setCursor(Cursor.V_RESIZE);
+								} else {
+									contentLine.setCursor(Cursor.CLOSED_HAND);
+								}
+							}
+						});
+					}
 					contentBox.getChildren().add(contentLine);
 				}
 			}

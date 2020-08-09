@@ -6,7 +6,7 @@
 
 	<groupId>org.silentsoft</groupId>
 	<artifactId>actlist-plugin</artifactId>
-	<version>2.0.1</version>
+	<version>2.1.0</version>
 
 	<name>actlist-plugin</name>
 	<description>Actlist Plugin</description>
@@ -38,10 +38,11 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-		<silentsoft-core.version>1.3.0</silentsoft-core.version>
-		<silentsoft-ui.version>1.2.0</silentsoft-ui.version>
-		<silentsoft-net.version>1.4.0</silentsoft-net.version>
-		<slf4j.version>1.7.5</slf4j.version>
+		<silentsoft-core.version>1.4.0</silentsoft-core.version>
+		<silentsoft-io.version>1.3.0</silentsoft-io.version>
+		<silentsoft-ui.version>1.3.0</silentsoft-ui.version>
+		<silentsoft-net.version>1.5.0</silentsoft-net.version>
+		<logback.version>1.2.3</logback.version>
 		<junit.version>4.8.1</junit.version>
 		<testfx.version>4.0.15-alpha</testfx.version>
 		<maven-model.version>3.6.0</maven-model.version>
@@ -50,6 +51,7 @@
 		<plushaze-traynotification.tag>5393c3a54f</plushaze-traynotification.tag>
 		<javassist.version>3.26.0-GA</javassist.version>
 		<commonmark.version>0.13.1</commonmark.version>
+		<notice-file-generator.version>2.2.2</notice-file-generator.version>
 	</properties>
 
 	<repositories>
@@ -73,6 +75,7 @@
 		</resources>
 		<plugins>
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.1</version>
 				<configuration>
@@ -163,6 +166,11 @@
 		</dependency>
 		<dependency>
 			<groupId>org.silentsoft</groupId>
+			<artifactId>silentsoft-io</artifactId>
+			<version>${silentsoft-io.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.silentsoft</groupId>
 			<artifactId>silentsoft-ui</artifactId>
 			<version>${silentsoft-ui.version}</version>
 		</dependency>
@@ -172,14 +180,9 @@
 			<version>${silentsoft-net.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-log4j12</artifactId>
-			<version>${slf4j.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-			<version>${slf4j.version}</version>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<version>${logback.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
@@ -222,6 +225,12 @@
 			<groupId>com.atlassian.commonmark</groupId>
 			<artifactId>commonmark</artifactId>
 			<version>${commonmark.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.silentsoft.oss</groupId>
+			<artifactId>notice-file-generator</artifactId>
+			<version>${notice-file-generator.version}</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 

@@ -6,7 +6,7 @@
 
 	<groupId>org.silentsoft</groupId>
 	<artifactId>actlist-plugin</artifactId>
-	<version>2.1.0-SNAPSHOT</version>
+	<version>2.1.0</version>
 
 	<name>actlist-plugin</name>
 	<description>Actlist Plugin</description>

@@ -51,7 +51,7 @@
 		<plushaze-traynotification.tag>5393c3a54f</plushaze-traynotification.tag>
 		<javassist.version>3.26.0-GA</javassist.version>
 		<commonmark.version>0.13.1</commonmark.version>
-		<notice-file-generator.version>2.2.2</notice-file-generator.version>
+		<notice-file-generator.version>2.2.3</notice-file-generator.version>
 	</properties>
 
 	<repositories>
